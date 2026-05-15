@@ -11,22 +11,22 @@ final class ServiceLevelTest extends TestCase
 {
     public function testCases(): void
     {
-        $this->assertSame('standard', ServiceLevel::STANDARD->value);
-        $this->assertSame('premium', ServiceLevel::PREMIUM->value);
-        $this->assertSame('enterprise', ServiceLevel::ENTERPRISE->value);
+        static::assertSame('standard', ServiceLevel::STANDARD->value);
+        static::assertSame('premium', ServiceLevel::PREMIUM->value);
+        static::assertSame('enterprise', ServiceLevel::ENTERPRISE->value);
     }
 
     public function testGetLabel(): void
     {
-        $this->assertSame('Standard', ServiceLevel::STANDARD->getLabel());
-        $this->assertSame('Premium', ServiceLevel::PREMIUM->getLabel());
-        $this->assertSame('Enterprise', ServiceLevel::ENTERPRISE->getLabel());
+        static::assertSame('Standard', ServiceLevel::STANDARD->getLabel());
+        static::assertSame('Premium', ServiceLevel::PREMIUM->getLabel());
+        static::assertSame('Enterprise', ServiceLevel::ENTERPRISE->getLabel());
     }
 
     public function testIsPremiumOrHigher(): void
     {
-        $this->assertFalse(ServiceLevel::STANDARD->isPremiumOrHigher());
-        $this->assertTrue(ServiceLevel::PREMIUM->isPremiumOrHigher());
-        $this->assertTrue(ServiceLevel::ENTERPRISE->isPremiumOrHigher());
+        static::assertFalse(ServiceLevel::STANDARD->isPremiumOrHigher());
+        static::assertTrue(ServiceLevel::PREMIUM->isPremiumOrHigher());
+        static::assertTrue(ServiceLevel::ENTERPRISE->isPremiumOrHigher());
     }
 }

@@ -26,10 +26,10 @@ class StaffingMetricsCalculationServiceTest extends TestCase
 
         // Assert
         // Taux de staffing = (17 / 20) * 100 = 85%
-        $this->assertEquals('85.00', $fact->getStaffingRate());
+        static::assertSame('85.00', $fact->getStaffingRate());
 
         // TACE = (17 / 20) * 100 = 85%
-        $this->assertEquals('85.00', $fact->getTace());
+        static::assertSame('85.00', $fact->getTace());
     }
 
     /**
@@ -48,8 +48,8 @@ class StaffingMetricsCalculationServiceTest extends TestCase
         $fact->calculateMetrics();
 
         // Assert
-        $this->assertEquals('0.00', $fact->getStaffingRate());
-        $this->assertEquals('0.00', $fact->getTace());
+        static::assertSame('0.00', $fact->getStaffingRate());
+        static::assertSame('0.00', $fact->getTace());
     }
 
     /**
@@ -69,10 +69,10 @@ class StaffingMetricsCalculationServiceTest extends TestCase
 
         // Assert
         // TACE = (18 / 20) * 100 = 90%
-        $this->assertEquals('90.00', $fact->getTace());
+        static::assertSame('90.00', $fact->getTace());
 
         // Staffing Rate = (18 / 22) * 100 = 81.818... arrondi à 81.81%
-        $this->assertEquals('81.81', $fact->getStaffingRate());
+        static::assertSame('81.81', $fact->getStaffingRate());
     }
 
     /**
@@ -91,9 +91,9 @@ class StaffingMetricsCalculationServiceTest extends TestCase
 
         // Assert
         // Staffing Rate = (19.5 / 20) * 100 = 97.50%
-        $this->assertEquals('97.50', $fact->getStaffingRate());
+        static::assertSame('97.50', $fact->getStaffingRate());
 
         // TACE = (19.5 / 20) * 100 = 97.50%
-        $this->assertEquals('97.50', $fact->getTace());
+        static::assertSame('97.50', $fact->getTace());
     }
 }

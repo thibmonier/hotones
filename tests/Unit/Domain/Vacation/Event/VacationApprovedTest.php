@@ -18,8 +18,8 @@ final class VacationApprovedTest extends TestCase
 
         $event = new VacationApproved($vacationId, $approverId);
 
-        self::assertSame($vacationId, $event->vacationId);
-        self::assertSame(42, $event->approvedByUserId);
+        static::assertSame($vacationId, $event->vacationId);
+        static::assertSame(42, $event->approvedByUserId);
     }
 
     public function testDefaultOccurredOnSetAtConstruction(): void
@@ -30,8 +30,8 @@ final class VacationApprovedTest extends TestCase
 
         $after = new DateTimeImmutable();
 
-        self::assertGreaterThanOrEqual($before, $event->occurredOn);
-        self::assertLessThanOrEqual($after, $event->occurredOn);
+        static::assertGreaterThanOrEqual($before, $event->occurredOn);
+        static::assertLessThanOrEqual($after, $event->occurredOn);
     }
 
     public function testExplicitOccurredOn(): void
@@ -40,6 +40,6 @@ final class VacationApprovedTest extends TestCase
 
         $event = new VacationApproved(VacationId::generate(), 5, $occurredOn);
 
-        self::assertSame($occurredOn, $event->occurredOn);
+        static::assertSame($occurredOn, $event->occurredOn);
     }
 }

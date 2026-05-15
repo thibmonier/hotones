@@ -34,7 +34,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
         $repo = $this->makeRepo(flatRepo: $flatRepo);
         $ddd = $repo->findById(ProjectId::fromLegacyInt(42));
 
-        $this->assertSame(42, $ddd->getId()->toLegacyInt());
+        static::assertSame(42, $ddd->getId()->toLegacyInt());
     }
 
     public function testFindByIdThrowsWhenNotFound(): void
@@ -51,13 +51,13 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
     public function testFindByIdOrNullReturnsNullForUuid(): void
     {
         $repo = $this->makeRepo();
-        $this->assertNull($repo->findByIdOrNull(ProjectId::generate()));
+        static::assertNull($repo->findByIdOrNull(ProjectId::generate()));
     }
 
     public function testFindByReferenceAlwaysReturnsNullPhase2(): void
     {
         $repo = $this->makeRepo();
-        $this->assertNull($repo->findByReference('REF-001'));
+        static::assertNull($repo->findByReference('REF-001'));
     }
 
     public function testFindByClientIdLegacy(): void
@@ -70,13 +70,13 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
         $repo = $this->makeRepo(flatRepo: $flatRepo);
         $projects = $repo->findByClientId(ClientId::fromLegacyInt(7));
 
-        $this->assertCount(2, $projects);
+        static::assertCount(2, $projects);
     }
 
     public function testFindByClientIdReturnsEmptyForUuid(): void
     {
         $repo = $this->makeRepo();
-        $this->assertSame([], $repo->findByClientId(ClientId::generate()));
+        static::assertSame([], $repo->findByClientId(ClientId::generate()));
     }
 
     public function testFindByStatus(): void
@@ -88,16 +88,16 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertCount(1, $repo->findByStatus(ProjectStatus::ACTIVE));
-        $this->assertCount(1, $repo->findByStatus(ProjectStatus::COMPLETED));
-        $this->assertCount(1, $repo->findByStatus(ProjectStatus::CANCELLED));
+        static::assertCount(1, $repo->findByStatus(ProjectStatus::ACTIVE));
+        static::assertCount(1, $repo->findByStatus(ProjectStatus::COMPLETED));
+        static::assertCount(1, $repo->findByStatus(ProjectStatus::CANCELLED));
     }
 
     public function testFindByTypeAlwaysReturnsEmptyPhase2(): void
     {
         $repo = $this->makeRepo();
-        $this->assertSame([], $repo->findByType(ProjectType::FORFAIT));
-        $this->assertSame([], $repo->findByType(ProjectType::REGIE));
+        static::assertSame([], $repo->findByType(ProjectType::FORFAIT));
+        static::assertSame([], $repo->findByType(ProjectType::REGIE));
     }
 
     public function testFindActiveDelegatesToFindByStatus(): void
@@ -109,7 +109,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertCount(1, $repo->findActive());
+        static::assertCount(1, $repo->findActive());
     }
 
     public function testFindInternalReturnsProjectsWithoutClient(): void
@@ -121,7 +121,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertCount(1, $repo->findInternal());
+        static::assertCount(1, $repo->findInternal());
     }
 
     public function testFindAll(): void
@@ -133,7 +133,7 @@ final class DoctrineDddProjectRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertCount(2, $repo->findAll());
+        static::assertCount(2, $repo->findAll());
     }
 
     public function testSaveExistingLegacyProject(): void

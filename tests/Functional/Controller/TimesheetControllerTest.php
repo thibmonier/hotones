@@ -72,7 +72,7 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($response['success']);
+        static::assertTrue($response['success']);
     }
 
     public function testSaveTimesheetRejectsInvalidHours(): void
@@ -93,8 +93,8 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(400);
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $response);
-        $this->assertStringContainsString('minimale', $response['error']);
+        static::assertArrayHasKey('error', $response);
+        static::assertStringContainsString('minimale', $response['error']);
     }
 
     public function testSaveTimesheetWithNonExistentProject(): void
@@ -106,15 +106,15 @@ class TimesheetControllerTest extends WebTestCase
 
         $client->loginUser($user);
         $client->request('POST', '/timesheet/save', [
-            'project_id' => 99999,
+            'project_id' => 99_999,
             'date' => '2025-01-15',
             'hours' => '8.0',
         ]);
 
         $this->assertResponseStatusCodeSame(400);
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $response);
-        $this->assertStringContainsString('Projet non trouvé', $response['error']);
+        static::assertArrayHasKey('error', $response);
+        static::assertStringContainsString('Projet non trouvé', $response['error']);
     }
 
     public function testCalendarView(): void
@@ -186,7 +186,7 @@ class TimesheetControllerTest extends WebTestCase
 
     public function testDuplicateWeek(): void
     {
-        $this->markTestSkipped('ISO week date matching issue - needs investigation with actual database queries');
+        static::markTestSkipped('ISO week date matching issue - needs investigation with actual database queries');
     }
 
     public function testDuplicateWeekWithSameWeek(): void
@@ -204,7 +204,7 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(400);
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertStringContainsString('différentes', $response['error']);
+        static::assertStringContainsString('différentes', $response['error']);
     }
 
     public function testStartTimer(): void
@@ -227,9 +227,9 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($response['success']);
-        $this->assertArrayHasKey('timer', $response);
-        $this->assertEquals($project->getId(), $response['timer']['project']['id']);
+        static::assertTrue($response['success']);
+        static::assertArrayHasKey('timer', $response);
+        static::assertEquals($project->getId(), $response['timer']['project']['id']);
     }
 
     public function testStopTimer(): void
@@ -257,8 +257,8 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($response['success']);
-        $this->assertArrayHasKey('hours_logged', $response);
+        static::assertTrue($response['success']);
+        static::assertArrayHasKey('hours_logged', $response);
     }
 
     public function testStopTimerWithoutActiveTimer(): void
@@ -273,7 +273,7 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(400);
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertStringContainsString('Aucun compteur actif', $response['error']);
+        static::assertStringContainsString('Aucun compteur actif', $response['error']);
     }
 
     public function testTimerOptions(): void
@@ -302,8 +302,8 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('projects', $response);
-        $this->assertCount(1, $response['projects']);
+        static::assertArrayHasKey('projects', $response);
+        static::assertCount(1, $response['projects']);
     }
 
     public function testActiveTimer(): void
@@ -318,8 +318,8 @@ class TimesheetControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('timer', $response);
-        $this->assertNull($response['timer']); // No active timer
+        static::assertArrayHasKey('timer', $response);
+        static::assertNull($response['timer']); // No active timer
     }
 
     public function testExportRequiresContributor(): void

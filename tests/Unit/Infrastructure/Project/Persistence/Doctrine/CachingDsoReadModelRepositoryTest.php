@@ -17,7 +17,7 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
 {
     public function testDelegatesToInnerOnCacheMiss(): void
     {
-        $inner = $this->createInnerSpy([$this->makeRecord(5, 10000)]);
+        $inner = $this->createInnerSpy([$this->makeRecord(5, 10_000)]);
         $cache = new ArrayAdapter();
         $repository = new CachingDsoReadModelRepository(
             inner: $inner,
@@ -27,13 +27,13 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
 
         $records = $repository->findPaidInRollingWindow(30, new DateTimeImmutable('2026-05-12'));
 
-        self::assertCount(1, $records);
-        self::assertSame(1, $inner->callCount);
+        static::assertCount(1, $records);
+        static::assertSame(1, $inner->callCount);
     }
 
     public function testReturnsCachedResultOnHit(): void
     {
-        $inner = $this->createInnerSpy([$this->makeRecord(5, 10000)]);
+        $inner = $this->createInnerSpy([$this->makeRecord(5, 10_000)]);
         $cache = new ArrayAdapter();
         $repository = new CachingDsoReadModelRepository(
             inner: $inner,
@@ -46,12 +46,12 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
         $repository->findPaidInRollingWindow(30, $now);
         $repository->findPaidInRollingWindow(30, $now);
 
-        self::assertSame(1, $inner->callCount, 'inner should be called once thanks to cache');
+        static::assertSame(1, $inner->callCount, 'inner should be called once thanks to cache');
     }
 
     public function testCacheKeyDifferentiatesWindowDays(): void
     {
-        $inner = $this->createInnerSpy([$this->makeRecord(5, 10000)]);
+        $inner = $this->createInnerSpy([$this->makeRecord(5, 10_000)]);
         $cache = new ArrayAdapter();
         $repository = new CachingDsoReadModelRepository(
             inner: $inner,
@@ -64,12 +64,12 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
         $repository->findPaidInRollingWindow(90, $now);
         $repository->findPaidInRollingWindow(365, $now);
 
-        self::assertSame(3, $inner->callCount, 'each window size triggers its own cache entry');
+        static::assertSame(3, $inner->callCount, 'each window size triggers its own cache entry');
     }
 
     public function testCacheKeyDifferentiatesCompany(): void
     {
-        $inner = $this->createInnerSpy([$this->makeRecord(5, 10000)]);
+        $inner = $this->createInnerSpy([$this->makeRecord(5, 10_000)]);
         $cache = new ArrayAdapter();
 
         $repositoryA = new CachingDsoReadModelRepository($inner, $cache, $this->companyContextWithId(1));
@@ -79,12 +79,12 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
         $repositoryA->findPaidInRollingWindow(30, $now);
         $repositoryB->findPaidInRollingWindow(30, $now);
 
-        self::assertSame(2, $inner->callCount, 'each tenant has its own cache entry (multi-tenant isolation)');
+        static::assertSame(2, $inner->callCount, 'each tenant has its own cache entry (multi-tenant isolation)');
     }
 
     public function testCacheKeyDifferentiatesDay(): void
     {
-        $inner = $this->createInnerSpy([$this->makeRecord(5, 10000)]);
+        $inner = $this->createInnerSpy([$this->makeRecord(5, 10_000)]);
         $cache = new ArrayAdapter();
         $repository = new CachingDsoReadModelRepository(
             inner: $inner,
@@ -95,7 +95,7 @@ final class CachingDsoReadModelRepositoryTest extends TestCase
         $repository->findPaidInRollingWindow(30, new DateTimeImmutable('2026-05-12'));
         $repository->findPaidInRollingWindow(30, new DateTimeImmutable('2026-05-13'));
 
-        self::assertSame(2, $inner->callCount, 'rolling window rebuilds at day boundary');
+        static::assertSame(2, $inner->callCount, 'rolling window rebuilds at day boundary');
     }
 
     /**

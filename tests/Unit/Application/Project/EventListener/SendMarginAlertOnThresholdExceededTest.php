@@ -21,8 +21,8 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::stringContains('Marge projet sous seuil'),
-                self::stringContains('Project Critical'),
+                static::stringContains('Marge projet sous seuil'),
+                static::stringContains('Project Critical'),
                 AlertSeverity::CRITICAL,
             )
             ->willReturn(true);
@@ -35,8 +35,8 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
         $event = MarginThresholdExceededEvent::create(
             projectId: ProjectId::generate(),
             projectName: 'Project Critical',
-            costTotal: Money::fromAmount(10000.00),
-            invoicedPaidTotal: Money::fromAmount(10300.00),
+            costTotal: Money::fromAmount(10_000.00),
+            invoicedPaidTotal: Money::fromAmount(10_300.00),
             marginPercent: 3.0,
             thresholdPercent: 10.0,
         );
@@ -50,8 +50,8 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::anything(),
-                self::anything(),
+                static::anything(),
+                static::anything(),
                 AlertSeverity::WARNING,
             )
             ->willReturn(true);
@@ -63,8 +63,8 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
         $event = MarginThresholdExceededEvent::create(
             projectId: ProjectId::generate(),
             projectName: 'Project Warning',
-            costTotal: Money::fromAmount(10000.00),
-            invoicedPaidTotal: Money::fromAmount(10800.00),
+            costTotal: Money::fromAmount(10_000.00),
+            invoicedPaidTotal: Money::fromAmount(10_800.00),
             marginPercent: 8.0,
             thresholdPercent: 10.0,
         );
@@ -81,8 +81,8 @@ final class SendMarginAlertOnThresholdExceededTest extends TestCase
         $logger->expects(self::once())
             ->method('info')
             ->with(
-                self::stringContains('MarginThresholdExceeded'),
-                self::callback(fn (array $context): bool => ($context['slack_sent'] ?? null) === false),
+                static::stringContains('MarginThresholdExceeded'),
+                static::callback(static fn (array $context): bool => ($context['slack_sent'] ?? null) === false),
             );
 
         $listener = new SendMarginAlertOnThresholdExceeded($slack, $logger);

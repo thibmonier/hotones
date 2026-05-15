@@ -32,7 +32,7 @@ final class ListActiveContributorsHandlerTest extends TestCase
 
         $result = $handler(new ListActiveContributorsQuery());
 
-        self::assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     public function testMapsAggregatesToDtos(): void
@@ -59,19 +59,19 @@ final class ListActiveContributorsHandlerTest extends TestCase
 
         $result = $handler(new ListActiveContributorsQuery());
 
-        self::assertCount(2, $result);
-        self::assertSame(7, $result[0]->id);
-        self::assertSame('Alice', $result[0]->firstName);
-        self::assertSame('Alice Wonder', $result[0]->fullName);
-        self::assertSame('alice@example.org', $result[0]->email);
-        self::assertSame('active', $result[0]->status);
-        self::assertSame(1, $result[0]->companyId);
-        self::assertNull($result[0]->managerId);
+        static::assertCount(2, $result);
+        static::assertSame(7, $result[0]->id);
+        static::assertSame('Alice', $result[0]->firstName);
+        static::assertSame('Alice Wonder', $result[0]->fullName);
+        static::assertSame('alice@example.org', $result[0]->email);
+        static::assertSame('active', $result[0]->status);
+        static::assertSame(1, $result[0]->companyId);
+        static::assertNull($result[0]->managerId);
 
-        self::assertSame(11, $result[1]->id);
-        self::assertSame('Bob Builder', $result[1]->fullName);
-        self::assertNull($result[1]->email);
-        self::assertSame('2025-01-15T10:00:00+00:00', $result[1]->createdAt);
+        static::assertSame(11, $result[1]->id);
+        static::assertSame('Bob Builder', $result[1]->fullName);
+        static::assertNull($result[1]->email);
+        static::assertSame('2025-01-15T10:00:00+00:00', $result[1]->createdAt);
     }
 
     public function testDtoToArrayShape(): void
@@ -96,7 +96,7 @@ final class ListActiveContributorsHandlerTest extends TestCase
         $result = $handler(new ListActiveContributorsQuery());
         $array = $result[0]->toArray();
 
-        self::assertSame([
+        static::assertSame([
             'id' => 42,
             'companyId' => 2,
             'firstName' => 'Carol',

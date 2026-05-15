@@ -11,87 +11,87 @@ final class InvoiceStatusTest extends TestCase
 {
     public function testCases(): void
     {
-        $this->assertSame('brouillon', InvoiceStatus::DRAFT->value);
-        $this->assertSame('envoyee', InvoiceStatus::SENT->value);
-        $this->assertSame('payee', InvoiceStatus::PAID->value);
-        $this->assertSame('en_retard', InvoiceStatus::OVERDUE->value);
-        $this->assertSame('annulee', InvoiceStatus::CANCELLED->value);
+        static::assertSame('brouillon', InvoiceStatus::DRAFT->value);
+        static::assertSame('envoyee', InvoiceStatus::SENT->value);
+        static::assertSame('payee', InvoiceStatus::PAID->value);
+        static::assertSame('en_retard', InvoiceStatus::OVERDUE->value);
+        static::assertSame('annulee', InvoiceStatus::CANCELLED->value);
     }
 
     public function testIsEditableOnlyForDraft(): void
     {
-        $this->assertTrue(InvoiceStatus::DRAFT->isEditable());
-        $this->assertFalse(InvoiceStatus::SENT->isEditable());
-        $this->assertFalse(InvoiceStatus::PAID->isEditable());
-        $this->assertFalse(InvoiceStatus::OVERDUE->isEditable());
-        $this->assertFalse(InvoiceStatus::CANCELLED->isEditable());
+        static::assertTrue(InvoiceStatus::DRAFT->isEditable());
+        static::assertFalse(InvoiceStatus::SENT->isEditable());
+        static::assertFalse(InvoiceStatus::PAID->isEditable());
+        static::assertFalse(InvoiceStatus::OVERDUE->isEditable());
+        static::assertFalse(InvoiceStatus::CANCELLED->isEditable());
     }
 
     public function testIsFinalized(): void
     {
-        $this->assertFalse(InvoiceStatus::DRAFT->isFinalized());
-        $this->assertTrue(InvoiceStatus::SENT->isFinalized());
-        $this->assertTrue(InvoiceStatus::PAID->isFinalized());
-        $this->assertTrue(InvoiceStatus::OVERDUE->isFinalized());
-        $this->assertFalse(InvoiceStatus::CANCELLED->isFinalized());
+        static::assertFalse(InvoiceStatus::DRAFT->isFinalized());
+        static::assertTrue(InvoiceStatus::SENT->isFinalized());
+        static::assertTrue(InvoiceStatus::PAID->isFinalized());
+        static::assertTrue(InvoiceStatus::OVERDUE->isFinalized());
+        static::assertFalse(InvoiceStatus::CANCELLED->isFinalized());
     }
 
     public function testGetLabel(): void
     {
-        $this->assertSame('Brouillon', InvoiceStatus::DRAFT->getLabel());
-        $this->assertSame('Payée', InvoiceStatus::PAID->getLabel());
-        $this->assertSame('Envoyée', InvoiceStatus::SENT->getLabel());
-        $this->assertSame('En retard', InvoiceStatus::OVERDUE->getLabel());
-        $this->assertSame('Annulée', InvoiceStatus::CANCELLED->getLabel());
+        static::assertSame('Brouillon', InvoiceStatus::DRAFT->getLabel());
+        static::assertSame('Payée', InvoiceStatus::PAID->getLabel());
+        static::assertSame('Envoyée', InvoiceStatus::SENT->getLabel());
+        static::assertSame('En retard', InvoiceStatus::OVERDUE->getLabel());
+        static::assertSame('Annulée', InvoiceStatus::CANCELLED->getLabel());
     }
 
     public function testIsClosed(): void
     {
-        $this->assertTrue(InvoiceStatus::PAID->isClosed());
-        $this->assertTrue(InvoiceStatus::CANCELLED->isClosed());
-        $this->assertFalse(InvoiceStatus::DRAFT->isClosed());
-        $this->assertFalse(InvoiceStatus::SENT->isClosed());
-        $this->assertFalse(InvoiceStatus::OVERDUE->isClosed());
+        static::assertTrue(InvoiceStatus::PAID->isClosed());
+        static::assertTrue(InvoiceStatus::CANCELLED->isClosed());
+        static::assertFalse(InvoiceStatus::DRAFT->isClosed());
+        static::assertFalse(InvoiceStatus::SENT->isClosed());
+        static::assertFalse(InvoiceStatus::OVERDUE->isClosed());
     }
 
     public function testIsAwaitingPayment(): void
     {
-        $this->assertTrue(InvoiceStatus::SENT->isAwaitingPayment());
-        $this->assertTrue(InvoiceStatus::OVERDUE->isAwaitingPayment());
-        $this->assertFalse(InvoiceStatus::DRAFT->isAwaitingPayment());
-        $this->assertFalse(InvoiceStatus::PAID->isAwaitingPayment());
-        $this->assertFalse(InvoiceStatus::CANCELLED->isAwaitingPayment());
+        static::assertTrue(InvoiceStatus::SENT->isAwaitingPayment());
+        static::assertTrue(InvoiceStatus::OVERDUE->isAwaitingPayment());
+        static::assertFalse(InvoiceStatus::DRAFT->isAwaitingPayment());
+        static::assertFalse(InvoiceStatus::PAID->isAwaitingPayment());
+        static::assertFalse(InvoiceStatus::CANCELLED->isAwaitingPayment());
     }
 
     public function testCanTransitionFromDraft(): void
     {
-        $this->assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::SENT));
-        $this->assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::CANCELLED));
-        $this->assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::PAID));
-        $this->assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::OVERDUE));
+        static::assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::SENT));
+        static::assertTrue(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::CANCELLED));
+        static::assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::PAID));
+        static::assertFalse(InvoiceStatus::DRAFT->canTransitionTo(InvoiceStatus::OVERDUE));
     }
 
     public function testCanTransitionFromSent(): void
     {
-        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::PAID));
-        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::OVERDUE));
-        $this->assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::CANCELLED));
-        $this->assertFalse(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::DRAFT));
+        static::assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::PAID));
+        static::assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::OVERDUE));
+        static::assertTrue(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::CANCELLED));
+        static::assertFalse(InvoiceStatus::SENT->canTransitionTo(InvoiceStatus::DRAFT));
     }
 
     public function testCanTransitionFromOverdue(): void
     {
-        $this->assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::PAID));
-        $this->assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::CANCELLED));
-        $this->assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::DRAFT));
-        $this->assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::SENT));
+        static::assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::PAID));
+        static::assertTrue(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::CANCELLED));
+        static::assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::DRAFT));
+        static::assertFalse(InvoiceStatus::OVERDUE->canTransitionTo(InvoiceStatus::SENT));
     }
 
     public function testTerminalStatesCannotTransition(): void
     {
         foreach (InvoiceStatus::cases() as $target) {
-            $this->assertFalse(InvoiceStatus::PAID->canTransitionTo($target));
-            $this->assertFalse(InvoiceStatus::CANCELLED->canTransitionTo($target));
+            static::assertFalse(InvoiceStatus::PAID->canTransitionTo($target));
+            static::assertFalse(InvoiceStatus::CANCELLED->canTransitionTo($target));
         }
     }
 }

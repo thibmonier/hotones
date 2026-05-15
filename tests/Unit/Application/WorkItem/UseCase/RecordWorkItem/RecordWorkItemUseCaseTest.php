@@ -45,8 +45,8 @@ final class RecordWorkItemUseCaseTest extends TestCase
 
         $useCase->execute($command);
 
-        self::assertNotNull($saved);
-        self::assertSame(WorkItemStatus::DRAFT, $saved->getStatus());
+        static::assertNotNull($saved);
+        static::assertSame(WorkItemStatus::DRAFT, $saved->getStatus());
     }
 
     public function testCreatesWorkItemValidatedWhenAuthorIsManager(): void
@@ -70,8 +70,8 @@ final class RecordWorkItemUseCaseTest extends TestCase
 
         $useCase->execute($command);
 
-        self::assertNotNull($saved);
-        self::assertSame(WorkItemStatus::VALIDATED, $saved->getStatus());
+        static::assertNotNull($saved);
+        static::assertSame(WorkItemStatus::VALIDATED, $saved->getStatus());
     }
 
     public function testThrowsDailyHoursWarningExceptionWhenExceededWithoutOverride(): void
@@ -108,8 +108,8 @@ final class RecordWorkItemUseCaseTest extends TestCase
         $logger->expects(self::once())
             ->method('warning')
             ->with(
-                self::stringContains('override accepted'),
-                self::callback(fn (array $context): bool => ($context['daily_total_after_override'] ?? null) === 8.0
+                static::stringContains('override accepted'),
+                static::callback(static fn (array $context): bool => ($context['daily_total_after_override'] ?? null) === 8.0
                     && ($context['daily_max_hours'] ?? null) === 7.0),
             );
 
@@ -132,7 +132,7 @@ final class RecordWorkItemUseCaseTest extends TestCase
 
         $useCase->execute($command);
 
-        self::assertNotNull($saved);
+        static::assertNotNull($saved);
     }
 
     public function testDispatchesDomainEventsViaMessageBus(): void

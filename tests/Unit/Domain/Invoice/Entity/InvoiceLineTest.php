@@ -16,8 +16,8 @@ final class InvoiceLineTest extends TestCase
     {
         $line = $this->makeLine();
 
-        self::assertSame('Consultation', $line->getDescription());
-        self::assertSame(10.0, $line->getQuantity());
+        static::assertSame('Consultation', $line->getDescription());
+        static::assertSame(10.0, $line->getQuantity());
     }
 
     public function testGetTotalHtIsQuantityTimesUnitPrice(): void
@@ -32,7 +32,7 @@ final class InvoiceLineTest extends TestCase
         );
 
         // 5 × 800 = 4000 €
-        self::assertSame(4000.0, $line->getTotalHt()->getAmount());
+        static::assertSame(4000.0, $line->getTotalHt()->getAmount());
     }
 
     public function testGetTaxAmountAppliesTaxRate(): void
@@ -47,7 +47,7 @@ final class InvoiceLineTest extends TestCase
         );
 
         // 100 × 20 % = 20 €
-        self::assertSame(20.0, $line->getTaxAmount()->getAmount());
+        static::assertSame(20.0, $line->getTaxAmount()->getAmount());
     }
 
     public function testGetTotalTtcIsHtPlusTax(): void
@@ -62,7 +62,7 @@ final class InvoiceLineTest extends TestCase
         );
 
         // 100 + 20 = 120 €
-        self::assertSame(120.0, $line->getTotalTtc()->getAmount());
+        static::assertSame(120.0, $line->getTotalTtc()->getAmount());
     }
 
     public function testUpdateChangesFields(): void
@@ -71,8 +71,8 @@ final class InvoiceLineTest extends TestCase
 
         $line->update('New description', 20.0, Money::fromAmount(50.00), TaxRate::standardFrance());
 
-        self::assertSame('New description', $line->getDescription());
-        self::assertSame(20.0, $line->getQuantity());
+        static::assertSame('New description', $line->getDescription());
+        static::assertSame(20.0, $line->getQuantity());
     }
 
     public function testUpdatePositionChangesPosition(): void
@@ -81,7 +81,7 @@ final class InvoiceLineTest extends TestCase
 
         $line->updatePosition(5);
 
-        self::assertSame(5, $line->getPosition());
+        static::assertSame(5, $line->getPosition());
     }
 
     public function testSetUnitAcceptsNullable(): void
@@ -89,10 +89,10 @@ final class InvoiceLineTest extends TestCase
         $line = $this->makeLine();
 
         $line->setUnit('hours');
-        self::assertSame('hours', $line->getUnit());
+        static::assertSame('hours', $line->getUnit());
 
         $line->setUnit(null);
-        self::assertNull($line->getUnit());
+        static::assertNull($line->getUnit());
     }
 
     private function makeLine(): InvoiceLine

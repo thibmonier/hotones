@@ -34,7 +34,7 @@ final class HubSpotClientTest extends TestCase
         ]);
         $client = new HubSpotClient($http, new NullLogger());
 
-        self::assertTrue($client->testConnection($this->buildSettings()));
+        static::assertTrue($client->testConnection($this->buildSettings()));
     }
 
     public function testConnectionReturnsFalseWhenContactsEndpointIs401(): void
@@ -44,7 +44,7 @@ final class HubSpotClientTest extends TestCase
         ]);
         $client = new HubSpotClient($http, new NullLogger());
 
-        self::assertFalse($client->testConnection($this->buildSettings()));
+        static::assertFalse($client->testConnection($this->buildSettings()));
     }
 
     public function testGetAccountInfoReturnsNullOnException(): void
@@ -54,7 +54,7 @@ final class HubSpotClientTest extends TestCase
         ]);
         $client = new HubSpotClient($http, new NullLogger());
 
-        self::assertNull($client->getAccountInfo($this->buildSettings()));
+        static::assertNull($client->getAccountInfo($this->buildSettings()));
     }
 
     public function testGetDealPipelinesParsesResults(): void
@@ -74,8 +74,8 @@ final class HubSpotClientTest extends TestCase
         $client = new HubSpotClient($http, new NullLogger());
         $pipelines = $client->getDealPipelines($this->buildSettings());
 
-        self::assertCount(2, $pipelines);
-        self::assertSame('default', $pipelines[0]['id']);
+        static::assertCount(2, $pipelines);
+        static::assertSame('default', $pipelines[0]['id']);
     }
 
     public function testGetDealsAggregatesPagedResultsViaAfter(): void
@@ -101,9 +101,9 @@ final class HubSpotClientTest extends TestCase
 
         $deals = $client->getDeals($this->buildSettings());
 
-        self::assertCount(3, $deals);
-        self::assertSame(['100', '101', '102'], array_column($deals, 'id'));
-        self::assertSame(2, $http->getRequestsCount());
+        static::assertCount(3, $deals);
+        static::assertSame(['100', '101', '102'], array_column($deals, 'id'));
+        static::assertSame(2, $http->getRequestsCount());
     }
 
     public function testGetDealsExcludesClosedStages(): void
@@ -122,8 +122,8 @@ final class HubSpotClientTest extends TestCase
 
         $deals = $client->getDeals($this->buildSettings(), ['closedwon', 'closedlost']);
 
-        self::assertCount(2, $deals);
-        self::assertSame(['1', '4'], array_column($deals, 'id'));
+        static::assertCount(2, $deals);
+        static::assertSame(['1', '4'], array_column($deals, 'id'));
     }
 
     public function testGetDealsFiltersByPipelineWhenSpecified(): void
@@ -140,8 +140,8 @@ final class HubSpotClientTest extends TestCase
 
         $deals = $client->getDeals($this->buildSettings(), [], ['enterprise']);
 
-        self::assertCount(1, $deals);
-        self::assertSame('2', $deals[0]['id']);
+        static::assertCount(1, $deals);
+        static::assertSame('2', $deals[0]['id']);
     }
 
     public function testGetDealReturnsNullOnNotFound(): void
@@ -151,7 +151,7 @@ final class HubSpotClientTest extends TestCase
         ]);
         $client = new HubSpotClient($http, new NullLogger());
 
-        self::assertNull($client->getDeal($this->buildSettings(), 'unknown-id'));
+        static::assertNull($client->getDeal($this->buildSettings(), 'unknown-id'));
     }
 
     public function testGetDealReturnsBodyOnSuccess(): void
@@ -162,14 +162,14 @@ final class HubSpotClientTest extends TestCase
 
         $deal = $client->getDeal($this->buildSettings(), '42');
 
-        self::assertSame('42', $deal['id']);
-        self::assertSame('Big Deal', $deal['properties']['dealname']);
+        static::assertSame('42', $deal['id']);
+        static::assertSame('Big Deal', $deal['properties']['dealname']);
     }
 
     public function testRequestIncludesBearerAuthHeader(): void
     {
         $captured = null;
-        $http = new MockHttpClient(function (string $method, string $url, array $options) use (&$captured) {
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) use (&$captured) {
             $captured = $options['headers'] ?? [];
 
             return new MockResponse('{"results":[]}', ['http_code' => 200]);
@@ -178,9 +178,9 @@ final class HubSpotClientTest extends TestCase
         $client = new HubSpotClient($http, new NullLogger());
         $client->testConnection($this->buildSettings());
 
-        self::assertNotNull($captured);
+        static::assertNotNull($captured);
         // MockHttpClient flattens headers as ["Header: value"] strings.
-        self::assertTrue(
+        static::assertTrue(
             $this->headersContainAuthorization($captured),
             'Expected an Authorization Bearer header on the outgoing request',
         );

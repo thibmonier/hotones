@@ -13,9 +13,9 @@ final class OrderIdLegacyTest extends TestCase
     public function testFromLegacyIntWrapsValue(): void
     {
         $id = OrderId::fromLegacyInt(42);
-        $this->assertSame('legacy:42', $id->getValue());
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testFromLegacyIntRejectsZero(): void
@@ -26,7 +26,7 @@ final class OrderIdLegacyTest extends TestCase
 
     public function testIsLegacyFalseForUuid(): void
     {
-        $this->assertFalse(OrderId::generate()->isLegacy());
+        static::assertFalse(OrderId::generate()->isLegacy());
     }
 
     public function testToLegacyIntRejectsUuid(): void
@@ -38,8 +38,8 @@ final class OrderIdLegacyTest extends TestCase
     public function testFromStringAcceptsLegacy(): void
     {
         $id = OrderId::fromString('legacy:99');
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(99, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(99, $id->toLegacyInt());
     }
 
     public function testFromStringRejectsArbitrary(): void

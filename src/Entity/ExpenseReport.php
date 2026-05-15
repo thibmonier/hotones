@@ -253,7 +253,7 @@ class ExpenseReport implements CompanyOwnedInterface
      */
     private function calculateAmountTTC(): void
     {
-        if (isset($this->amountHT) && isset($this->vatRate)) {
+        if (isset($this->amountHT, $this->vatRate)) {
             $vatMultiplier = bcadd('1', bcdiv($this->vatRate, '100', 4), 4);
             $this->amountTTC = bcmul($this->amountHT, $vatMultiplier, 2);
         }

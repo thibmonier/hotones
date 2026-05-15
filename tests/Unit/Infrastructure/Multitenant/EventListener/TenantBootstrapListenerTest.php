@@ -86,7 +86,7 @@ final class TenantBootstrapListenerTest extends TestCase
         $listener = new TenantBootstrapListener($security, $tenantContext, $em);
         $listener($this->makeEvent(HttpKernelInterface::SUB_REQUEST));
 
-        $this->assertFalse($tenantContext->hasTenant());
+        static::assertFalse($tenantContext->hasTenant());
     }
 
     public function testAnonymousUserDoesNotSetTenantOrTouchFilter(): void
@@ -102,7 +102,7 @@ final class TenantBootstrapListenerTest extends TestCase
         $listener = new TenantBootstrapListener($security, $tenantContext, $em);
         $listener($this->makeEvent());
 
-        $this->assertFalse($tenantContext->hasTenant());
+        static::assertFalse($tenantContext->hasTenant());
     }
 
     public function testTransientCompanyWithoutIdIsIgnored(): void
@@ -124,7 +124,7 @@ final class TenantBootstrapListenerTest extends TestCase
         $listener = new TenantBootstrapListener($security, $tenantContext, $em);
         $listener($this->makeEvent());
 
-        $this->assertFalse($tenantContext->hasTenant());
+        static::assertFalse($tenantContext->hasTenant());
     }
 
     public function testAuthenticatedUserSetsTenantAndEnablesFilter(): void
@@ -144,8 +144,8 @@ final class TenantBootstrapListenerTest extends TestCase
         $listener = new TenantBootstrapListener($security, $tenantContext, $em);
         $listener($this->makeEvent());
 
-        $this->assertTrue($tenantContext->hasTenant());
-        $this->assertSame(42, $tenantContext->getCurrentTenant()->value);
+        static::assertTrue($tenantContext->hasTenant());
+        static::assertSame(42, $tenantContext->getCurrentTenant()->value);
     }
 
     public function testFilterAlreadyEnabledIsNotReEnabled(): void
@@ -165,6 +165,6 @@ final class TenantBootstrapListenerTest extends TestCase
         $listener = new TenantBootstrapListener($security, $tenantContext, $em);
         $listener($this->makeEvent());
 
-        $this->assertSame(7, $tenantContext->getCurrentTenant()->value);
+        static::assertSame(7, $tenantContext->getCurrentTenant()->value);
     }
 }

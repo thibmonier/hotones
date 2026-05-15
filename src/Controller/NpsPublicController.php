@@ -8,6 +8,7 @@ use App\Entity\NpsSurvey;
 use App\Form\NpsResponseType;
 use App\Repository\NpsSurveyRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use SensitiveParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,7 @@ class NpsPublicController extends AbstractController
      * Page publique pour répondre à une enquête NPS via le token.
      */
     #[Route('/{token}', name: 'nps_public_respond', methods: ['GET', 'POST'])]
-    public function respond(string $token, Request $request): Response
+    public function respond(#[SensitiveParameter] string $token, Request $request): Response
     {
         $survey = $this->npsSurveyRepository->findByToken($token);
 

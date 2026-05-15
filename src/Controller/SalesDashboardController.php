@@ -31,8 +31,8 @@ class SalesDashboardController extends AbstractController
 
         // Période de filtrage (par défaut: année en cours)
         $year = $request->query->get('year', date('Y'));
-        $startDate = new DateTime("$year-01-01");
-        $endDate = new DateTime("$year-12-31");
+        $startDate = new DateTime("{$year}-01-01");
+        $endDate = new DateTime("{$year}-12-31");
 
         // Filtres utilisateur - gestion robuste des paramètres
         $userIdParam = $request->query->get('user_id');
@@ -50,7 +50,7 @@ class SalesDashboardController extends AbstractController
         );
 
         // KPI 1: Nombre de devis en attente de signature (avec cache)
-        $pendingCount = $cache->get($cacheKey.'_pending', function (ItemInterface $item) use (
+        $pendingCount = $cache->get($cacheKey.'_pending', static function (ItemInterface $item) use (
             $orderRepository,
             $filterUserId,
             $filterUserRole,
@@ -61,7 +61,7 @@ class SalesDashboardController extends AbstractController
         });
 
         // KPI 2: CA signé sur la période (avec cache)
-        $signedRevenue = $cache->get($cacheKey.'_signed', function (ItemInterface $item) use (
+        $signedRevenue = $cache->get($cacheKey.'_signed', static function (ItemInterface $item) use (
             $orderRepository,
             $startDate,
             $endDate,
@@ -74,7 +74,7 @@ class SalesDashboardController extends AbstractController
         });
 
         // KPI 3: Taux de conversion (avec cache)
-        $conversionRate = $cache->get($cacheKey.'_conversion', function (ItemInterface $item) use (
+        $conversionRate = $cache->get($cacheKey.'_conversion', static function (ItemInterface $item) use (
             $orderRepository,
             $startDate,
             $endDate,
@@ -87,7 +87,7 @@ class SalesDashboardController extends AbstractController
         });
 
         // KPI 4: Évolution du CA signé (mensuelle) (avec cache)
-        $revenueEvolution = $cache->get($cacheKey.'_evolution', function (ItemInterface $item) use (
+        $revenueEvolution = $cache->get($cacheKey.'_evolution', static function (ItemInterface $item) use (
             $orderRepository,
             $startDate,
             $endDate,
@@ -98,7 +98,7 @@ class SalesDashboardController extends AbstractController
         });
 
         // KPI 5: Évolution du volume de devis créés (mensuel) (avec cache)
-        $volumeEvolution = $cache->get($cacheKey.'_volume', function (ItemInterface $item) use (
+        $volumeEvolution = $cache->get($cacheKey.'_volume', static function (ItemInterface $item) use (
             $orderRepository,
             $startDate,
             $endDate,
@@ -109,7 +109,7 @@ class SalesDashboardController extends AbstractController
         });
 
         // KPI 6: Somme de CA par statut (filtrée par période) (avec cache)
-        $statsByStatus = $cache->get($cacheKey.'_stats', function (ItemInterface $item) use (
+        $statsByStatus = $cache->get($cacheKey.'_stats', static function (ItemInterface $item) use (
             $orderRepository,
             $startDate,
             $endDate,
@@ -221,7 +221,7 @@ class SalesDashboardController extends AbstractController
         $sql = "SELECT DISTINCT {$yearExtract} as year FROM orders ORDER BY year DESC";
         $result = $conn->executeQuery($sql)->fetchAllAssociative();
 
-        $years = array_map(fn ($row): int => (int) $row['year'], $result);
+        $years = array_map(static fn ($row): int => (int) $row['year'], $result);
 
         // Ajouter l'année en cours si elle n'existe pas
         $currentYear = (int) date('Y');
@@ -240,8 +240,8 @@ class SalesDashboardController extends AbstractController
 
         // Récupération des mêmes paramètres que le dashboard
         $year = $request->query->get('year', date('Y'));
-        $startDate = new DateTime("$year-01-01");
-        $endDate = new DateTime("$year-12-31");
+        $startDate = new DateTime("{$year}-01-01");
+        $endDate = new DateTime("{$year}-12-31");
 
         $userIdParam = $request->query->get('user_id');
         $filterUserId = $userIdParam !== null && $userIdParam !== '' ? (int) $userIdParam : null;

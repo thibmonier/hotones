@@ -41,7 +41,7 @@ class BillingService
         }
 
         // Tri par date croissante
-        usort($entries, fn ($a, $b): int => $a['date'] <=> $b['date']);
+        usort($entries, static fn ($a, $b): int => $a['date'] <=> $b['date']);
 
         return $entries;
     }

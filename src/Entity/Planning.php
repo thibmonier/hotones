@@ -233,7 +233,7 @@ class Planning implements CompanyOwnedInterface
     public function getUnmetMandatorySkills(): Collection
     {
         return $this->planningSkills->filter(
-            fn (PlanningSkill $ps): bool => $ps->isMandatory() && !$ps->isMetByAssignedContributor(),
+            static fn (PlanningSkill $ps): bool => $ps->isMandatory() && !$ps->isMetByAssignedContributor(),
         );
     }
 

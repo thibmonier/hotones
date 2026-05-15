@@ -41,7 +41,7 @@ final class DoctrineEmploymentPeriodAdapterTest extends KernelTestCase
     {
         $contributor = ContributorFactory::createOne();
         $contributorId = $contributor->getId();
-        self::assertNotNull($contributorId);
+        static::assertNotNull($contributorId);
 
         $snapshot = $this->adapter->findActiveSnapshotForContributor(
             ContributorId::fromLegacyInt($contributorId),
@@ -49,8 +49,8 @@ final class DoctrineEmploymentPeriodAdapterTest extends KernelTestCase
         );
 
         // ContributorFactory crée auto un EmploymentPeriod avec weeklyHours 35.0
-        self::assertNotNull($snapshot);
-        self::assertSame(35.0, $snapshot->weeklyHours->getValue());
+        static::assertNotNull($snapshot);
+        static::assertSame(35.0, $snapshot->weeklyHours->getValue());
     }
 
     public function testFindActiveSnapshotReturnsNullForUuidId(): void
@@ -62,22 +62,22 @@ final class DoctrineEmploymentPeriodAdapterTest extends KernelTestCase
             new DateTimeImmutable('today'),
         );
 
-        self::assertNull($snapshot);
+        static::assertNull($snapshot);
     }
 
     public function testDailyMaxHoursComputedFromSnapshot(): void
     {
         $contributor = ContributorFactory::createOne();
         $contributorId = $contributor->getId();
-        self::assertNotNull($contributorId);
+        static::assertNotNull($contributorId);
 
         $snapshot = $this->adapter->findActiveSnapshotForContributor(
             ContributorId::fromLegacyInt($contributorId),
             new DateTimeImmutable('today'),
         );
 
-        self::assertNotNull($snapshot);
+        static::assertNotNull($snapshot);
         // 35h × 100% / 5 = 7h
-        self::assertSame(7.0, $snapshot->dailyMaxHours()->getValue());
+        static::assertSame(7.0, $snapshot->dailyMaxHours()->getValue());
     }
 }

@@ -585,8 +585,8 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_values(array_filter(
-            array_map(fn ($r): mixed => $r['type'], $rows),
-            fn ($v): bool => $v !== null && $v !== '',
+            array_map(static fn ($r): mixed => $r['type'], $rows),
+            static fn ($v): bool => $v !== null && $v !== '',
         ));
     }
 
@@ -604,8 +604,8 @@ class ProjectRepository extends CompanyAwareRepository
             ->getArrayResult();
 
         return array_values(array_filter(
-            array_map(fn ($r): mixed => $r['status'], $rows),
-            fn ($v): bool => $v !== null && $v !== '',
+            array_map(static fn ($r): mixed => $r['status'], $rows),
+            static fn ($v): bool => $v !== null && $v !== '',
         ));
     }
 

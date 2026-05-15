@@ -84,7 +84,7 @@ class PlanningOptimizer
         }
 
         // Trier par priorité (score)
-        usort($recommendations, fn ($a, $b): int => $b['priority_score'] <=> $a['priority_score']);
+        usort($recommendations, static fn ($a, $b): int => $b['priority_score'] <=> $a['priority_score']);
 
         return [
             'recommendations' => $recommendations,
@@ -162,7 +162,7 @@ class PlanningOptimizer
 
         // Trier par priorité : projets internes d'abord (à décharger en premier),
         // puis par niveau de service client croissant, puis par heures décroissantes
-        usort($projectsWorkload, function ($a, $b) {
+        usort($projectsWorkload, static function ($a, $b) {
             $aInternal = $a['project']->isInternal;
             $bInternal = $b['project']->isInternal;
 
@@ -276,14 +276,16 @@ class PlanningOptimizer
         // Filtrer les projets où le contributeur a les compétences
         $compatibleProjects = [];
         foreach ($activeProjects as $project) {
-            if ($this->isContributorCompatibleWithProject($contributor, $project)) {
-                $compatibleProjects[] = $project;
+            if (!$this->isContributorCompatibleWithProject($contributor, $project)) {
+                continue;
             }
+
+            $compatibleProjects[] = $project;
         }
 
         if (!empty($compatibleProjects)) {
             // Prioriser les projets clients VIP/Prioritaires
-            usort($compatibleProjects, function ($a, $b) {
+            usort($compatibleProjects, static function ($a, $b) {
                 $levelPriority = ['vip' => 4, 'priority' => 3, 'standard' => 2, 'low' => 1];
                 $aPrio = $levelPriority[$a->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
                 $bPrio = $levelPriority[$b->getClient()?->getServiceLevel() ?? 'standard'] ?? 2;
@@ -342,7 +344,7 @@ class PlanningOptimizer
     private function findCompatibleContributors(Contributor $source, array $candidates): array
     {
         // Extraire les IDs des profils du contributeur source
-        $sourceProfileIds = array_map(fn ($p) => $p->getId(), $source->getProfiles()->toArray());
+        $sourceProfileIds = array_map(static fn ($p) => $p->getId(), $source->getProfiles()->toArray());
         $compatible = [];
 
         foreach ($candidates as $candidate) {
@@ -354,7 +356,7 @@ class PlanningOptimizer
             }
 
             // Vérifier les profils communs (par ID)
-            $targetProfileIds = array_map(fn ($p) => $p->getId(), $targetContributor->getProfiles()->toArray());
+            $targetProfileIds = array_map(static fn ($p) => $p->getId(), $targetContributor->getProfiles()->toArray());
             $commonProfileIds = array_intersect($sourceProfileIds, $targetProfileIds);
 
             if (count($commonProfileIds) > 0) {
@@ -363,7 +365,7 @@ class PlanningOptimizer
         }
 
         // Trier par TACE croissant (les plus sous-utilisés en premier)
-        usort($compatible, fn ($a, $b): int => $a['tace'] <=> $b['tace']);
+        usort($compatible, static fn ($a, $b): int => $a['tace'] <=> $b['tace']);
 
         return $compatible;
     }
@@ -409,15 +411,15 @@ class PlanningOptimizer
             'total_recommendations' => count($recommendations),
             'high_priority_count' => count(array_filter(
                 $recommendations,
-                fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high',
+                static fn ($r): bool => $r['severity_level'] === 'critical' || $r['severity_level'] === 'high',
             )),
             'medium_priority_count' => count(array_filter(
                 $recommendations,
-                fn ($r): bool => $r['severity_level'] === 'medium',
+                static fn ($r): bool => $r['severity_level'] === 'medium',
             )),
             'low_priority_count' => count(array_filter(
                 $recommendations,
-                fn ($r): bool => $r['severity_level'] === 'low',
+                static fn ($r): bool => $r['severity_level'] === 'low',
             )),
             'critical_workload_count' => count($analysis['critical']),
             'contributors_analyzed' => count($analysis['critical'])

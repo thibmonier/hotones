@@ -48,11 +48,11 @@ final class AuditContributorsCjmDailyHoursIntegrationTest extends KernelTestCase
 
         $exitCode = $this->commandTester->execute(['--audit-daily-hours' => true]);
 
-        self::assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        self::assertStringContainsString('Audit EmploymentPeriod', $output);
-        self::assertStringContainsString('OK', $output);
+        static::assertStringContainsString('Audit EmploymentPeriod', $output);
+        static::assertStringContainsString('OK', $output);
     }
 
     public function testReturnsSuccessWhenNoContributors(): void
@@ -60,10 +60,10 @@ final class AuditContributorsCjmDailyHoursIntegrationTest extends KernelTestCase
         // No contributors created.
         $exitCode = $this->commandTester->execute(['--audit-daily-hours' => true]);
 
-        self::assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        self::assertStringContainsString('Aucun contributeur', $output);
+        static::assertStringContainsString('Aucun contributeur', $output);
     }
 
     public function testCjmAuditWithoutDailyHoursFlagRunsLegacyAudit(): void
@@ -76,9 +76,9 @@ final class AuditContributorsCjmDailyHoursIntegrationTest extends KernelTestCase
         // SUCCESS (CJM résolu via EmploymentPeriod automatique factory) OR
         // FAILURE si Risk Q3 détecté. Both acceptable — only verify command
         // ran without crash.
-        self::assertContains($exitCode, [Command::SUCCESS, Command::FAILURE]);
+        static::assertContains($exitCode, [Command::SUCCESS, Command::FAILURE]);
 
         $output = $this->commandTester->getDisplay();
-        self::assertStringContainsString('Audit Contributors', $output);
+        static::assertStringContainsString('Audit Contributors', $output);
     }
 }

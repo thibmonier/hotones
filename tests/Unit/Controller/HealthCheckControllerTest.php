@@ -61,15 +61,15 @@ final class HealthCheckControllerTest extends TestCase
 
         $response = $controller->check();
 
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
+        static::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
 
         $payload = $this->decode($response);
-        self::assertSame('unhealthy', $payload['status']);
-        self::assertSame('unhealthy', $payload['checks']['database']['status']);
-        self::assertStringContainsString('connection refused', $payload['checks']['database']['message']);
+        static::assertSame('unhealthy', $payload['status']);
+        static::assertSame('unhealthy', $payload['checks']['database']['status']);
+        static::assertStringContainsString('connection refused', $payload['checks']['database']['message']);
         // Cache + filesystem should still be reported, allowing operators to triage.
-        self::assertArrayHasKey('cache', $payload['checks']);
-        self::assertArrayHasKey('filesystem', $payload['checks']);
+        static::assertArrayHasKey('cache', $payload['checks']);
+        static::assertArrayHasKey('filesystem', $payload['checks']);
     }
 
     public function testCheckReturnsServiceUnavailableWhenCacheFails(): void
@@ -82,13 +82,13 @@ final class HealthCheckControllerTest extends TestCase
 
         $response = $controller->check();
 
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
+        static::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
 
         $payload = $this->decode($response);
-        self::assertSame('unhealthy', $payload['status']);
-        self::assertSame('unhealthy', $payload['checks']['cache']['status']);
-        self::assertSame('healthy', $payload['checks']['database']['status']);
-        self::assertStringContainsString('redis unreachable', $payload['checks']['cache']['message']);
+        static::assertSame('unhealthy', $payload['status']);
+        static::assertSame('unhealthy', $payload['checks']['cache']['status']);
+        static::assertSame('healthy', $payload['checks']['database']['status']);
+        static::assertStringContainsString('redis unreachable', $payload['checks']['cache']['message']);
     }
 
     public function testCheckAggregatesMultipleFailures(): void
@@ -101,12 +101,12 @@ final class HealthCheckControllerTest extends TestCase
 
         $response = $controller->check();
 
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
+        static::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
 
         $payload = $this->decode($response);
-        self::assertSame('unhealthy', $payload['status']);
-        self::assertSame('unhealthy', $payload['checks']['database']['status']);
-        self::assertSame('unhealthy', $payload['checks']['cache']['status']);
+        static::assertSame('unhealthy', $payload['status']);
+        static::assertSame('unhealthy', $payload['checks']['database']['status']);
+        static::assertSame('unhealthy', $payload['checks']['cache']['status']);
     }
 
     public function testReadinessReportsNotReadyWhenDatabaseDown(): void
@@ -119,27 +119,27 @@ final class HealthCheckControllerTest extends TestCase
 
         $response = $controller->readiness();
 
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
+        static::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $response->getStatusCode());
 
         $payload = $this->decode($response);
-        self::assertSame('not ready', $payload['status']);
-        self::assertSame('not ready', $payload['checks']['database']);
-        self::assertSame('ready', $payload['checks']['cache']);
+        static::assertSame('not ready', $payload['status']);
+        static::assertSame('not ready', $payload['checks']['database']);
+        static::assertSame('ready', $payload['checks']['cache']);
     }
 
     public function testLivenessIsAlwaysAlive(): void
     {
         // Even with broken dependencies, liveness must return 200 — its purpose
         // is to tell the orchestrator the PHP process itself is alive.
-        $this->connection->expects(self::never())->method(self::anything());
-        $this->cache->expects(self::never())->method(self::anything());
+        $this->connection->expects(self::never())->method(static::anything());
+        $this->cache->expects(self::never())->method(static::anything());
 
         $controller = $this->buildController();
 
         $response = $controller->liveness();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertSame('alive', $this->decode($response)['status']);
+        static::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        static::assertSame('alive', $this->decode($response)['status']);
     }
 
     public function testCheckReportsHealthyWhenEverythingWorks(): void
@@ -151,13 +151,13 @@ final class HealthCheckControllerTest extends TestCase
 
         $response = $controller->check();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        static::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
         $payload = $this->decode($response);
-        self::assertSame('healthy', $payload['status']);
-        self::assertSame('healthy', $payload['checks']['database']['status']);
-        self::assertSame('healthy', $payload['checks']['cache']['status']);
-        self::assertSame('healthy', $payload['checks']['filesystem']['status']);
+        static::assertSame('healthy', $payload['status']);
+        static::assertSame('healthy', $payload['checks']['database']['status']);
+        static::assertSame('healthy', $payload['checks']['cache']['status']);
+        static::assertSame('healthy', $payload['checks']['filesystem']['status']);
     }
 
     private function stubHealthyDatabase(): void

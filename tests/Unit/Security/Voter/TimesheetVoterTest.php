@@ -76,7 +76,7 @@ final class TimesheetVoterTest extends TestCase
         $owner = $this->makeUser($company, ['ROLE_INTERVENANT'], id: 7);
         $timesheet = $this->makeTimesheet($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($owner, $timesheet, TimesheetVoter::VIEW));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($owner, $timesheet, TimesheetVoter::VIEW));
     }
 
     public function testManagerCanView(): void
@@ -86,7 +86,7 @@ final class TimesheetVoterTest extends TestCase
         $manager = $this->makeUser($company, ['ROLE_MANAGER'], id: 99);
         $timesheet = $this->makeTimesheet($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $timesheet, TimesheetVoter::VIEW));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $timesheet, TimesheetVoter::VIEW));
     }
 
     public function testNonOwnerInterventantCannotView(): void
@@ -96,7 +96,7 @@ final class TimesheetVoterTest extends TestCase
         $other = $this->makeUser($company, ['ROLE_INTERVENANT'], id: 99);
         $timesheet = $this->makeTimesheet($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($other, $timesheet, TimesheetVoter::VIEW));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($other, $timesheet, TimesheetVoter::VIEW));
     }
 
     public function testOwnerCannotValidateOwnTimesheet(): void
@@ -105,7 +105,7 @@ final class TimesheetVoterTest extends TestCase
         $owner = $this->makeUser($company, ['ROLE_INTERVENANT', 'ROLE_CHEF_PROJET'], id: 7);
         $timesheet = $this->makeTimesheet($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $timesheet, TimesheetVoter::VALIDATE));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $timesheet, TimesheetVoter::VALIDATE));
     }
 
     public function testManagerCanValidateOthersTimesheet(): void
@@ -115,6 +115,6 @@ final class TimesheetVoterTest extends TestCase
         $manager = $this->makeUser($company, ['ROLE_MANAGER'], id: 99);
         $timesheet = $this->makeTimesheet($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $timesheet, TimesheetVoter::VALIDATE));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $timesheet, TimesheetVoter::VALIDATE));
     }
 }

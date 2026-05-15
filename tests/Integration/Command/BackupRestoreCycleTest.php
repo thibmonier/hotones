@@ -61,7 +61,7 @@ final class BackupRestoreCycleTest extends KernelTestCase
     public function testDumpThenRestoreReproducesIdenticalData(): void
     {
         $kernel = self::$kernel;
-        self::assertNotNull($kernel);
+        static::assertNotNull($kernel);
 
         $application = new Application($kernel);
 
@@ -69,16 +69,16 @@ final class BackupRestoreCycleTest extends KernelTestCase
         $dumpExit = new CommandTester($dumpCommand)->execute([
             '--output' => $this->dumpPath,
         ]);
-        self::assertSame(Command::SUCCESS, $dumpExit);
-        self::assertFileExists($this->dumpPath);
-        self::assertGreaterThan(0, filesize($this->dumpPath), 'Dump file is empty');
-        self::assertStringContainsString('backup_restore_cycle_fixture', file_get_contents($this->dumpPath) ?: '');
+        static::assertSame(Command::SUCCESS, $dumpExit);
+        static::assertFileExists($this->dumpPath);
+        static::assertGreaterThan(0, filesize($this->dumpPath), 'Dump file is empty');
+        static::assertStringContainsString('backup_restore_cycle_fixture', file_get_contents($this->dumpPath) ?: '');
 
         // Snapshot the original rows before wiping.
         $expected = $this->connection->fetchAllAssociative(
             'SELECT id, label, amount FROM backup_restore_cycle_fixture ORDER BY id',
         );
-        self::assertCount(3, $expected);
+        static::assertCount(3, $expected);
 
         // Mutate state: drop one row, alter another. Restore must undo both changes.
         $this->connection->executeStatement('DELETE FROM backup_restore_cycle_fixture WHERE id = 1');
@@ -89,12 +89,12 @@ final class BackupRestoreCycleTest extends KernelTestCase
         $restoreExit = $restoreTester->execute([
             'file' => $this->dumpPath,
         ]);
-        self::assertSame(Command::SUCCESS, $restoreExit, $restoreTester->getDisplay());
+        static::assertSame(Command::SUCCESS, $restoreExit, $restoreTester->getDisplay());
 
         $actual = $this->connection->fetchAllAssociative(
             'SELECT id, label, amount FROM backup_restore_cycle_fixture ORDER BY id',
         );
 
-        self::assertSame($expected, $actual, 'Restored data does not match the dump');
+        static::assertSame($expected, $actual, 'Restored data does not match the dump');
     }
 }

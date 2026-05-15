@@ -210,7 +210,7 @@ class ClientController extends AbstractController
             $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
             $fs = new Filesystem();
             if (!$fs->exists($uploadDir)) {
-                $fs->mkdir($uploadDir, 0775);
+                $fs->mkdir($uploadDir, 0o775);
             }
             $safeName = uniqid('client_', true).'.'.$logo->guessExtension();
             $logo->move($uploadDir, $safeName);
@@ -339,7 +339,7 @@ class ClientController extends AbstractController
                 $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads/clients';
                 $fs = new Filesystem();
                 if (!$fs->exists($uploadDir)) {
-                    $fs->mkdir($uploadDir, 0775);
+                    $fs->mkdir($uploadDir, 0o775);
                 }
                 $safeName = uniqid('client_', true).'.'.$logo->guessExtension();
                 $logo->move($uploadDir, $safeName);

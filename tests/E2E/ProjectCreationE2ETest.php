@@ -53,7 +53,7 @@ class ProjectCreationE2ETest extends PantherTestCase
 
         // Expect redirect to show page and project name visible
         $client->waitForElementToContain('h5, h1, h2, .page-title-box h4', 'E2E Demo Project');
-        $this->assertStringContainsString(
+        static::assertStringContainsString(
             '/projects/',
             (string) parse_url((string) $client->getCurrentURL(), PHP_URL_PATH),
         );

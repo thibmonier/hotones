@@ -28,8 +28,8 @@ class PdfGeneratorServiceTest extends TestCase
 
         $result = $this->service->generatePdf('template.html.twig', ['title' => 'Test']);
 
-        $this->assertNotEmpty($result);
-        $this->assertIsString($result);
+        static::assertNotEmpty($result);
+        static::assertIsString($result);
     }
 
     public function testGeneratePdfStartsWithPdfSignature(): void
@@ -38,7 +38,7 @@ class PdfGeneratorServiceTest extends TestCase
 
         $result = $this->service->generatePdf('template.html.twig', []);
 
-        $this->assertStringStartsWith('%PDF', $result);
+        static::assertStringStartsWith('%PDF', $result);
     }
 
     public function testCreatePdfResponseReturnsResponse(): void
@@ -47,8 +47,8 @@ class PdfGeneratorServiceTest extends TestCase
 
         $response = $this->service->createPdfResponse('template.html.twig', [], 'test.pdf');
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        static::assertInstanceOf(Response::class, $response);
+        static::assertSame(200, $response->getStatusCode());
     }
 
     public function testCreatePdfResponseSetsContentType(): void
@@ -57,7 +57,7 @@ class PdfGeneratorServiceTest extends TestCase
 
         $response = $this->service->createPdfResponse('template.html.twig', [], 'test.pdf');
 
-        $this->assertSame('application/pdf', $response->headers->get('Content-Type'));
+        static::assertSame('application/pdf', $response->headers->get('Content-Type'));
     }
 
     public function testCreatePdfResponseInlineDisposition(): void
@@ -66,8 +66,8 @@ class PdfGeneratorServiceTest extends TestCase
 
         $response = $this->service->createPdfResponse('template.html.twig', [], 'preview.pdf', inline: true);
 
-        $this->assertStringContainsString('inline', $response->headers->get('Content-Disposition'));
-        $this->assertStringContainsString('preview.pdf', $response->headers->get('Content-Disposition'));
+        static::assertStringContainsString('inline', $response->headers->get('Content-Disposition'));
+        static::assertStringContainsString('preview.pdf', $response->headers->get('Content-Disposition'));
     }
 
     public function testCreatePdfResponseAttachmentDisposition(): void
@@ -76,8 +76,8 @@ class PdfGeneratorServiceTest extends TestCase
 
         $response = $this->service->createPdfResponse('template.html.twig', [], 'download.pdf', inline: false);
 
-        $this->assertStringContainsString('attachment', $response->headers->get('Content-Disposition'));
-        $this->assertStringContainsString('download.pdf', $response->headers->get('Content-Disposition'));
+        static::assertStringContainsString('attachment', $response->headers->get('Content-Disposition'));
+        static::assertStringContainsString('download.pdf', $response->headers->get('Content-Disposition'));
     }
 
     public function testGeneratePdfPassesDataToTemplate(): void
@@ -106,7 +106,7 @@ class PdfGeneratorServiceTest extends TestCase
             ],
         );
 
-        $this->assertNotEmpty($result);
-        $this->assertStringStartsWith('%PDF', $result);
+        static::assertNotEmpty($result);
+        static::assertStringStartsWith('%PDF', $result);
     }
 }

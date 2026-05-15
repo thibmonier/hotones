@@ -32,7 +32,7 @@ final class UpdateClientUseCaseTest extends TestCase
         $repo
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(fn (Client $client): bool => $client->getName()->getValue() === 'New Name'
+            ->with(static::callback(static fn (Client $client): bool => $client->getName()->getValue() === 'New Name'
             && $client->getServiceLevel() === ServiceLevel::ENTERPRISE
             && $client->getNotes() === 'Updated notes'));
 
@@ -55,7 +55,7 @@ final class UpdateClientUseCaseTest extends TestCase
         $useCase = new UpdateClientUseCase($repo);
         $useCase->execute(new UpdateClientCommand(clientId: 1, name: 'Acme', serviceLevel: 'premium'));
 
-        $this->assertSame(ServiceLevel::PREMIUM, $existing->getServiceLevel());
+        static::assertSame(ServiceLevel::PREMIUM, $existing->getServiceLevel());
     }
 
     public function testInvalidServiceLevelRejected(): void

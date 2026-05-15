@@ -27,7 +27,7 @@ final class OrderTest extends TestCase
             'D202601-001',
             ClientId::generate(),
             ContractType::FIXED_PRICE,
-            Money::fromAmount(10000),
+            Money::fromAmount(10_000),
         );
     }
 
@@ -35,13 +35,13 @@ final class OrderTest extends TestCase
     {
         $order = $this->makeOrder();
 
-        $this->assertSame('D202601-001', $order->getReference());
-        $this->assertSame(OrderStatus::DRAFT, $order->getStatus());
-        $this->assertSame(ContractType::FIXED_PRICE, $order->getContractType());
-        $this->assertSame(10000.0, $order->getAmount()->getAmount());
-        $this->assertNull($order->getTitle());
-        $this->assertNull($order->getDiscount());
-        $this->assertNotNull($order->getCreatedAt());
+        static::assertSame('D202601-001', $order->getReference());
+        static::assertSame(OrderStatus::DRAFT, $order->getStatus());
+        static::assertSame(ContractType::FIXED_PRICE, $order->getContractType());
+        static::assertSame(10_000.0, $order->getAmount()->getAmount());
+        static::assertNull($order->getTitle());
+        static::assertNull($order->getDiscount());
+        static::assertNotNull($order->getCreatedAt());
     }
 
     public function testCreateRecordsOrderCreatedEvent(): void
@@ -49,8 +49,8 @@ final class OrderTest extends TestCase
         $order = $this->makeOrder();
         $events = $order->pullDomainEvents();
 
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(OrderCreatedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(OrderCreatedEvent::class, $events[0]);
     }
 
     public function testTransitionDraftToToSign(): void
@@ -60,10 +60,10 @@ final class OrderTest extends TestCase
 
         $order->changeStatus(OrderStatus::TO_SIGN);
 
-        $this->assertSame(OrderStatus::TO_SIGN, $order->getStatus());
+        static::assertSame(OrderStatus::TO_SIGN, $order->getStatus());
         $events = $order->pullDomainEvents();
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(OrderStatusChangedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(OrderStatusChangedEvent::class, $events[0]);
     }
 
     public function testInvalidTransitionDraftToSigned(): void
@@ -81,7 +81,7 @@ final class OrderTest extends TestCase
         $order->changeStatus(OrderStatus::WON);
         $order->changeStatus(OrderStatus::SIGNED);
 
-        $this->assertNotNull($order->getSignedAt());
+        static::assertNotNull($order->getSignedAt());
     }
 
     public function testCannotUpdateAmountOnClosedOrder(): void
@@ -97,9 +97,9 @@ final class OrderTest extends TestCase
     public function testUpdateAmountOnActiveOrder(): void
     {
         $order = $this->makeOrder();
-        $order->updateAmount(Money::fromAmount(15000));
+        $order->updateAmount(Money::fromAmount(15_000));
 
-        $this->assertSame(15000.0, $order->getAmount()->getAmount());
+        static::assertSame(15_000.0, $order->getAmount()->getAmount());
     }
 
     public function testApplyDiscount(): void
@@ -107,7 +107,7 @@ final class OrderTest extends TestCase
         $order = $this->makeOrder();
         $order->applyDiscount(Money::fromAmount(1000));
 
-        $this->assertSame(1000.0, $order->getDiscount()->getAmount());
+        static::assertSame(1000.0, $order->getDiscount()->getAmount());
     }
 
     public function testNetAmountWithDiscount(): void
@@ -116,27 +116,27 @@ final class OrderTest extends TestCase
         $order->applyDiscount(Money::fromAmount(1500));
 
         // Net = amount (10000) - discount (1500) = 8500
-        $this->assertSame(8500.0, $order->getNetAmount()->getAmount());
+        static::assertSame(8500.0, $order->getNetAmount()->getAmount());
     }
 
     public function testNetAmountWithoutDiscount(): void
     {
         $order = $this->makeOrder();
 
-        $this->assertSame(10000.0, $order->getNetAmount()->getAmount());
+        static::assertSame(10_000.0, $order->getNetAmount()->getAmount());
     }
 
     public function testIsActiveAndIsClosed(): void
     {
         $order = $this->makeOrder();
-        $this->assertTrue($order->isActive());
-        $this->assertFalse($order->isClosed());
+        static::assertTrue($order->isActive());
+        static::assertFalse($order->isClosed());
 
         $order->changeStatus(OrderStatus::TO_SIGN);
         $order->changeStatus(OrderStatus::LOST);
 
-        $this->assertFalse($order->isActive());
-        $this->assertTrue($order->isClosed());
+        static::assertFalse($order->isActive());
+        static::assertTrue($order->isClosed());
     }
 
     public function testInvalidDateRangeRejected(): void

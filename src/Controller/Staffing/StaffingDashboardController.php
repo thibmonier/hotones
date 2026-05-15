@@ -53,8 +53,8 @@ class StaffingDashboardController extends AbstractController
         // Période selon le mode de vue
         if ($viewMode === 'annual') {
             // Vue annuelle : toute l'année sélectionnée
-            $startDate = new DateTime("$year-01-01");
-            $endDate = new DateTime("$year-12-31");
+            $startDate = new DateTime("{$year}-01-01");
+            $endDate = new DateTime("{$year}-12-31");
             // Forcer la granularité hebdomadaire pour la vue annuelle
             $granularity = 'weekly';
         } else {

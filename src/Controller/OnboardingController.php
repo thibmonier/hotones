@@ -45,7 +45,7 @@ class OnboardingController extends AbstractController
         }
 
         // Sort by progress (incomplete first, then by overdue count)
-        usort($onboardingData, function ($a, $b) {
+        usort($onboardingData, static function ($a, $b) {
             if ($a['summary']['is_complete'] !== $b['summary']['is_complete']) {
                 return $a['summary']['is_complete'] ? 1 : -1;
             }

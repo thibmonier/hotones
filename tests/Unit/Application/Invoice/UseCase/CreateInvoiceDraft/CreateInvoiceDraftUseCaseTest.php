@@ -95,11 +95,11 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
             paymentTerms: null,
         );
 
-        $this->assertSame(1, $command->companyId);
-        $this->assertSame(7, $command->clientId);
-        $this->assertNull($command->orderId);
-        $this->assertNull($command->projectId);
-        $this->assertNull($command->paymentTerms);
+        static::assertSame(1, $command->companyId);
+        static::assertSame(7, $command->clientId);
+        static::assertNull($command->orderId);
+        static::assertNull($command->projectId);
+        static::assertNull($command->paymentTerms);
     }
 
     public function testCommandConstructionWithAllFields(): void
@@ -112,9 +112,9 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
             paymentTerms: 'Net 30',
         );
 
-        $this->assertSame(42, $command->orderId);
-        $this->assertSame(33, $command->projectId);
-        $this->assertSame('Net 30', $command->paymentTerms);
+        static::assertSame(42, $command->orderId);
+        static::assertSame(33, $command->projectId);
+        static::assertSame('Net 30', $command->paymentTerms);
     }
 
     public function testHappyPathPersistsAndAutoGeneratesInvoiceNumber(): void
@@ -129,7 +129,7 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
             paymentTerms: null,
         ));
 
-        $this->assertSame(42, $reservationLikeId->toLegacyInt());
+        static::assertSame(42, $reservationLikeId->toLegacyInt());
     }
 
     public function testHappyPathAppliesPaymentTermsViaTranslator(): void
@@ -137,7 +137,7 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
         $persistedFlat = null;
         $useCase = $this->buildUseCaseWithCompanyAndClient(
             persistedId: 7,
-            persistCapture: function (FlatInvoice $flat) use (&$persistedFlat): void {
+            persistCapture: static function (FlatInvoice $flat) use (&$persistedFlat): void {
                 $persistedFlat = $flat;
             },
         );
@@ -150,10 +150,10 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
             paymentTerms: 'Net 60 days',
         ));
 
-        $this->assertNotNull($persistedFlat);
-        $this->assertSame('Net 60 days', $persistedFlat->paymentTerms);
-        $this->assertNotEmpty($persistedFlat->invoiceNumber, 'auto-generated invoice number');
-        $this->assertStringStartsWith('F', $persistedFlat->invoiceNumber);
+        static::assertNotNull($persistedFlat);
+        static::assertSame('Net 60 days', $persistedFlat->paymentTerms);
+        static::assertNotEmpty($persistedFlat->invoiceNumber, 'auto-generated invoice number');
+        static::assertStringStartsWith('F', $persistedFlat->invoiceNumber);
     }
 
     /**
@@ -178,7 +178,7 @@ final class CreateInvoiceDraftUseCaseTest extends TestCase
             },
         );
         $em->method('persist')->willReturnCallback(
-            function (object $entity) use ($persistedId, $persistCapture): void {
+            static function (object $entity) use ($persistedId, $persistCapture): void {
                 if ($entity instanceof FlatInvoice) {
                     new ReflectionProperty(FlatInvoice::class, 'id')->setValue($entity, $persistedId);
                     if ($persistCapture !== null) {

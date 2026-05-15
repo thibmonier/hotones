@@ -65,16 +65,18 @@ class OnboardingTemplateController extends AbstractController
             if (!empty($tasksData)) {
                 $order = 0;
                 foreach ($tasksData as $taskData) {
-                    if (!empty($taskData['title'])) {
-                        $tasks[] = [
-                            'title' => $taskData['title'],
-                            'description' => $taskData['description'] ?? '',
-                            'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
-                            'type' => $taskData['type'] ?? 'action',
-                            'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
-                            'order' => $order++,
-                        ];
+                    if (empty($taskData['title'])) {
+                        continue;
                     }
+
+                    $tasks[] = [
+                        'title' => $taskData['title'],
+                        'description' => $taskData['description'] ?? '',
+                        'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
+                        'type' => $taskData['type'] ?? 'action',
+                        'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
+                        'order' => $order++,
+                    ];
                 }
             }
 
@@ -139,16 +141,18 @@ class OnboardingTemplateController extends AbstractController
             if (!empty($tasksData)) {
                 $order = 0;
                 foreach ($tasksData as $taskData) {
-                    if (!empty($taskData['title'])) {
-                        $tasks[] = [
-                            'title' => $taskData['title'],
-                            'description' => $taskData['description'] ?? '',
-                            'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
-                            'type' => $taskData['type'] ?? 'action',
-                            'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
-                            'order' => $order++,
-                        ];
+                    if (empty($taskData['title'])) {
+                        continue;
                     }
+
+                    $tasks[] = [
+                        'title' => $taskData['title'],
+                        'description' => $taskData['description'] ?? '',
+                        'assigned_to' => $taskData['assigned_to'] ?? 'contributor',
+                        'type' => $taskData['type'] ?? 'action',
+                        'days_after_start' => (int) ($taskData['days_after_start'] ?? 0),
+                        'order' => $order++,
+                    ];
                 }
             }
 

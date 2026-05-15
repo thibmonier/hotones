@@ -33,12 +33,12 @@ final class RequestVacationHandlerTest extends TestCase
         $vacationRepo = $this->createMock(VacationRepositoryInterface::class);
         $vacationRepo->expects($this->once())
             ->method('save')
-            ->with($this->isInstanceOf(Vacation::class));
+            ->with(static::isInstanceOf(Vacation::class));
 
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(VacationNotificationMessage::class))
+            ->with(static::isInstanceOf(VacationNotificationMessage::class))
             ->willReturn(new Envelope(new stdClass()));
 
         $handler = new RequestVacationHandler($vacationRepo, $contributorRepo, $bus);
@@ -52,7 +52,7 @@ final class RequestVacationHandlerTest extends TestCase
             reason: 'Vacation reason',
         ));
 
-        $this->assertNotEmpty($vacationId->getValue());
+        static::assertNotEmpty($vacationId->getValue());
     }
 
     public function testThrowsWhenContributorNotFound(): void
@@ -87,7 +87,7 @@ final class RequestVacationHandlerTest extends TestCase
 
         $captured = null;
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturnCallback(function ($msg) use (&$captured) {
+        $bus->method('dispatch')->willReturnCallback(static function ($msg) use (&$captured) {
             $captured = $msg;
 
             return new Envelope($msg);
@@ -101,8 +101,8 @@ final class RequestVacationHandlerTest extends TestCase
             type: 'conges_payes',
         ));
 
-        $this->assertInstanceOf(VacationNotificationMessage::class, $captured);
-        $this->assertSame('created', $captured->getType());
+        static::assertInstanceOf(VacationNotificationMessage::class, $captured);
+        static::assertSame('created', $captured->getType());
     }
 
     private function makeContributor(): Contributor

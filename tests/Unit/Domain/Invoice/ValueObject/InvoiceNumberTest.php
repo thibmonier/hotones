@@ -13,7 +13,7 @@ final class InvoiceNumberTest extends TestCase
     public function testFromStringValidFormat(): void
     {
         $number = InvoiceNumber::fromString('F202501001');
-        $this->assertSame('F202501001', $number->getValue());
+        static::assertSame('F202501001', $number->getValue());
     }
 
     public function testFromStringInvalidPrefixRejected(): void
@@ -37,15 +37,15 @@ final class InvoiceNumberTest extends TestCase
     public function testGenerateProducesExpectedValue(): void
     {
         $number = InvoiceNumber::generate(2025, 3, 42);
-        $this->assertSame('F202503042', $number->getValue());
+        static::assertSame('F202503042', $number->getValue());
     }
 
     public function testGenerateExtractsYearMonthSequence(): void
     {
         $number = InvoiceNumber::generate(2025, 3, 42);
-        $this->assertSame(2025, $number->getYear());
-        $this->assertSame(3, $number->getMonth());
-        $this->assertSame(42, $number->getSequence());
+        static::assertSame(2025, $number->getYear());
+        static::assertSame(3, $number->getMonth());
+        static::assertSame(42, $number->getSequence());
     }
 
     public function testGenerateRejectsYearTooSmall(): void
@@ -82,18 +82,18 @@ final class InvoiceNumberTest extends TestCase
     {
         $a = InvoiceNumber::fromString('F202501001');
         $b = InvoiceNumber::fromString('F202501001');
-        $this->assertTrue($a->equals($b));
+        static::assertTrue($a->equals($b));
     }
 
     public function testEqualsFalseForDifferentValues(): void
     {
         $a = InvoiceNumber::fromString('F202501001');
         $b = InvoiceNumber::fromString('F202501002');
-        $this->assertFalse($a->equals($b));
+        static::assertFalse($a->equals($b));
     }
 
     public function testToStringReturnsValue(): void
     {
-        $this->assertSame('F202501001', (string) InvoiceNumber::fromString('F202501001'));
+        static::assertSame('F202501001', (string) InvoiceNumber::fromString('F202501001'));
     }
 }

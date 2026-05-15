@@ -54,7 +54,7 @@ final class ProjectSubTaskFactory extends PersistentObjectFactory
     #[Override]
     public function initialize(): static
     {
-        return $this->afterInstantiate(function (ProjectSubTask $subTask): void {
+        return $this->afterInstantiate(static function (ProjectSubTask $subTask): void {
             // Ensure project is consistent with the task's project by using the setter
             $subTask->setTask($subTask->getTask());
         });

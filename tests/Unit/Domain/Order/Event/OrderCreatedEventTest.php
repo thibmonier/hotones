@@ -19,9 +19,9 @@ final class OrderCreatedEventTest extends TestCase
             'D202601-001',
         );
 
-        $this->assertSame(7, $event->getOrderId()->toLegacyInt());
-        $this->assertSame(42, $event->getClientId()->toLegacyInt());
-        $this->assertSame('D202601-001', $event->getReference());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertSame(7, $event->getOrderId()->toLegacyInt());
+        static::assertSame(42, $event->getClientId()->toLegacyInt());
+        static::assertSame('D202601-001', $event->getReference());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

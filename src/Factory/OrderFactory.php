@@ -54,7 +54,7 @@ final class OrderFactory extends PersistentObjectFactory
             'contingenceAmount' => (string) $faker->randomFloat(2, 0, 2000),
             'contingenceReason' => $faker->optional()->sentence(8),
             // provisional, may be updated by fixtures after creating tasks/sections
-            'totalAmount' => (string) $faker->randomFloat(2, 1000, 50000),
+            'totalAmount' => (string) $faker->randomFloat(2, 1000, 50_000),
             'createdAt' => $date,
             'validatedAt' => $validatedAtTemp,
             'status' => $this->pickWeighted([

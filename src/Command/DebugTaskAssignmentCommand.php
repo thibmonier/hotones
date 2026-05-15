@@ -35,7 +35,7 @@ class DebugTaskAssignmentCommand extends Command
         if ($contributorId) {
             $contributor = $this->em->getReference(Contributor::class, $contributorId);
             if (!$contributor) {
-                $io->error("Contributeur #$contributorId non trouvé");
+                $io->error("Contributeur #{$contributorId} non trouvé");
 
                 return Command::FAILURE;
             }

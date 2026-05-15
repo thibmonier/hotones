@@ -69,12 +69,12 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
             '--csv-report' => '',
         ]);
 
-        self::assertSame(0, $this->tester->getStatusCode());
+        static::assertSame(0, $this->tester->getStatusCode());
 
         $timesheet = $this->fetchSingleTimesheet();
-        self::assertNull($timesheet->migratedAt);
-        self::assertNull($timesheet->legacyCostCents);
-        self::assertFalse($timesheet->legacyCostDrift);
+        static::assertNull($timesheet->migratedAt);
+        static::assertNull($timesheet->legacyCostCents);
+        static::assertFalse($timesheet->legacyCostDrift);
     }
 
     public function testExecuteWritesSnapshotOnFirstRun(): void
@@ -86,12 +86,12 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
         $tester = $this->commandTesterWithFreshContainer();
         $tester->execute(['--csv-report' => '']);
 
-        self::assertSame(0, $tester->getStatusCode());
+        static::assertSame(0, $tester->getStatusCode());
 
         $timesheet = $this->fetchSingleTimesheet();
-        self::assertNotNull($timesheet->migratedAt, 'migrated_at set');
-        self::assertSame(40000, $timesheet->legacyCostCents);
-        self::assertFalse($timesheet->legacyCostDrift, 'no drift on first snapshot');
+        static::assertNotNull($timesheet->migratedAt, 'migrated_at set');
+        static::assertSame(40_000, $timesheet->legacyCostCents);
+        static::assertFalse($timesheet->legacyCostDrift, 'no drift on first snapshot');
     }
 
     public function testIdempotentReplaySkipsAlreadyMigrated(): void
@@ -102,18 +102,18 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
         $tester = $this->commandTesterWithFreshContainer();
         $tester->execute(['--csv-report' => '']);
         $firstMigratedAt = $this->fetchSingleTimesheet()->migratedAt;
-        self::assertNotNull($firstMigratedAt);
+        static::assertNotNull($firstMigratedAt);
 
         // Re-run with same tester
         $tester->execute(['--csv-report' => '']);
         $display = $tester->getDisplay();
 
-        self::assertStringContainsString('Already migrated (skip)', $display);
-        self::assertSame(0, $tester->getStatusCode());
+        static::assertStringContainsString('Already migrated (skip)', $display);
+        static::assertSame(0, $tester->getStatusCode());
 
         // migrated_at unchanged
         $timesheet = $this->fetchSingleTimesheet();
-        self::assertEquals($firstMigratedAt, $timesheet->migratedAt);
+        static::assertEquals($firstMigratedAt, $timesheet->migratedAt);
     }
 
     public function testDriftDetectedWhenLegacyCostMismatches(): void
@@ -129,17 +129,17 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
             '--csv-report' => $csvPath,
         ]);
 
-        self::assertSame(0, $tester->getStatusCode(), 'no abandon trigger (drift < 5 %)');
+        static::assertSame(0, $tester->getStatusCode(), 'no abandon trigger (drift < 5 %)');
 
         $timesheet = $this->fetchSingleTimesheet();
-        self::assertTrue($timesheet->legacyCostDrift, 'drift flagged');
+        static::assertTrue($timesheet->legacyCostDrift, 'drift flagged');
         // legacy_cost_cents conservé à snapshot original (rollback safety)
-        self::assertSame(1_000_000, $timesheet->legacyCostCents);
-        self::assertNotNull($timesheet->migratedAt);
+        static::assertSame(1_000_000, $timesheet->legacyCostCents);
+        static::assertNotNull($timesheet->migratedAt);
 
-        self::assertFileExists($csvPath);
+        static::assertFileExists($csvPath);
         $csv = (string) file_get_contents($csvPath);
-        self::assertStringContainsString('1000000,1000800,800,800', $csv);
+        static::assertStringContainsString('1000000,1000800,800,800', $csv);
     }
 
     public function testTriggerAbandonCase3ExitsFailure(): void
@@ -155,13 +155,13 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
 
         $tester->execute(['--csv-report' => '']);
 
-        self::assertSame(1, $tester->getStatusCode(), 'exit FAILURE if abandon trigger');
-        self::assertStringContainsString('Trigger abandon ADR-0013 cas 3', $tester->getDisplay());
+        static::assertSame(1, $tester->getStatusCode(), 'exit FAILURE if abandon trigger');
+        static::assertStringContainsString('Trigger abandon ADR-0013 cas 3', $tester->getDisplay());
     }
 
     public function testCsvAutoPathGeneratedUnderProjectDir(): void
     {
-        $this->seedTimesheet(hours: '8.00', cjm: '400.00', legacyCostCents: 40000);
+        $this->seedTimesheet(hours: '8.00', cjm: '400.00', legacyCostCents: 40_000);
         $this->overrideHourlyRateProvider(6000);
 
         $application = new Application(self::$kernel);
@@ -171,7 +171,7 @@ final class MigrateWorkItemLegacyCostCommandTest extends KernelTestCase
         $tester->execute(['--csv-report' => 'auto']);
 
         $display = $tester->getDisplay();
-        self::assertMatchesRegularExpression(
+        static::assertMatchesRegularExpression(
             '#Drift report CSV exporté : .+/var/migration/workitem-cost-drift-\d{4}-\d{2}-\d{2}-\d{6}\.csv#',
             $display,
         );

@@ -132,7 +132,7 @@ class InvoiceReminderService
         };
 
         // Récupérer l'email du premier contact actif du client
-        $contacts = $client->getContacts()->filter(fn ($contact): bool => $contact->getEmail() !== null);
+        $contacts = $client->getContacts()->filter(static fn ($contact): bool => $contact->getEmail() !== null);
         if ($contacts->isEmpty()) {
             return; // Pas de contact avec email, impossible d'envoyer la relance
         }
@@ -222,10 +222,12 @@ class InvoiceReminderService
 
         foreach ($allInvoices as $invoice) {
             foreach (self::REMINDER_DELAYS as $delay) {
-                if ($this->hasReminderBeenSent($invoice, $delay)) {
-                    ++$stats['total_reminders'];
-                    ++$stats['by_delay'][$delay];
+                if (!$this->hasReminderBeenSent($invoice, $delay)) {
+                    continue;
                 }
+
+                ++$stats['total_reminders'];
+                ++$stats['by_delay'][$delay];
             }
         }
 

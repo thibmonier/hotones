@@ -13,13 +13,13 @@ final class OrderLineIdTest extends TestCase
 {
     public function testGenerateProducesValidUuid(): void
     {
-        $this->assertTrue(Uuid::isValid(OrderLineId::generate()->getValue()));
+        static::assertTrue(Uuid::isValid(OrderLineId::generate()->getValue()));
     }
 
     public function testFromStringAcceptsValidUuid(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertSame($uuid, OrderLineId::fromString($uuid)->getValue());
+        static::assertSame($uuid, OrderLineId::fromString($uuid)->getValue());
     }
 
     public function testFromStringRejectsInvalidUuid(): void
@@ -31,13 +31,13 @@ final class OrderLineIdTest extends TestCase
     public function testEquals(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertTrue(OrderLineId::fromString($uuid)->equals(OrderLineId::fromString($uuid)));
-        $this->assertFalse(OrderLineId::generate()->equals(OrderLineId::generate()));
+        static::assertTrue(OrderLineId::fromString($uuid)->equals(OrderLineId::fromString($uuid)));
+        static::assertFalse(OrderLineId::generate()->equals(OrderLineId::generate()));
     }
 
     public function testToString(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertSame($uuid, (string) OrderLineId::fromString($uuid));
+        static::assertSame($uuid, (string) OrderLineId::fromString($uuid));
     }
 }

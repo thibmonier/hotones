@@ -96,13 +96,13 @@ class DashboardReadServiceTest extends TestCase
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
-        $this->assertIsArray($result);
-        $this->assertEquals(10000.00, $result['revenue']['total_revenue']);
-        $this->assertEquals(7000.00, $result['revenue']['total_cost']);
-        $this->assertEquals(3000.00, $result['revenue']['total_margin']);
-        $this->assertEquals(30.00, $result['revenue']['margin_rate']);
-        $this->assertEquals(5, $result['projects']['total']);
-        $this->assertEquals(3, $result['projects']['active']);
+        static::assertIsArray($result);
+        static::assertSame(10_000.00, $result['revenue']['total_revenue']);
+        static::assertSame(7000.00, $result['revenue']['total_cost']);
+        static::assertSame(3000.00, $result['revenue']['total_margin']);
+        static::assertSame(30.00, $result['revenue']['margin_rate']);
+        static::assertSame(5, $result['projects']['total']);
+        static::assertSame(3, $result['projects']['active']);
     }
 
     public function testGetKPIsFallbackToRealTimeWhenNoData(): void
@@ -136,8 +136,8 @@ class DashboardReadServiceTest extends TestCase
         $realTimeData = [
             'period' => ['start' => $startDate, 'end' => $endDate],
             'revenue' => [
-                'total_revenue' => 15000.00,
-                'total_cost' => 10000.00,
+                'total_revenue' => 15_000.00,
+                'total_cost' => 10_000.00,
                 'total_margin' => 5000.00,
                 'margin_rate' => 33.33,
             ],
@@ -153,7 +153,7 @@ class DashboardReadServiceTest extends TestCase
         $this->logger
             ->expects($this->once())
             ->method('warning')
-            ->with($this->stringContains('Aucune donnée dans le modèle en étoile'), $this->anything());
+            ->with(static::stringContains('Aucune donnée dans le modèle en étoile'), static::anything());
 
         // Mock cache to execute callback immediately
         $this->cache
@@ -166,7 +166,7 @@ class DashboardReadServiceTest extends TestCase
 
         $result = $this->service->getKPIs($startDate, $endDate);
 
-        $this->assertEquals($realTimeData, $result);
+        static::assertEquals($realTimeData, $result);
     }
 
     public function testGetMonthlyEvolutionReturnsFormattedData(): void
@@ -220,12 +220,12 @@ class DashboardReadServiceTest extends TestCase
 
         $result = $this->service->getMonthlyEvolution(12);
 
-        $this->assertIsArray($result);
-        $this->assertCount(2, $result);
-        $this->assertEquals('Janvier 2025', $result[0]['month']);
-        $this->assertEquals(10000.00, $result[0]['revenue']);
-        $this->assertEquals(7000.00, $result[0]['costs']);
-        $this->assertEquals(3000.00, $result[0]['margin']);
+        static::assertIsArray($result);
+        static::assertCount(2, $result);
+        static::assertSame('Janvier 2025', $result[0]['month']);
+        static::assertSame(10_000.00, $result[0]['revenue']);
+        static::assertSame(7000.00, $result[0]['costs']);
+        static::assertSame(3000.00, $result[0]['margin']);
     }
 
     public function testGetMonthlyEvolutionFallbackWhenNoData(): void
@@ -261,7 +261,7 @@ class DashboardReadServiceTest extends TestCase
         $this->logger
             ->expects($this->once())
             ->method('warning')
-            ->with($this->stringContains('Pas de données d\'évolution'));
+            ->with(static::stringContains('Pas de données d\'évolution'));
 
         // Mock cache to execute callback immediately
         $this->cache
@@ -274,6 +274,6 @@ class DashboardReadServiceTest extends TestCase
 
         $result = $this->service->getMonthlyEvolution(12);
 
-        $this->assertEquals($realTimeEvolution, $result);
+        static::assertEquals($realTimeEvolution, $result);
     }
 }

@@ -91,7 +91,7 @@ class ProjectType extends AbstractType
             // Rôles projet avec Users
             ->add('keyAccountManager', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'choice_label' => static fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
                 'label' => 'KAM (Key Account Manager)',
                 'required' => false,
                 'placeholder' => '-- Sélectionner un utilisateur --',
@@ -99,7 +99,7 @@ class ProjectType extends AbstractType
             ])
             ->add('projectManager', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'choice_label' => static fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
                 'label' => 'Chef de projet',
                 'required' => false,
                 'placeholder' => '-- Sélectionner un utilisateur --',
@@ -107,7 +107,7 @@ class ProjectType extends AbstractType
             ])
             ->add('projectDirector', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'choice_label' => static fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
                 'label' => 'Directeur de projet',
                 'required' => false,
                 'placeholder' => '-- Sélectionner un utilisateur --',
@@ -115,7 +115,7 @@ class ProjectType extends AbstractType
             ])
             ->add('salesPerson', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
+                'choice_label' => static fn (User $user): string => $user->getFirstName().' '.$user->getLastName(),
                 'label' => 'Commercial',
                 'required' => false,
                 'placeholder' => '-- Sélectionner un utilisateur --',

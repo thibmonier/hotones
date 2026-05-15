@@ -66,7 +66,7 @@ class PerformanceReviewServiceTest extends TestCase
 
         $count = $this->service->createCampaign(2024);
 
-        $this->assertEquals(2, $count);
+        static::assertSame(2, $count);
     }
 
     public function testCreateCampaignSkipsExistingReviews(): void
@@ -95,7 +95,7 @@ class PerformanceReviewServiceTest extends TestCase
 
         $count = $this->service->createCampaign(2024);
 
-        $this->assertEquals(1, $count); // Only one created
+        static::assertSame(1, $count); // Only one created
     }
 
     public function testCompleteSelfEvaluation(): void
@@ -120,12 +120,12 @@ class PerformanceReviewServiceTest extends TestCase
             'Technical skills',
         );
 
-        $this->assertEquals('auto_eval_faite', $review->getStatus());
+        static::assertSame('auto_eval_faite', $review->getStatus());
         $selfEval = $review->getSelfEvaluation();
-        $this->assertEquals('Achievement 1, Achievement 2', $selfEval['achievements']);
-        $this->assertEquals('Strong communication', $selfEval['strengths']);
-        $this->assertEquals('Technical skills', $selfEval['improvements']);
-        $this->assertArrayHasKey('completed_at', $selfEval);
+        static::assertSame('Achievement 1, Achievement 2', $selfEval['achievements']);
+        static::assertSame('Strong communication', $selfEval['strengths']);
+        static::assertSame('Technical skills', $selfEval['improvements']);
+        static::assertArrayHasKey('completed_at', $selfEval);
     }
 
     public function testCompleteManagerEvaluation(): void
@@ -155,14 +155,14 @@ class PerformanceReviewServiceTest extends TestCase
             4,
         );
 
-        $this->assertEquals('eval_manager_faite', $review->getStatus());
-        $this->assertEquals(4, $review->getOverallRating());
+        static::assertSame('eval_manager_faite', $review->getStatus());
+        static::assertSame(4, $review->getOverallRating());
 
         $managerEval = $review->getManagerEvaluation();
-        $this->assertEquals('Excellent work on project X', $managerEval['achievements']);
-        $this->assertEquals('Leadership, Technical expertise', $managerEval['strengths']);
-        $this->assertEquals('Time management', $managerEval['improvements']);
-        $this->assertEquals('Overall great performance', $managerEval['feedback']);
+        static::assertSame('Excellent work on project X', $managerEval['achievements']);
+        static::assertSame('Leadership, Technical expertise', $managerEval['strengths']);
+        static::assertSame('Time management', $managerEval['improvements']);
+        static::assertSame('Overall great performance', $managerEval['feedback']);
     }
 
     public function testValidateReview(): void
@@ -194,10 +194,10 @@ class PerformanceReviewServiceTest extends TestCase
 
         $this->service->validateReview($review, $objectives, $interviewDate, 'Great discussion');
 
-        $this->assertEquals('validee', $review->getStatus());
-        $this->assertEquals($objectives, $review->getObjectives());
-        $this->assertEquals($interviewDate, $review->getInterviewDate());
-        $this->assertEquals('Great discussion', $review->getComments());
+        static::assertSame('validee', $review->getStatus());
+        static::assertEquals($objectives, $review->getObjectives());
+        static::assertEquals($interviewDate, $review->getInterviewDate());
+        static::assertSame('Great discussion', $review->getComments());
     }
 
     public function testCanEditSelfEvaluation(): void
@@ -212,7 +212,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('en_attente');
 
-        $this->assertTrue($this->service->canEditSelfEvaluation($review, $user));
+        static::assertTrue($this->service->canEditSelfEvaluation($review, $user));
     }
 
     public function testCanEditSelfEvaluationWhenAlreadyCompleted(): void
@@ -227,7 +227,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('auto_eval_faite');
 
-        $this->assertTrue($this->service->canEditSelfEvaluation($review, $user));
+        static::assertTrue($this->service->canEditSelfEvaluation($review, $user));
     }
 
     public function testCannotEditSelfEvaluationWhenManagerEvaluationCompleted(): void
@@ -240,7 +240,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setContributor($contributor);
         $review->setStatus('eval_manager_faite');
 
-        $this->assertFalse($this->service->canEditSelfEvaluation($review, $user));
+        static::assertFalse($this->service->canEditSelfEvaluation($review, $user));
     }
 
     public function testCanEditManagerEvaluation(): void
@@ -253,7 +253,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('auto_eval_faite');
 
-        $this->assertTrue($this->service->canEditManagerEvaluation($review, $manager));
+        static::assertTrue($this->service->canEditManagerEvaluation($review, $manager));
     }
 
     public function testCannotEditManagerEvaluationWhenSelfEvaluationNotCompleted(): void
@@ -266,7 +266,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('en_attente');
 
-        $this->assertFalse($this->service->canEditManagerEvaluation($review, $manager));
+        static::assertFalse($this->service->canEditManagerEvaluation($review, $manager));
     }
 
     public function testCanValidateReview(): void
@@ -279,7 +279,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('eval_manager_faite');
 
-        $this->assertTrue($this->service->canValidateReview($review, $manager));
+        static::assertTrue($this->service->canValidateReview($review, $manager));
     }
 
     public function testCannotValidateReviewWhenManagerEvaluationNotCompleted(): void
@@ -292,7 +292,7 @@ class PerformanceReviewServiceTest extends TestCase
         $review->setManager($manager);
         $review->setStatus('auto_eval_faite');
 
-        $this->assertFalse($this->service->canValidateReview($review, $manager));
+        static::assertFalse($this->service->canValidateReview($review, $manager));
     }
 
     public function testGetContributorHistory(): void
@@ -311,8 +311,8 @@ class PerformanceReviewServiceTest extends TestCase
 
         $result = $this->service->getContributorHistory($contributor);
 
-        $this->assertSame($reviews, $result);
-        $this->assertCount(2, $result);
+        static::assertSame($reviews, $result);
+        static::assertCount(2, $result);
     }
 
     private function createContributor(int $id, string $firstName, string $lastName, ?User $user = null): Contributor

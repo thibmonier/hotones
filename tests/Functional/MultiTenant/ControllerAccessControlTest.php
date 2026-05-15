@@ -131,8 +131,8 @@ class ControllerAccessControlTest extends WebTestCase
 
         // Vérifier que seuls les projets de Company 1 sont affichés
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('Project Alpha', $content);
-        $this->assertStringNotContainsString('Project Beta', $content);
+        static::assertStringContainsString('Project Alpha', $content);
+        static::assertStringNotContainsString('Project Beta', $content);
     }
 
     /**
@@ -170,8 +170,8 @@ class ControllerAccessControlTest extends WebTestCase
             ->getRepository(\App\Entity\Project::class)
             ->findOneBy(['name' => 'New Project']);
 
-        $this->assertNotNull($project);
-        $this->assertEquals($company->getId(), $project->getCompany()->getId());
+        static::assertNotNull($project);
+        static::assertEquals($company->getId(), $project->getCompany()->getId());
     }
 
     /**
@@ -199,7 +199,7 @@ class ControllerAccessControlTest extends WebTestCase
         $content2 = $this->client->getResponse()->getContent();
 
         // Les contenus doivent être différents
-        $this->assertNotEquals($content1, $content2);
+        static::assertNotEquals($content1, $content2);
     }
 
     /**

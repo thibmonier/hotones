@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use Exception;
 use OpenAI;
+use SensitiveParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,9 +24,9 @@ class ChatbotController extends AbstractController
         private readonly HttpClientInterface $httpClient,
         #[Autowire(env: 'OPENAI_API_KEY')]
         private readonly string $openAiKey,
-        #[Autowire(env: 'ANTHROPIC_API_KEY')]
+        #[SensitiveParameter] #[Autowire(env: 'ANTHROPIC_API_KEY')]
         private readonly string $anthropicApiKey,
-        #[Autowire(env: 'GEMINI_API_KEY')]
+        #[SensitiveParameter] #[Autowire(env: 'GEMINI_API_KEY')]
         private readonly string $geminiApiKey,
     ) {
     }

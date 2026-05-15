@@ -22,21 +22,21 @@ final class PerformanceProcessorTest extends TestCase
 
         $record = $processor($this->makeRecord());
 
-        self::assertArrayHasKey('memory_usage_mb', $record->extra);
-        self::assertArrayHasKey('memory_peak_mb', $record->extra);
-        self::assertArrayHasKey('execution_time_ms', $record->extra);
+        static::assertArrayHasKey('memory_usage_mb', $record->extra);
+        static::assertArrayHasKey('memory_peak_mb', $record->extra);
+        static::assertArrayHasKey('execution_time_ms', $record->extra);
 
-        self::assertIsFloat($record->extra['memory_usage_mb']);
-        self::assertIsFloat($record->extra['memory_peak_mb']);
-        self::assertIsFloat($record->extra['execution_time_ms']);
+        static::assertIsFloat($record->extra['memory_usage_mb']);
+        static::assertIsFloat($record->extra['memory_peak_mb']);
+        static::assertIsFloat($record->extra['execution_time_ms']);
 
-        self::assertGreaterThan(0.0, $record->extra['memory_usage_mb']);
-        self::assertGreaterThanOrEqual(
+        static::assertGreaterThan(0.0, $record->extra['memory_usage_mb']);
+        static::assertGreaterThanOrEqual(
             $record->extra['memory_usage_mb'],
             $record->extra['memory_peak_mb'],
             'peak memory >= current memory',
         );
-        self::assertGreaterThanOrEqual(0.0, $record->extra['execution_time_ms']);
+        static::assertGreaterThanOrEqual(0.0, $record->extra['execution_time_ms']);
     }
 
     public function testExistingExtraDataIsPreserved(): void
@@ -54,8 +54,8 @@ final class PerformanceProcessorTest extends TestCase
 
         $record = $processor($original);
 
-        self::assertSame('data', $record->extra['existing']);
-        self::assertArrayHasKey('memory_usage_mb', $record->extra);
+        static::assertSame('data', $record->extra['existing']);
+        static::assertArrayHasKey('memory_usage_mb', $record->extra);
     }
 
     public function testExecutionTimeIsMeasuredFromStartTime(): void
@@ -66,7 +66,7 @@ final class PerformanceProcessorTest extends TestCase
         $record = $processor($this->makeRecord());
 
         // Should be at least 5ms (allow margin for slow CI).
-        self::assertGreaterThan(0.0, $record->extra['execution_time_ms']);
+        static::assertGreaterThan(0.0, $record->extra['execution_time_ms']);
     }
 
     private function makeRecord(): LogRecord

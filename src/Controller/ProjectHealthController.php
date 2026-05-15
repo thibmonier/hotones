@@ -48,9 +48,11 @@ class ProjectHealthController extends AbstractController
         $allAtRisk = $this->healthScoreRepository->findProjectsAtRisk();
 
         foreach ($allAtRisk as $healthScore) {
-            if ($healthScore->getHealthLevel() === 'critical') {
-                $criticalProjects[] = $healthScore;
+            if ($healthScore->getHealthLevel() !== 'critical') {
+                continue;
             }
+
+            $criticalProjects[] = $healthScore;
         }
 
         return $this->render('project_health/overview.html.twig', [

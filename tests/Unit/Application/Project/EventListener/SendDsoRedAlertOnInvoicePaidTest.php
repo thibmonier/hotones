@@ -29,8 +29,8 @@ final class SendDsoRedAlertOnInvoicePaidTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::stringContains('DSO 30j'),
-                self::stringContains('70.0 j'),
+                static::stringContains('DSO 30j'),
+                static::stringContains('70.0 j'),
                 AlertSeverity::CRITICAL,
             )
             ->willReturn(true);
@@ -71,8 +71,8 @@ final class SendDsoRedAlertOnInvoicePaidTest extends TestCase
         $logger->expects(self::once())
             ->method('info')
             ->with(
-                self::stringContains('DSO red alert triggered'),
-                self::callback(fn (array $ctx) => isset($ctx['dso_30_days'], $ctx['threshold_days'], $ctx['slack_sent'])
+                static::stringContains('DSO red alert triggered'),
+                static::callback(static fn (array $ctx) => isset($ctx['dso_30_days'], $ctx['threshold_days'], $ctx['slack_sent'])
                     && $ctx['threshold_days'] === SendDsoRedAlertOnInvoicePaid::DEFAULT_RED_THRESHOLD_DAYS
                     && $ctx['slack_sent'] === true),
             );

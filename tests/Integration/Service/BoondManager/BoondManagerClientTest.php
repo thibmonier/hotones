@@ -38,7 +38,7 @@ final class BoondManagerClientTest extends TestCase
         ]);
         $client = new BoondManagerClient($http, new NullLogger());
 
-        self::assertTrue($client->testConnection($this->buildSettings()));
+        static::assertTrue($client->testConnection($this->buildSettings()));
     }
 
     public function testConnectionReturnsFalseWhenDictionaryRaises(): void
@@ -48,7 +48,7 @@ final class BoondManagerClientTest extends TestCase
         ]);
         $client = new BoondManagerClient($http, new NullLogger());
 
-        self::assertFalse($client->testConnection($this->buildSettings()));
+        static::assertFalse($client->testConnection($this->buildSettings()));
     }
 
     public function testGetTimesAggregatesPagedResponses(): void
@@ -79,9 +79,9 @@ final class BoondManagerClientTest extends TestCase
             new DateTimeImmutable('2026-01-31'),
         );
 
-        self::assertCount(3, $times);
-        self::assertSame([1, 2, 3], array_column($times, 'id'));
-        self::assertSame(2, $http->getRequestsCount());
+        static::assertCount(3, $times);
+        static::assertSame([1, 2, 3], array_column($times, 'id'));
+        static::assertSame(2, $http->getRequestsCount());
     }
 
     public function testGetResourceReturnsNullOnNotFound(): void
@@ -91,7 +91,7 @@ final class BoondManagerClientTest extends TestCase
         ]);
         $client = new BoondManagerClient($http, new NullLogger());
 
-        self::assertNull($client->getResource($this->buildSettings(), 999));
+        static::assertNull($client->getResource($this->buildSettings(), 999));
     }
 
     public function testGetResourceReturnsDataOnSuccess(): void
@@ -104,8 +104,8 @@ final class BoondManagerClientTest extends TestCase
 
         $result = $client->getResource($this->buildSettings(), 42);
 
-        self::assertSame(42, $result['id']);
-        self::assertSame('Doe', $result['lastName']);
+        static::assertSame(42, $result['id']);
+        static::assertSame('Doe', $result['lastName']);
     }
 
     public function testGetProjectsAggregatesPaging(): void
@@ -120,7 +120,7 @@ final class BoondManagerClientTest extends TestCase
 
         $projects = $client->getProjects($this->buildSettings());
 
-        self::assertCount(2, $projects);
+        static::assertCount(2, $projects);
     }
 
     public function testGetProjectReturnsNullOnException(): void
@@ -130,7 +130,7 @@ final class BoondManagerClientTest extends TestCase
         ]);
         $client = new BoondManagerClient($http, new NullLogger());
 
-        self::assertNull($client->getProject($this->buildSettings(), 7));
+        static::assertNull($client->getProject($this->buildSettings(), 7));
     }
 
     public function testGetDictionaryReturnsArrayOnSuccess(): void
@@ -141,13 +141,13 @@ final class BoondManagerClientTest extends TestCase
 
         $dict = $client->getDictionary($this->buildSettings());
 
-        self::assertIsArray($dict);
-        self::assertSame(['active', 'inactive'], $dict['statuses']);
+        static::assertIsArray($dict);
+        static::assertSame(['active', 'inactive'], $dict['statuses']);
     }
 
     public function testRequestUsesBasicAuthWhenConfigured(): void
     {
-        $http = new MockHttpClient(function (string $method, string $url, array $options) {
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) {
             self::assertSame('GET', $method);
             self::assertStringStartsWith(self::BASE_URL, $url);
             self::assertContains('auth_basic', array_keys($options));
@@ -162,7 +162,7 @@ final class BoondManagerClientTest extends TestCase
     public function testGetTimesPassesDateRangeAsQueryString(): void
     {
         $captured = [];
-        $http = new MockHttpClient(function (string $method, string $url, array $options) use (&$captured) {
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) use (&$captured) {
             $captured[] = ['method' => $method, 'url' => $url];
 
             return new MockResponse(
@@ -181,10 +181,10 @@ final class BoondManagerClientTest extends TestCase
             new DateTimeImmutable('2026-03-31'),
         );
 
-        self::assertCount(1, $captured);
-        self::assertStringContainsString('startDate=2026-03-01', $captured[0]['url']);
-        self::assertStringContainsString('endDate=2026-03-31', $captured[0]['url']);
-        self::assertStringContainsString('page=1', $captured[0]['url']);
+        static::assertCount(1, $captured);
+        static::assertStringContainsString('startDate=2026-03-01', $captured[0]['url']);
+        static::assertStringContainsString('endDate=2026-03-31', $captured[0]['url']);
+        static::assertStringContainsString('page=1', $captured[0]['url']);
     }
 
     private function buildSettings(): BoondManagerSettings

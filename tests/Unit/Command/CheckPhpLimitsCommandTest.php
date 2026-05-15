@@ -28,7 +28,7 @@ class CheckPhpLimitsCommandTest extends TestCase
     {
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
     }
 
     public function testExecuteDisplaysTitle(): void
@@ -36,7 +36,7 @@ class CheckPhpLimitsCommandTest extends TestCase
         $this->commandTester->execute([]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Limites PHP pour les uploads', $output);
+        static::assertStringContainsString('Limites PHP pour les uploads', $output);
     }
 
     public function testExecuteDisplaysPhpConfigurationTable(): void
@@ -46,13 +46,13 @@ class CheckPhpLimitsCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
 
         // Verify table headers and common config keys
-        $this->assertStringContainsString('Configuration', $output);
-        $this->assertStringContainsString('Valeur', $output);
-        $this->assertStringContainsString('upload_max_filesize', $output);
-        $this->assertStringContainsString('post_max_size', $output);
-        $this->assertStringContainsString('memory_limit', $output);
-        $this->assertStringContainsString('max_execution_time', $output);
-        $this->assertStringContainsString('file_uploads', $output);
+        static::assertStringContainsString('Configuration', $output);
+        static::assertStringContainsString('Valeur', $output);
+        static::assertStringContainsString('upload_max_filesize', $output);
+        static::assertStringContainsString('post_max_size', $output);
+        static::assertStringContainsString('memory_limit', $output);
+        static::assertStringContainsString('max_execution_time', $output);
+        static::assertStringContainsString('file_uploads', $output);
     }
 
     public function testExecuteDisplaysVerificationSection(): void
@@ -60,7 +60,7 @@ class CheckPhpLimitsCommandTest extends TestCase
         $this->commandTester->execute([]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Vérifications', $output);
+        static::assertStringContainsString('Vérifications', $output);
     }
 
     public function testParseSizeWithMinusOne(): void
@@ -70,7 +70,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '-1');
 
-        $this->assertEquals(-1, $result);
+        static::assertEquals(-1, $result);
     }
 
     public function testParseSizeWithGigabytes(): void
@@ -80,7 +80,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '2G');
 
-        $this->assertEquals(2 * 1024 * 1024 * 1024, $result);
+        static::assertEquals(2 * 1024 * 1024 * 1024, $result);
     }
 
     public function testParseSizeWithMegabytes(): void
@@ -90,7 +90,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '128M');
 
-        $this->assertEquals(128 * 1024 * 1024, $result);
+        static::assertEquals(128 * 1024 * 1024, $result);
     }
 
     public function testParseSizeWithKilobytes(): void
@@ -100,7 +100,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '512K');
 
-        $this->assertEquals(512 * 1024, $result);
+        static::assertEquals(512 * 1024, $result);
     }
 
     public function testParseSizeWithPlainBytes(): void
@@ -110,7 +110,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '1024');
 
-        $this->assertEquals(1024, $result);
+        static::assertSame(1024, $result);
     }
 
     public function testParseSizeWithZero(): void
@@ -120,7 +120,7 @@ class CheckPhpLimitsCommandTest extends TestCase
 
         $result = $method->invoke($this->command, '0');
 
-        $this->assertEquals(0, $result);
+        static::assertSame(0, $result);
     }
 
     public function testParseSizeWithLowercaseUnits(): void
@@ -133,9 +133,9 @@ class CheckPhpLimitsCommandTest extends TestCase
         $resultM = $method->invoke($this->command, '2m');
         $resultK = $method->invoke($this->command, '3k');
 
-        $this->assertEquals(1024 * 1024 * 1024, $resultG);
-        $this->assertEquals(2 * 1024 * 1024, $resultM);
-        $this->assertEquals(3 * 1024, $resultK);
+        static::assertEquals(1024 * 1024 * 1024, $resultG);
+        static::assertEquals(2 * 1024 * 1024, $resultM);
+        static::assertEquals(3 * 1024, $resultK);
     }
 
     public function testParseSizeWithVariousSizes(): void
@@ -144,16 +144,16 @@ class CheckPhpLimitsCommandTest extends TestCase
         $method = $reflection->getMethod('parseSize');
 
         $testCases = [
-            ['input' => '1G', 'expected' => 1073741824],
-            ['input' => '10M', 'expected' => 10485760],
-            ['input' => '100K', 'expected' => 102400],
+            ['input' => '1G', 'expected' => 1_073_741_824],
+            ['input' => '10M', 'expected' => 10_485_760],
+            ['input' => '100K', 'expected' => 102_400],
             ['input' => '500', 'expected' => 500],
-            ['input' => '2048M', 'expected' => 2147483648],
+            ['input' => '2048M', 'expected' => 2_147_483_648],
         ];
 
         foreach ($testCases as $case) {
             $result = $method->invoke($this->command, $case['input']);
-            $this->assertEquals($case['expected'], $result, "Failed for input: {$case['input']}");
+            static::assertEquals($case['expected'], $result, "Failed for input: {$case['input']}");
         }
     }
 
@@ -163,7 +163,7 @@ class CheckPhpLimitsCommandTest extends TestCase
         // (it's a diagnostic command, not a validation command that fails)
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertEquals(0, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertSame(0, $exitCode);
     }
 }

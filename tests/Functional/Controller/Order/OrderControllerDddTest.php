@@ -61,8 +61,8 @@ final class OrderControllerDddTest extends WebTestCase
         self::assertResponseRedirects();
 
         $order = $em->getRepository(Order::class)->findOneBy(['orderNumber' => 'D-TEST-001']);
-        self::assertNotNull($order);
-        self::assertSame('Quote Q1', $order->name);
+        static::assertNotNull($order);
+        static::assertSame('Quote Q1', $order->name);
     }
 
     public function testCreateOrderAutoGeneratesReferenceIfMissing(): void
@@ -84,8 +84,8 @@ final class OrderControllerDddTest extends WebTestCase
         self::assertResponseRedirects();
 
         $order = $em->getRepository(Order::class)->findOneBy(['name' => 'Auto Ref Order']);
-        self::assertNotNull($order);
-        self::assertNotEmpty($order->orderNumber);
+        static::assertNotNull($order);
+        static::assertNotEmpty($order->orderNumber);
     }
 
     public function testCreateOrderRejectsInvalidContractType(): void
@@ -107,7 +107,7 @@ final class OrderControllerDddTest extends WebTestCase
         self::assertResponseRedirects('/orders');
 
         $order = $em->getRepository(Order::class)->findOneBy(['orderNumber' => 'D-BAD-CT']);
-        self::assertNull($order);
+        static::assertNull($order);
     }
 
     public function testGetNewRendersForm(): void
@@ -133,7 +133,7 @@ final class OrderControllerDddTest extends WebTestCase
         ]);
 
         // Route promoted/removed : Symfony match `/{id}` (GET) → 405 pour POST.
-        self::assertContains($this->client->getResponse()->getStatusCode(), [404, 405]);
+        static::assertContains($this->client->getResponse()->getStatusCode(), [404, 405]);
     }
 
     private function makeClient(EntityManagerInterface $em): Client

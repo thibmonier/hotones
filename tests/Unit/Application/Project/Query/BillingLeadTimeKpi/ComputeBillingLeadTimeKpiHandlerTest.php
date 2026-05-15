@@ -22,12 +22,12 @@ final class ComputeBillingLeadTimeKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertSame(0, $dto->stats30->count);
-        self::assertSame(0, $dto->stats90->count);
-        self::assertSame(0, $dto->stats365->count);
-        self::assertSame([], $dto->topSlowClients);
-        self::assertFalse($dto->warningTriggered);
-        self::assertSame(14.0, $dto->warningThresholdDays);
+        static::assertSame(0, $dto->stats30->count);
+        static::assertSame(0, $dto->stats90->count);
+        static::assertSame(0, $dto->stats365->count);
+        static::assertSame([], $dto->topSlowClients);
+        static::assertFalse($dto->warningTriggered);
+        static::assertSame(14.0, $dto->warningThresholdDays);
     }
 
     public function testFlagsWarningWhenMedian30JAboveThreshold(): void
@@ -43,8 +43,8 @@ final class ComputeBillingLeadTimeKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertTrue($dto->warningTriggered);
-        self::assertEqualsWithDelta(20.0, $dto->stats30->p50->getDays(), 0.5);
+        static::assertTrue($dto->warningTriggered);
+        static::assertEqualsWithDelta(20.0, $dto->stats30->p50->getDays(), 0.5);
     }
 
     public function testRanksTopSlowClientsByAverageLeadTimeDesc(): void
@@ -68,13 +68,13 @@ final class ComputeBillingLeadTimeKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertCount(3, $dto->topSlowClients);
-        self::assertSame('Gamma', $dto->topSlowClients[0]->clientName);
-        self::assertSame(50.0, $dto->topSlowClients[0]->averageLeadTimeDays);
-        self::assertSame('Acme', $dto->topSlowClients[1]->clientName);
-        self::assertSame(30.0, $dto->topSlowClients[1]->averageLeadTimeDays);
-        self::assertSame(2, $dto->topSlowClients[1]->sampleCount);
-        self::assertSame('Beta', $dto->topSlowClients[2]->clientName);
+        static::assertCount(3, $dto->topSlowClients);
+        static::assertSame('Gamma', $dto->topSlowClients[0]->clientName);
+        static::assertSame(50.0, $dto->topSlowClients[0]->averageLeadTimeDays);
+        static::assertSame('Acme', $dto->topSlowClients[1]->clientName);
+        static::assertSame(30.0, $dto->topSlowClients[1]->averageLeadTimeDays);
+        static::assertSame(2, $dto->topSlowClients[1]->sampleCount);
+        static::assertSame('Beta', $dto->topSlowClients[2]->clientName);
     }
 
     public function testSkipsRecordsWithoutClientIdInTop3(): void
@@ -91,8 +91,8 @@ final class ComputeBillingLeadTimeKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertCount(1, $dto->topSlowClients);
-        self::assertSame('Acme', $dto->topSlowClients[0]->clientName);
+        static::assertCount(1, $dto->topSlowClients);
+        static::assertSame('Acme', $dto->topSlowClients[0]->clientName);
     }
 
     /**

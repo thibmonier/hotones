@@ -39,7 +39,7 @@ final class ProfileFactory extends PersistentObjectFactory
             'name' => $faker->unique()->jobTitle(),
             'description' => $faker->optional()->sentence(10),
             'defaultDailyRate' => (string) $faker->numberBetween(400, 900),
-            'color' => sprintf('#%06X', $faker->numberBetween(0, 0xFFFFFF)),
+            'color' => sprintf('#%06X', $faker->numberBetween(0, 0xFF_FFFF)),
             'active' => true,
             'company' => $company ?? CompanyFactory::new(),
         ];

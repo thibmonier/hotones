@@ -19,40 +19,40 @@ class ProjectTaskTest extends TestCase
         $task = new ProjectTask();
 
         $task->setName('Task 1');
-        $this->assertEquals('Task 1', $task->getName());
+        static::assertSame('Task 1', $task->getName());
 
         $task->setDescription('Description');
-        $this->assertEquals('Description', $task->getDescription());
+        static::assertSame('Description', $task->getDescription());
 
         $task->setType('regular');
-        $this->assertEquals('regular', $task->getType());
+        static::assertSame('regular', $task->getType());
 
         $task->setIsDefault(true);
-        $this->assertTrue($task->getIsDefault());
+        static::assertTrue($task->getIsDefault());
 
         $task->setCountsForProfitability(true);
-        $this->assertTrue($task->getCountsForProfitability());
+        static::assertTrue($task->getCountsForProfitability());
 
         $task->setPosition(1);
-        $this->assertEquals(1, $task->getPosition());
+        static::assertSame(1, $task->getPosition());
 
         $task->setActive(true);
-        $this->assertTrue($task->getActive());
+        static::assertTrue($task->getActive());
 
         $task->setEstimatedHoursSold(100);
-        $this->assertEquals(100, $task->getEstimatedHoursSold());
+        static::assertSame(100, $task->getEstimatedHoursSold());
 
         $task->setEstimatedHoursRevised(90);
-        $this->assertEquals(90, $task->getEstimatedHoursRevised());
+        static::assertSame(90, $task->getEstimatedHoursRevised());
 
         $task->setProgressPercentage(50);
-        $this->assertEquals(50, $task->getProgressPercentage());
+        static::assertSame(50, $task->getProgressPercentage());
 
         $task->setDailyRate('500.00');
-        $this->assertEquals('500.00', $task->getDailyRate());
+        static::assertSame('500.00', $task->getDailyRate());
 
         $task->setStatus('in_progress');
-        $this->assertEquals('in_progress', $task->getStatus());
+        static::assertSame('in_progress', $task->getStatus());
     }
 
     public function testProjectRelation(): void
@@ -63,8 +63,8 @@ class ProjectTaskTest extends TestCase
 
         $task->setProject($project);
 
-        $this->assertSame($project, $task->getProject());
-        $this->assertEquals('Test Project', $task->getProject()->getName());
+        static::assertSame($project, $task->getProject());
+        static::assertSame('Test Project', $task->getProject()->getName());
     }
 
     public function testOrderLineRelation(): void
@@ -74,7 +74,7 @@ class ProjectTaskTest extends TestCase
 
         $task->setOrderLine($orderLine);
 
-        $this->assertSame($orderLine, $task->getOrderLine());
+        static::assertSame($orderLine, $task->getOrderLine());
     }
 
     public function testAssignedContributorRelation(): void
@@ -86,7 +86,7 @@ class ProjectTaskTest extends TestCase
 
         $task->setAssignedContributor($contributor);
 
-        $this->assertSame($contributor, $task->getAssignedContributor());
+        static::assertSame($contributor, $task->getAssignedContributor());
     }
 
     public function testRequiredProfileRelation(): void
@@ -97,7 +97,7 @@ class ProjectTaskTest extends TestCase
 
         $task->setRequiredProfile($profile);
 
-        $this->assertSame($profile, $task->getRequiredProfile());
+        static::assertSame($profile, $task->getRequiredProfile());
     }
 
     public function testDatesHandling(): void
@@ -110,8 +110,8 @@ class ProjectTaskTest extends TestCase
         $task->setStartDate($startDate);
         $task->setEndDate($endDate);
 
-        $this->assertEquals($startDate, $task->getStartDate());
-        $this->assertEquals($endDate, $task->getEndDate());
+        static::assertEquals($startDate, $task->getStartDate());
+        static::assertEquals($endDate, $task->getEndDate());
     }
 
     public function testDefaultValues(): void
@@ -119,7 +119,7 @@ class ProjectTaskTest extends TestCase
         $task = new ProjectTask();
 
         // Note: Default values are set in the entity constructor
-        $this->assertEquals(0, $task->getProgressPercentage());
+        static::assertSame(0, $task->getProgressPercentage());
     }
 
     public function testEstimatedHoursLogic(): void
@@ -130,8 +130,8 @@ class ProjectTaskTest extends TestCase
         $task->setEstimatedHoursSold(100);
         $task->setEstimatedHoursRevised(80);
 
-        $this->assertEquals(80, $task->getEstimatedHoursRevised());
-        $this->assertEquals(100, $task->getEstimatedHoursSold());
+        static::assertSame(80, $task->getEstimatedHoursRevised());
+        static::assertSame(100, $task->getEstimatedHoursSold());
     }
 
     public function testProgressPercentageConstraints(): void
@@ -139,13 +139,13 @@ class ProjectTaskTest extends TestCase
         $task = new ProjectTask();
 
         $task->setProgressPercentage(0);
-        $this->assertEquals(0, $task->getProgressPercentage());
+        static::assertSame(0, $task->getProgressPercentage());
 
         $task->setProgressPercentage(50);
-        $this->assertEquals(50, $task->getProgressPercentage());
+        static::assertSame(50, $task->getProgressPercentage());
 
         $task->setProgressPercentage(100);
-        $this->assertEquals(100, $task->getProgressPercentage());
+        static::assertSame(100, $task->getProgressPercentage());
     }
 
     public function testTaskTypeValues(): void
@@ -156,7 +156,7 @@ class ProjectTaskTest extends TestCase
 
         foreach ($validTypes as $type) {
             $task->setType($type);
-            $this->assertEquals($type, $task->getType());
+            static::assertEquals($type, $task->getType());
         }
     }
 
@@ -168,7 +168,7 @@ class ProjectTaskTest extends TestCase
 
         foreach ($validStatuses as $status) {
             $task->setStatus($status);
-            $this->assertEquals($status, $task->getStatus());
+            static::assertEquals($status, $task->getStatus());
         }
     }
 }

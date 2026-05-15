@@ -8,7 +8,6 @@ use App\Domain\Client\Entity\Client as DddClient;
 use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Client\ValueObject\CompanyName;
 use App\Domain\Client\ValueObject\ServiceLevel;
-use App\Domain\Shared\ValueObject\Email;
 use App\Entity\Client as FlatClient;
 use DateTimeImmutable;
 use RuntimeException;

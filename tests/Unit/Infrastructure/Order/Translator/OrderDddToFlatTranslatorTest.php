@@ -24,7 +24,7 @@ final class OrderDddToFlatTranslatorTest extends TestCase
             'D202601-001',
             ClientId::fromLegacyInt(7),
             $type,
-            Money::fromAmount(10000),
+            Money::fromAmount(10_000),
         );
         if ($status !== null) {
             new ReflectionProperty(DddOrder::class, 'status')->setValue($order, $status);
@@ -41,10 +41,10 @@ final class OrderDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat);
 
-        $this->assertSame('D202601-001', $flat->orderNumber);
-        $this->assertSame('a_signer', $flat->status); // DRAFT collapses to a_signer
-        $this->assertSame('forfait', $flat->contractType);
-        $this->assertSame('10000', $flat->totalAmount);
+        static::assertSame('D202601-001', $flat->orderNumber);
+        static::assertSame('a_signer', $flat->status); // DRAFT collapses to a_signer
+        static::assertSame('forfait', $flat->contractType);
+        static::assertSame('10000', $flat->totalAmount);
     }
 
     public function testStatusMappingSigned(): void
@@ -55,7 +55,7 @@ final class OrderDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat);
 
-        $this->assertSame('signe', $flat->status);
+        static::assertSame('signe', $flat->status);
     }
 
     public function testStatusMappingCompleted(): void
@@ -66,7 +66,7 @@ final class OrderDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat);
 
-        $this->assertSame('termine', $flat->status);
+        static::assertSame('termine', $flat->status);
     }
 
     public function testStatusDraftCollapsesToToSign(): void
@@ -77,7 +77,7 @@ final class OrderDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat);
 
-        $this->assertSame('a_signer', $flat->status);
+        static::assertSame('a_signer', $flat->status);
     }
 
     public function testContractTypeMapping(): void
@@ -88,6 +88,6 @@ final class OrderDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat);
 
-        $this->assertSame('regie', $flat->contractType);
+        static::assertSame('regie', $flat->contractType);
     }
 }

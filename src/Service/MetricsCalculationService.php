@@ -310,9 +310,11 @@ class MetricsCalculationService
 
         $workingDays = 0;
         foreach ($period as $date) {
-            if ((int) $date->format('N') <= 5) {
-                ++$workingDays;
+            if ((int) $date->format('N') > 5) {
+                continue;
             }
+
+            ++$workingDays;
         }
 
         return $workingDays;

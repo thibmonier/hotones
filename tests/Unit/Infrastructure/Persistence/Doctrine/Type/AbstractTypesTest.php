@@ -60,12 +60,12 @@ final class AbstractTypesTest extends TestCase
 
         $platform = $this->createMock(AbstractPlatform::class);
 
-        $this->assertNull($type->convertToPHPValue(null, $platform));
-        $this->assertNull($type->convertToPHPValue('', $platform));
-        $this->assertSame(TestStatusEnum::ACTIVE, $type->convertToPHPValue('active', $platform));
+        static::assertNull($type->convertToPHPValue(null, $platform));
+        static::assertNull($type->convertToPHPValue('', $platform));
+        static::assertSame(TestStatusEnum::ACTIVE, $type->convertToPHPValue('active', $platform));
 
-        $this->assertNull($type->convertToDatabaseValue(null, $platform));
-        $this->assertSame('active', $type->convertToDatabaseValue(TestStatusEnum::ACTIVE, $platform));
+        static::assertNull($type->convertToDatabaseValue(null, $platform));
+        static::assertSame('active', $type->convertToDatabaseValue(TestStatusEnum::ACTIVE, $platform));
     }
 
     public function testStringTypeRoundTrip(): void
@@ -84,15 +84,15 @@ final class AbstractTypesTest extends TestCase
 
         $platform = $this->createMock(AbstractPlatform::class);
 
-        $this->assertNull($type->convertToPHPValue(null, $platform));
-        $this->assertNull($type->convertToPHPValue('', $platform));
+        static::assertNull($type->convertToPHPValue(null, $platform));
+        static::assertNull($type->convertToPHPValue('', $platform));
 
         $vo = $type->convertToPHPValue('hello', $platform);
-        $this->assertInstanceOf(TestStringValueObject::class, $vo);
-        $this->assertSame('hello', $vo->getValue());
+        static::assertInstanceOf(TestStringValueObject::class, $vo);
+        static::assertSame('hello', $vo->getValue());
 
-        $this->assertNull($type->convertToDatabaseValue(null, $platform));
-        $this->assertSame('hello', $type->convertToDatabaseValue($vo, $platform));
+        static::assertNull($type->convertToDatabaseValue(null, $platform));
+        static::assertSame('hello', $type->convertToDatabaseValue($vo, $platform));
     }
 
     public function testUuidTypeRoundTrip(): void
@@ -112,14 +112,14 @@ final class AbstractTypesTest extends TestCase
         $platform = $this->createMock(AbstractPlatform::class);
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
 
-        $this->assertNull($type->convertToPHPValue(null, $platform));
-        $this->assertNull($type->convertToPHPValue('', $platform));
+        static::assertNull($type->convertToPHPValue(null, $platform));
+        static::assertNull($type->convertToPHPValue('', $platform));
 
         $vo = $type->convertToPHPValue($uuid, $platform);
-        $this->assertInstanceOf(TestStringValueObject::class, $vo);
-        $this->assertSame($uuid, $vo->getValue());
+        static::assertInstanceOf(TestStringValueObject::class, $vo);
+        static::assertSame($uuid, $vo->getValue());
 
-        $this->assertNull($type->convertToDatabaseValue(null, $platform));
-        $this->assertSame($uuid, $type->convertToDatabaseValue($vo, $platform));
+        static::assertNull($type->convertToDatabaseValue(null, $platform));
+        static::assertSame($uuid, $type->convertToDatabaseValue($vo, $platform));
     }
 }

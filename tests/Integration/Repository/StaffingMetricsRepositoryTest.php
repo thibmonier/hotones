@@ -63,12 +63,12 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         $results = $this->repository->getWeeklyOccupancyByContributor(2024);
 
         // Assert
-        $this->assertCount(2, $results);
-        $this->assertEquals($contributor->getId(), (int) $results[0]['contributorId']);
-        $this->assertEquals('John Doe', $results[0]['contributorName']);
-        $this->assertEquals('2024-S01', $results[0]['weekNumber']);
-        $this->assertEquals(90.0, $results[0]['occupancyRate']); // (4 + 0.5) / 5 * 100
-        $this->assertEquals(0.5, $results[0]['remainingCapacity']); // 5 - 4.5
+        static::assertCount(2, $results);
+        static::assertEquals($contributor->getId(), (int) $results[0]['contributorId']);
+        static::assertSame('John Doe', $results[0]['contributorName']);
+        static::assertSame('2024-S01', $results[0]['weekNumber']);
+        static::assertSame(90.0, $results[0]['occupancyRate']); // (4 + 0.5) / 5 * 100
+        static::assertSame(0.5, $results[0]['remainingCapacity']); // 5 - 4.5
     }
 
     public function testGetWeeklyOccupancyByContributorWithProfileFilter(): void
@@ -92,7 +92,7 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         $results = $this->repository->getWeeklyOccupancyByContributor(2024, $profile);
 
         // Assert
-        $this->assertCount(1, $results);
+        static::assertCount(1, $results);
     }
 
     public function testGetWeeklyGlobalTACE(): void
@@ -122,11 +122,12 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         $results = $this->repository->getWeeklyGlobalTACE(2024);
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals('2024-S01', $results[0]['weekNumber']);
-        $this->assertEquals(5, (int) $results[0]['contributorCount']); // 3 + 2
-        $this->assertEquals('36.00', $results[0]['staffedDays']); // 17 + 19
-        $this->assertEquals('40.00', $results[0]['workedDays']); // 20 + 20
+        static::assertCount(1, $results);
+        static::assertSame('2024-S01', $results[0]['weekNumber']);
+        static::assertSame(5, (int) $results[0]['contributorCount']); // 3 + 2
+        // Doctrine SUM() peut renvoyer un int (PG) ou un string (MySQL). Compare en numérique.
+        static::assertSame(36, (int) $results[0]['staffedDays']); // 17 + 19
+        static::assertSame(40, (int) $results[0]['workedDays']); // 20 + 20
     }
 
     public function testGetWeeklyGlobalTACEExcludesNonProductiveProfiles(): void
@@ -164,9 +165,9 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         $results = $this->repository->getWeeklyGlobalTACE(2024);
 
         // Assert
-        $this->assertCount(1, $results);
+        static::assertCount(1, $results);
         // Should only count productive (3) + null profile (2) = 5
-        $this->assertEquals(5, (int) $results[0]['contributorCount']);
+        static::assertSame(5, (int) $results[0]['contributorCount']);
     }
 
     public function testDeleteForDateRangeReturnsZeroWhenNoMatches(): void
@@ -181,6 +182,6 @@ class StaffingMetricsRepositoryTest extends KernelTestCase
         );
 
         // Assert
-        $this->assertEquals(0, $deleted);
+        static::assertSame(0, $deleted);
     }
 }

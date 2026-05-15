@@ -27,8 +27,8 @@ final class CachingBillingLeadTimeReadModelRepositoryTest extends TestCase
 
         $records = $repository->findEmittedInRollingWindow(30, new DateTimeImmutable('2026-05-12'));
 
-        self::assertCount(1, $records);
-        self::assertSame(1, $inner->callCount);
+        static::assertCount(1, $records);
+        static::assertSame(1, $inner->callCount);
     }
 
     public function testReturnsCachedResultOnHit(): void
@@ -46,7 +46,7 @@ final class CachingBillingLeadTimeReadModelRepositoryTest extends TestCase
         $repository->findEmittedInRollingWindow(30, $now);
         $repository->findEmittedInRollingWindow(30, $now);
 
-        self::assertSame(1, $inner->callCount, 'inner called once thanks to cache');
+        static::assertSame(1, $inner->callCount, 'inner called once thanks to cache');
     }
 
     public function testCacheKeyDifferentiatesWindowDays(): void
@@ -64,7 +64,7 @@ final class CachingBillingLeadTimeReadModelRepositoryTest extends TestCase
         $repository->findEmittedInRollingWindow(90, $now);
         $repository->findEmittedInRollingWindow(365, $now);
 
-        self::assertSame(3, $inner->callCount);
+        static::assertSame(3, $inner->callCount);
     }
 
     public function testCacheKeyDifferentiatesCompany(): void
@@ -79,7 +79,7 @@ final class CachingBillingLeadTimeReadModelRepositoryTest extends TestCase
         $repoA->findEmittedInRollingWindow(30, $now);
         $repoB->findEmittedInRollingWindow(30, $now);
 
-        self::assertSame(2, $inner->callCount, 'multi-tenant isolation');
+        static::assertSame(2, $inner->callCount, 'multi-tenant isolation');
     }
 
     public function testCacheKeyDifferentiatesDay(): void
@@ -95,7 +95,7 @@ final class CachingBillingLeadTimeReadModelRepositoryTest extends TestCase
         $repository->findEmittedInRollingWindow(30, new DateTimeImmutable('2026-05-12'));
         $repository->findEmittedInRollingWindow(30, new DateTimeImmutable('2026-05-13'));
 
-        self::assertSame(2, $inner->callCount, 'rolling window rebuilds at day boundary');
+        static::assertSame(2, $inner->callCount, 'rolling window rebuilds at day boundary');
     }
 
     /**

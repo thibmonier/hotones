@@ -101,19 +101,19 @@ class ProfitabilityServiceTest extends TestCase
         // Revenue: 5 * 1000 with 0 contingency = 5000; method also supports contingency but none set
         // BUT calculateOrderTotal subtracts contingency if set; not set here
         // Service adds purchases: project 200 + line 100 = 300; Human cost: 16h * 400 / 8 = 800
-        $this->assertSame('5000.00', $result['revenue']);
-        $this->assertSame('1100.00', $result['cost']);
-        $this->assertSame('3900.00', $result['margin']);
-        $this->assertSame('78.00', $result['margin_rate']);
-        $this->assertSame('5.00', $result['sold_days']);
-        $this->assertSame('16', $result['worked_hours']);
-        $this->assertSame('2.00', $result['worked_days']);
-        $this->assertSame('16.00', $result['billable_hours']);
-        $this->assertSame('2.00', $result['billable_days']);
-        $this->assertFalse($result['is_internal']);
-        $this->assertSame('0', $result['excluded_hours']);
-        $this->assertSame(1, $result['orders_count']);
-        $this->assertSame('200.00', $result['purchases_amount']);
+        static::assertSame('5000.00', $result['revenue']);
+        static::assertSame('1100.00', $result['cost']);
+        static::assertSame('3900.00', $result['margin']);
+        static::assertSame('78.00', $result['margin_rate']);
+        static::assertSame('5.00', $result['sold_days']);
+        static::assertSame('16', $result['worked_hours']);
+        static::assertSame('2.00', $result['worked_days']);
+        static::assertSame('16.00', $result['billable_hours']);
+        static::assertSame('2.00', $result['billable_days']);
+        static::assertFalse($result['is_internal']);
+        static::assertSame('0', $result['excluded_hours']);
+        static::assertSame(1, $result['orders_count']);
+        static::assertSame('200.00', $result['purchases_amount']);
     }
 
     public function testCalculateProjectProfitabilityForInternalProject(): void
@@ -144,13 +144,13 @@ class ProfitabilityServiceTest extends TestCase
 
         $result = $service->calculateProjectProfitability($project);
 
-        $this->assertTrue($result['is_internal']);
-        $this->assertSame('0', $result['revenue']);
-        $this->assertSame('0', $result['cost']);
-        $this->assertSame('0', $result['margin']);
-        $this->assertSame('0', $result['margin_rate']);
-        $this->assertSame('1.00', $result['worked_days']);
-        $this->assertSame('8', $result['worked_hours']);
+        static::assertTrue($result['is_internal']);
+        static::assertSame('0', $result['revenue']);
+        static::assertSame('0', $result['cost']);
+        static::assertSame('0', $result['margin']);
+        static::assertSame('0', $result['margin_rate']);
+        static::assertSame('1.00', $result['worked_days']);
+        static::assertSame('8', $result['worked_hours']);
     }
 
     public function testCalculateProjectProfitabilityWithContingency(): void
@@ -187,7 +187,7 @@ class ProfitabilityServiceTest extends TestCase
         $result = $service->calculateProjectProfitability($project);
 
         // 10 days * 1000 = 10000, minus 10% contingency = 9000
-        $this->assertSame('9000.00', $result['revenue']);
+        static::assertSame('9000.00', $result['revenue']);
     }
 
     public function testCalculateProjectProfitabilityWithNonBillableTasks(): void
@@ -244,10 +244,10 @@ class ProfitabilityServiceTest extends TestCase
         $result = $service->calculateProjectProfitability($project);
 
         // Total hours: 12, excluded: 4, billable: 8
-        $this->assertSame('12', $result['worked_hours']);
-        $this->assertSame('4.00', $result['excluded_hours']);
-        $this->assertSame('8.00', $result['billable_hours']);
-        $this->assertSame('1.00', $result['billable_days']);
+        static::assertSame('12', $result['worked_hours']);
+        static::assertSame('4.00', $result['excluded_hours']);
+        static::assertSame('8.00', $result['billable_hours']);
+        static::assertSame('1.00', $result['billable_days']);
     }
 
     public function testCalculateGlobalKPIsExcludesInternalProjects(): void
@@ -285,9 +285,9 @@ class ProfitabilityServiceTest extends TestCase
         $projects = [$externalProject, $internalProject];
         $result = $service->calculateGlobalKPIs($projects);
 
-        $this->assertSame(1, $result['external_projects_count']);
-        $this->assertSame(1, $result['internal_projects_count']);
-        $this->assertSame('5000.00', $result['total_revenue']);
+        static::assertSame(1, $result['external_projects_count']);
+        static::assertSame(1, $result['internal_projects_count']);
+        static::assertSame('5000.00', $result['total_revenue']);
     }
 
     public function testCalculateGlobalKPIsWithZeroRevenue(): void
@@ -297,10 +297,10 @@ class ProfitabilityServiceTest extends TestCase
         $projects = [];
         $result = $service->calculateGlobalKPIs($projects);
 
-        $this->assertSame('0', $result['total_revenue']);
-        $this->assertSame('0', $result['total_cost']);
-        $this->assertSame('0.00', $result['total_margin']);
-        $this->assertSame('0', $result['global_margin_rate']);
+        static::assertSame('0', $result['total_revenue']);
+        static::assertSame('0', $result['total_cost']);
+        static::assertSame('0.00', $result['total_margin']);
+        static::assertSame('0', $result['global_margin_rate']);
     }
 
     public function testCompareProjectForecastVsRealizedOverrun(): void
@@ -352,18 +352,18 @@ class ProfitabilityServiceTest extends TestCase
                 ->setContributor($contributor)
                 ->setProject($project)
                 ->setTask($billableTask)
-                ->setDate(new DateTime("2025-01-1$i"))
+                ->setDate(new DateTime("2025-01-1{$i}"))
                 ->setHours('8.00');
             $project->getTimesheets()->add($ts);
         }
 
         $result = $service->compareProjectForecastVsRealized($project);
 
-        $this->assertSame('5.00', $result['sold_days']);
-        $this->assertSame('6.00', $result['billable_days']);
-        $this->assertSame('1.00', $result['days_overrun']); // 6 - 5 = 1
-        $this->assertTrue($result['is_overrun']);
-        $this->assertGreaterThan(10, floatval($result['overrun_percentage'])); // (1/5)*100 = 20%
+        static::assertSame('5.00', $result['sold_days']);
+        static::assertSame('6.00', $result['billable_days']);
+        static::assertSame('1.00', $result['days_overrun']); // 6 - 5 = 1
+        static::assertTrue($result['is_overrun']);
+        static::assertGreaterThan(10, floatval($result['overrun_percentage'])); // (1/5)*100 = 20%
     }
 
     public function testGenerateProfitabilityAlertsNegativeMargin(): void
@@ -415,7 +415,7 @@ class ProfitabilityServiceTest extends TestCase
                 ->setContributor($contributor)
                 ->setProject($project)
                 ->setTask($billableTask)
-                ->setDate(new DateTime("2025-01-$i"))
+                ->setDate(new DateTime("2025-01-{$i}"))
                 ->setHours('8.00');
             $project->getTimesheets()->add($ts);
         }
@@ -423,10 +423,10 @@ class ProfitabilityServiceTest extends TestCase
         $alerts = $service->generateProfitabilityAlerts($project);
         $hasNegativeMarginAlert = array_any(
             $alerts,
-            fn ($alert): bool => $alert['type'] === 'danger' && $alert['title'] === 'Marge négative',
+            static fn ($alert): bool => $alert['type'] === 'danger' && $alert['title'] === 'Marge négative',
         );
 
-        $this->assertTrue($hasNegativeMarginAlert);
+        static::assertTrue($hasNegativeMarginAlert);
     }
 
     public function testFormatProfitabilityForDisplay(): void
@@ -448,11 +448,11 @@ class ProfitabilityServiceTest extends TestCase
 
         $result = $service->formatProfitabilityForDisplay($profitability);
 
-        $this->assertStringContainsString('5 000', $result['revenue']);
-        $this->assertStringContainsString('€', $result['revenue']);
-        $this->assertStringContainsString('40', $result['margin_rate']);
-        $this->assertStringContainsString('%', $result['margin_rate']);
-        $this->assertFalse($result['is_internal']);
+        static::assertStringContainsString('5 000', $result['revenue']);
+        static::assertStringContainsString('€', $result['revenue']);
+        static::assertStringContainsString('40', $result['margin_rate']);
+        static::assertStringContainsString('%', $result['margin_rate']);
+        static::assertFalse($result['is_internal']);
     }
 
     public function testBuildBudgetDonut(): void
@@ -463,13 +463,13 @@ class ProfitabilityServiceTest extends TestCase
         $project = $this->createProjectWithRevenueAndCosts();
         $result = $service->buildBudgetDonut($project);
 
-        $this->assertArrayHasKey('labels', $result);
-        $this->assertArrayHasKey('data', $result);
-        $this->assertCount(3, $result['labels']);
-        $this->assertCount(3, $result['data']);
-        $this->assertContains('Marge', $result['labels']);
-        $this->assertContains('Achats', $result['labels']);
-        $this->assertContains('Coût homme', $result['labels']);
+        static::assertArrayHasKey('labels', $result);
+        static::assertArrayHasKey('data', $result);
+        static::assertCount(3, $result['labels']);
+        static::assertCount(3, $result['data']);
+        static::assertContains('Marge', $result['labels']);
+        static::assertContains('Achats', $result['labels']);
+        static::assertContains('Coût homme', $result['labels']);
     }
 
     public function testMultipleOrdersCalculation(): void
@@ -518,10 +518,10 @@ class ProfitabilityServiceTest extends TestCase
         $result = $service->calculateProjectProfitability($project);
 
         // Total revenue: (5 * 1000) + (3 * 1200) = 5000 + 3600 = 8600
-        $this->assertSame('8600.00', $result['revenue']);
+        static::assertSame('8600.00', $result['revenue']);
         // Total sold days: 5 + 3 = 8
-        $this->assertSame('8.00', $result['sold_days']);
-        $this->assertSame(2, $result['orders_count']);
+        static::assertSame('8.00', $result['sold_days']);
+        static::assertSame(2, $result['orders_count']);
     }
 
     public function testOrderStatusFiltering(): void
@@ -570,7 +570,7 @@ class ProfitabilityServiceTest extends TestCase
         $result = $service->calculateProjectProfitability($project);
 
         // Only signed order should count
-        $this->assertSame('5000.00', $result['revenue']);
-        $this->assertSame('5.00', $result['sold_days']);
+        static::assertSame('5000.00', $result['revenue']);
+        static::assertSame('5.00', $result['sold_days']);
     }
 }

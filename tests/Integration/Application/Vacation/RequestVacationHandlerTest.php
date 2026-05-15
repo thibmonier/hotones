@@ -58,11 +58,11 @@ final class RequestVacationHandlerTest extends KernelTestCase
         $vacationId = ($this->handler)($command);
 
         $vacation = $this->repository->findById($vacationId);
-        self::assertSame(VacationStatus::PENDING, $vacation->getStatus());
-        self::assertSame($contributor->getId(), $vacation->getContributor()->getId());
-        self::assertSame(VacationType::PAID_LEAVE, $vacation->getType());
-        self::assertSame('8', $vacation->getDailyHours()->getValue());
-        self::assertSame('Family event', $vacation->getReason());
+        static::assertSame(VacationStatus::PENDING, $vacation->getStatus());
+        static::assertSame($contributor->getId(), $vacation->getContributor()->getId());
+        static::assertSame(VacationType::PAID_LEAVE, $vacation->getType());
+        static::assertSame('8', $vacation->getDailyHours()->getValue());
+        static::assertSame('Family event', $vacation->getReason());
     }
 
     public function testHandlerThrowsWhenContributorIsUnknown(): void

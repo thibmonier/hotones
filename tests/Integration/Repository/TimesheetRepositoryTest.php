@@ -64,7 +64,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2024-04-30');
         $sum = $this->repository->getTotalHoursForMonth($start, $end);
 
-        $this->assertEquals(19.5, $sum, '');
+        static::assertSame(19.5, $sum, '');
     }
 
     public function testFindByContributorAndDateRange(): void
@@ -107,7 +107,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2025-01-31');
         $timesheets = $this->repository->findByContributorAndDateRange($contributor1, $start, $end);
 
-        $this->assertCount(2, $timesheets);
+        static::assertCount(2, $timesheets);
     }
 
     public function testFindRecentByContributor(): void
@@ -122,7 +122,7 @@ class TimesheetRepositoryTest extends KernelTestCase
 
         $recent = $this->repository->findRecentByContributor($contributor, 3);
 
-        $this->assertCount(3, $recent);
+        static::assertCount(3, $recent);
     }
 
     public function testFindForPeriodWithProject(): void
@@ -157,7 +157,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2025-01-31');
         $timesheets = $this->repository->findForPeriodWithProject($start, $end, $project1);
 
-        $this->assertCount(2, $timesheets);
+        static::assertCount(2, $timesheets);
     }
 
     public function testFindForPeriodWithProjectReturnsAllWhenNoProjectSpecified(): void
@@ -183,7 +183,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2025-01-31');
         $timesheets = $this->repository->findForPeriodWithProject($start, $end);
 
-        $this->assertCount(2, $timesheets);
+        static::assertCount(2, $timesheets);
     }
 
     public function testFindForPeriodWithProjects(): void
@@ -214,7 +214,7 @@ class TimesheetRepositoryTest extends KernelTestCase
         $projectIds = [$project1->getId(), $project2->getId()];
         $timesheets = $this->repository->findForPeriodWithProjects($start, $end, $projectIds);
 
-        $this->assertCount(2, $timesheets);
+        static::assertCount(2, $timesheets);
     }
 
     public function testGetHoursGroupedByProjectForContributor(): void
@@ -246,12 +246,12 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2025-01-31');
         $grouped = $this->repository->getHoursGroupedByProjectForContributor($contributor, $start, $end);
 
-        $this->assertCount(2, $grouped);
+        static::assertCount(2, $grouped);
         // Verify structure: ['project' => [...], 'totalHours' => ...]
-        $this->assertArrayHasKey('project', $grouped[0]);
-        $this->assertArrayHasKey('totalHours', $grouped[0]);
-        $this->assertArrayHasKey('id', $grouped[0]['project']);
-        $this->assertArrayHasKey('name', $grouped[0]['project']);
+        static::assertArrayHasKey('project', $grouped[0]);
+        static::assertArrayHasKey('totalHours', $grouped[0]);
+        static::assertArrayHasKey('id', $grouped[0]['project']);
+        static::assertArrayHasKey('name', $grouped[0]['project']);
     }
 
     public function testFindExistingTimesheet(): void
@@ -269,9 +269,9 @@ class TimesheetRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findExistingTimesheet($contributor, $project, $date);
 
-        $this->assertNotNull($result);
-        $this->assertEquals($contributor->getId(), $result->getContributor()->getId());
-        $this->assertEquals($project->getId(), $result->getProject()->getId());
+        static::assertNotNull($result);
+        static::assertEquals($contributor->getId(), $result->getContributor()->getId());
+        static::assertEquals($project->getId(), $result->getProject()->getId());
     }
 
     public function testFindExistingTimesheetReturnsNullWhenNotFound(): void
@@ -282,7 +282,7 @@ class TimesheetRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findExistingTimesheet($contributor, $project, $date);
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testGetStatsPerContributor(): void
@@ -308,11 +308,11 @@ class TimesheetRepositoryTest extends KernelTestCase
         $end = new DateTime('2025-01-31');
         $stats = $this->repository->getStatsPerContributor($start, $end);
 
-        $this->assertCount(2, $stats);
+        static::assertCount(2, $stats);
         // Verify structure: contributorName, totalHours, totalEntries
-        $this->assertArrayHasKey('contributorName', $stats[0]);
-        $this->assertArrayHasKey('totalHours', $stats[0]);
-        $this->assertArrayHasKey('totalEntries', $stats[0]);
+        static::assertArrayHasKey('contributorName', $stats[0]);
+        static::assertArrayHasKey('totalHours', $stats[0]);
+        static::assertArrayHasKey('totalEntries', $stats[0]);
     }
 
     public function testGetStatsPerContributorForProjects(): void
@@ -346,10 +346,10 @@ class TimesheetRepositoryTest extends KernelTestCase
         $projectIds = [$project1->getId(), $project2->getId()];
         $stats = $this->repository->getStatsPerContributorForProjects($start, $end, $projectIds);
 
-        $this->assertCount(1, $stats);
+        static::assertCount(1, $stats);
         // Should only include hours from project1 and project2 (8.00 + 6.00 = 14.00)
         $totalHours = (float) $stats[0]['totalHours'];
-        $this->assertEquals(14.0, $totalHours, '');
+        static::assertSame(14.0, $totalHours, '');
     }
 
     public function testGetTotalHoursForPeriodAndProjects(): void
@@ -376,12 +376,12 @@ class TimesheetRepositoryTest extends KernelTestCase
         $projectIds = [$project1->getId(), $project2->getId()];
         $totalHours = $this->repository->getTotalHoursForPeriodAndProjects($start, $end, $projectIds);
 
-        $this->assertEquals(14.0, $totalHours, '');
+        static::assertSame(14.0, $totalHours, '');
     }
 
     public function testGetMonthlyHoursForProject(): void
     {
-        $this->markTestSkipped('Uses MySQL YEAR/MONTH functions not compatible with SQLite test environment');
+        static::markTestSkipped('Uses MySQL YEAR/MONTH functions not compatible with SQLite test environment');
     }
 
     public function testGetPeriodAggregatesForProjects(): void
@@ -409,11 +409,11 @@ class TimesheetRepositoryTest extends KernelTestCase
         $aggregates = $this->repository->getPeriodAggregatesForProjects($start, $end, $projectIds);
 
         // Returns a single associative array, not array of arrays
-        $this->assertIsArray($aggregates);
-        $this->assertArrayHasKey('totalHours', $aggregates);
-        $this->assertArrayHasKey('totalHumanCost', $aggregates);
-        $this->assertArrayHasKey('totalRevenue', $aggregates);
+        static::assertIsArray($aggregates);
+        static::assertArrayHasKey('totalHours', $aggregates);
+        static::assertArrayHasKey('totalHumanCost', $aggregates);
+        static::assertArrayHasKey('totalRevenue', $aggregates);
         // Verify total hours is 24.00 (16.00 + 8.00)
-        $this->assertEquals(24.0, $aggregates['totalHours'], '');
+        static::assertSame(24.0, $aggregates['totalHours'], '');
     }
 }

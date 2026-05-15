@@ -105,7 +105,7 @@ class ProjectController extends AbstractController
         );
 
         // Agrégats SQL en batch pour éviter le parcours objet
-        $projectIds = array_map(fn ($p) => $p->id, $projects);
+        $projectIds = array_map(static fn ($p) => $p->id, $projects);
         $aggregates = $projectRepo->getAggregatedMetricsFor($projectIds);
 
         // Construire la structure attendue par la vue

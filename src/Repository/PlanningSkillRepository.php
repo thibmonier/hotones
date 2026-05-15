@@ -111,9 +111,11 @@ class PlanningSkillRepository extends CompanyAwareRepository
         $unmet = [];
 
         foreach ($planningSkills as $planningSkill) {
-            if (!$planningSkill->isMetByAssignedContributor()) {
-                $unmet[] = $planningSkill;
+            if ($planningSkill->isMetByAssignedContributor()) {
+                continue;
             }
+
+            $unmet[] = $planningSkill;
         }
 
         return $unmet;
@@ -130,9 +132,11 @@ class PlanningSkillRepository extends CompanyAwareRepository
         $unmet = [];
 
         foreach ($mandatorySkills as $planningSkill) {
-            if (!$planningSkill->isMetByAssignedContributor()) {
-                $unmet[] = $planningSkill;
+            if ($planningSkill->isMetByAssignedContributor()) {
+                continue;
             }
+
+            $unmet[] = $planningSkill;
         }
 
         return $unmet;
@@ -219,9 +223,11 @@ class PlanningSkillRepository extends CompanyAwareRepository
         $mismatched = [];
 
         foreach ($plannings as $planning) {
-            if (!$this->contributorMeetsMandatorySkills($planning, $planning->getContributor())) {
-                $mismatched[] = $planning;
+            if ($this->contributorMeetsMandatorySkills($planning, $planning->getContributor())) {
+                continue;
             }
+
+            $mismatched[] = $planning;
         }
 
         return $mismatched;

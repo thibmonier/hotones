@@ -303,7 +303,7 @@ class ImportTheTribeProjectsCommand extends Command
             return true;
         }
 
-        return array_any(self::SKIP_NAMES, fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
+        return array_any(self::SKIP_NAMES, static fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
     }
 
     /**
@@ -360,9 +360,11 @@ class ImportTheTribeProjectsCommand extends Command
         ];
 
         foreach ($typeLabels as $type => $label) {
-            if (isset($typeCounts[$type])) {
-                $io->writeln(sprintf('    - %d %s', $typeCounts[$type], $label));
+            if (!(isset($typeCounts[$type]))) {
+                continue;
             }
+
+            $io->writeln(sprintf('    - %d %s', $typeCounts[$type], $label));
         }
 
         return $projects;
@@ -414,9 +416,11 @@ class ImportTheTribeProjectsCommand extends Command
         // Projects
         $io->section('Création des projets');
         foreach ($aggregated as $data) {
-            if ($this->findOrCreateProject($data, $company, $io)) {
-                ++$stats['projects'];
+            if (!$this->findOrCreateProject($data, $company, $io)) {
+                continue;
             }
+
+            ++$stats['projects'];
         }
 
         // Orders

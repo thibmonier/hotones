@@ -156,7 +156,7 @@ class BlogPostCrudController extends AbstractCrudController
         yield AssociationField::new('author', 'Auteur')
             ->setHelp('Auteur de l\'article (auto-assigné si non spécifié)')
             ->hideOnForm()
-            ->formatValue(fn ($value, BlogPost $entity): string => $entity->getAuthor()->getFullName());
+            ->formatValue(static fn ($value, BlogPost $entity): string => $entity->getAuthor()->getFullName());
 
         yield DateTimeField::new('publishedAt', 'Date de publication')->setHelp(
             'Date de publication (auto-définie lors du passage en "Publié")',

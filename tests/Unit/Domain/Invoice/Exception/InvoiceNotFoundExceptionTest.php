@@ -18,10 +18,10 @@ final class InvoiceNotFoundExceptionTest extends TestCase
 
         $exception = InvoiceNotFoundException::withId($invoiceId);
 
-        self::assertInstanceOf(InvoiceNotFoundException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
-        self::assertStringContainsString($invoiceId->getValue(), $exception->getMessage());
-        self::assertStringContainsString('not found', $exception->getMessage());
+        static::assertInstanceOf(InvoiceNotFoundException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
+        static::assertStringContainsString($invoiceId->getValue(), $exception->getMessage());
+        static::assertStringContainsString('not found', $exception->getMessage());
     }
 
     public function testWithNumberFactory(): void
@@ -30,8 +30,8 @@ final class InvoiceNotFoundExceptionTest extends TestCase
 
         $exception = InvoiceNotFoundException::withNumber($invoiceNumber);
 
-        self::assertInstanceOf(InvoiceNotFoundException::class, $exception);
-        self::assertStringContainsString($invoiceNumber->getValue(), $exception->getMessage());
-        self::assertStringContainsString('not found', $exception->getMessage());
+        static::assertInstanceOf(InvoiceNotFoundException::class, $exception);
+        static::assertStringContainsString($invoiceNumber->getValue(), $exception->getMessage());
+        static::assertStringContainsString('not found', $exception->getMessage());
     }
 }

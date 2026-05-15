@@ -23,9 +23,9 @@ final class OrderStatusChangedEventTest extends TestCase
             new DateTimeImmutable(),
         );
 
-        $this->assertSame(7, $event->getOrderId()->toLegacyInt());
-        $this->assertSame(OrderStatus::DRAFT, $event->getPreviousStatus());
-        $this->assertSame(OrderStatus::TO_SIGN, $event->getNewStatus());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertSame(7, $event->getOrderId()->toLegacyInt());
+        static::assertSame(OrderStatus::DRAFT, $event->getPreviousStatus());
+        static::assertSame(OrderStatus::TO_SIGN, $event->getNewStatus());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

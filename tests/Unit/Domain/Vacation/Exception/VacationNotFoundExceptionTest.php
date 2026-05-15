@@ -17,8 +17,8 @@ final class VacationNotFoundExceptionTest extends TestCase
 
         $exception = VacationNotFoundException::withId($vacationId);
 
-        self::assertInstanceOf(VacationNotFoundException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
+        static::assertInstanceOf(VacationNotFoundException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
     }
 
     public function testWithIdMessageContainsVacationId(): void
@@ -27,7 +27,7 @@ final class VacationNotFoundExceptionTest extends TestCase
 
         $exception = VacationNotFoundException::withId($vacationId);
 
-        self::assertStringContainsString($vacationId->getValue(), $exception->getMessage());
-        self::assertStringContainsString('Vacation not found', $exception->getMessage());
+        static::assertStringContainsString($vacationId->getValue(), $exception->getMessage());
+        static::assertStringContainsString('Vacation not found', $exception->getMessage());
     }
 }

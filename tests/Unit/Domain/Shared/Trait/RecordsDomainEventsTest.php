@@ -40,12 +40,12 @@ final class RecordsDomainEventsTest extends TestCase
         $aggregate->emit($event2);
 
         $pulled = $aggregate->pullDomainEvents();
-        $this->assertCount(2, $pulled);
-        $this->assertSame($event1, $pulled[0]);
-        $this->assertSame($event2, $pulled[1]);
+        static::assertCount(2, $pulled);
+        static::assertSame($event1, $pulled[0]);
+        static::assertSame($event2, $pulled[1]);
 
         // Second pull is empty (buffer cleared).
-        $this->assertSame([], $aggregate->pullDomainEvents());
+        static::assertSame([], $aggregate->pullDomainEvents());
     }
 
     public function testEmptyByDefault(): void
@@ -54,6 +54,6 @@ final class RecordsDomainEventsTest extends TestCase
             use RecordsDomainEvents;
         };
 
-        $this->assertSame([], $aggregate->pullDomainEvents());
+        static::assertSame([], $aggregate->pullDomainEvents());
     }
 }

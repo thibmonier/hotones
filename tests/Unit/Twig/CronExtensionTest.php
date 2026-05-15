@@ -40,7 +40,7 @@ final class CronExtensionTest extends TestCase
     {
         $actual = $this->ext->humanizeCron($expr, $locale);
         // Some descriptions include composed strings; assert start matches expected
-        $this->assertStringStartsWith(
+        static::assertStringStartsWith(
             $expectedStartsWith,
             $actual,
             sprintf(
@@ -56,7 +56,7 @@ final class CronExtensionTest extends TestCase
     public function testCronNextRunReturnsDate(): void
     {
         $next = $this->ext->nextRun('*/5 * * * *', 'Europe/Paris');
-        $this->assertNotNull($next);
-        $this->assertInstanceOf(DateTimeImmutable::class, $next);
+        static::assertNotNull($next);
+        static::assertInstanceOf(DateTimeImmutable::class, $next);
     }
 }

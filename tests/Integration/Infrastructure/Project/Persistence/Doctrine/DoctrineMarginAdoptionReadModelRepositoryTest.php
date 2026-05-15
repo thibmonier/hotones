@@ -39,7 +39,7 @@ final class DoctrineMarginAdoptionReadModelRepositoryTest extends KernelTestCase
 
     public function testReturnsEmptyArrayWhenNoProjects(): void
     {
-        self::assertSame([], $this->repository->findActiveWithMarginSnapshot());
+        static::assertSame([], $this->repository->findActiveWithMarginSnapshot());
     }
 
     public function testReturnsActiveProjectsWithMarginSnapshot(): void
@@ -55,14 +55,14 @@ final class DoctrineMarginAdoptionReadModelRepositoryTest extends KernelTestCase
 
         $records = $this->repository->findActiveWithMarginSnapshot();
 
-        self::assertCount(4, $records);
+        static::assertCount(4, $records);
         foreach ($records as $record) {
-            self::assertInstanceOf(ProjectMarginSnapshotRecord::class, $record);
+            static::assertInstanceOf(ProjectMarginSnapshotRecord::class, $record);
         }
 
         $names = array_map(static fn (ProjectMarginSnapshotRecord $r): string => $r->projectName, $records);
-        self::assertContains('Fresh', $names);
-        self::assertContains('Never', $names);
+        static::assertContains('Fresh', $names);
+        static::assertContains('Never', $names);
     }
 
     public function testExcludesCompletedAndCancelledProjects(): void
@@ -73,8 +73,8 @@ final class DoctrineMarginAdoptionReadModelRepositoryTest extends KernelTestCase
 
         $records = $this->repository->findActiveWithMarginSnapshot();
 
-        self::assertCount(1, $records);
-        self::assertSame('ActiveOnly', $records[0]->projectName);
+        static::assertCount(1, $records);
+        static::assertSame('ActiveOnly', $records[0]->projectName);
     }
 
     public function testFiltersByCurrentCompany(): void
@@ -91,8 +91,8 @@ final class DoctrineMarginAdoptionReadModelRepositoryTest extends KernelTestCase
 
         $records = $this->repository->findActiveWithMarginSnapshot();
 
-        self::assertCount(1, $records);
-        self::assertSame('Own', $records[0]->projectName);
+        static::assertCount(1, $records);
+        static::assertSame('Own', $records[0]->projectName);
     }
 
     public function testRecordsConsumableByCalculator(): void
@@ -106,11 +106,11 @@ final class DoctrineMarginAdoptionReadModelRepositoryTest extends KernelTestCase
         $records = $this->repository->findActiveWithMarginSnapshot();
         $stats = (new MarginAdoptionCalculator())->classify($records, $this->now);
 
-        self::assertSame(5, $stats->totalActive);
-        self::assertSame(2, $stats->freshCount);
-        self::assertSame(1, $stats->staleWarningCount);
-        self::assertSame(2, $stats->staleCriticalCount);
-        self::assertEqualsWithDelta(40.0, $stats->freshPercent, 0.5);
+        static::assertSame(5, $stats->totalActive);
+        static::assertSame(2, $stats->freshCount);
+        static::assertSame(1, $stats->staleWarningCount);
+        static::assertSame(2, $stats->staleCriticalCount);
+        static::assertEqualsWithDelta(40.0, $stats->freshPercent, 0.5);
     }
 
     private function createProject(string $name, string $status, ?int $daysAgoMargin): void

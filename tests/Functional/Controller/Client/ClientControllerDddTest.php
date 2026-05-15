@@ -60,8 +60,8 @@ final class ClientControllerDddTest extends WebTestCase
 
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $client = $em->getRepository(Client::class)->findOneBy(['name' => 'Acme via DDD']);
-        self::assertNotNull($client);
-        self::assertSame('Acme via DDD', $client->name);
+        static::assertNotNull($client);
+        static::assertSame('Acme via DDD', $client->name);
     }
 
     public function testCreateClientViaDddRejectsShortName(): void
@@ -79,7 +79,7 @@ final class ClientControllerDddTest extends WebTestCase
 
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $client = $em->getRepository(Client::class)->findOneBy(['name' => 'A']);
-        self::assertNull($client);
+        static::assertNull($client);
     }
 
     public function testEditViaDddRoute(): void
@@ -107,9 +107,9 @@ final class ClientControllerDddTest extends WebTestCase
 
         $em->clear();
         $reloaded = $em->getRepository(Client::class)->find($clientId);
-        self::assertSame('Updated Name', $reloaded->name);
+        static::assertSame('Updated Name', $reloaded->name);
         // ENTERPRISE → vip via translator (ADR-0005 lossy mapping)
-        self::assertSame('vip', $reloaded->serviceLevel);
+        static::assertSame('vip', $reloaded->serviceLevel);
     }
 
     public function testDeleteViaDddRoute(): void
@@ -130,6 +130,6 @@ final class ClientControllerDddTest extends WebTestCase
         self::assertResponseRedirects('/clients');
 
         $em->clear();
-        self::assertNull($em->getRepository(Client::class)->find($clientId));
+        static::assertNull($em->getRepository(Client::class)->find($clientId));
     }
 }

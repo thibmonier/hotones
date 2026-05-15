@@ -76,7 +76,7 @@ class ProjectPlanningAssistant
         }
 
         // Trier par confiance décroissante
-        usort($suggestions, fn ($a, $b): int => $b['confidence'] <=> $a['confidence']);
+        usort($suggestions, static fn ($a, $b): int => $b['confidence'] <=> $a['confidence']);
 
         return [
             'suggestions' => $suggestions,
@@ -228,7 +228,7 @@ class ProjectPlanningAssistant
         }
 
         // Trier par score décroissant
-        usort($scoredCandidates, fn ($a, $b): int => $b['score'] <=> $a['score']);
+        usort($scoredCandidates, static fn ($a, $b): int => $b['score'] <=> $a['score']);
 
         return $scoredCandidates[0];
     }
@@ -400,9 +400,11 @@ class ProjectPlanningAssistant
             if ($dayOfWeek < 6) {
                 ++$workDays;
                 foreach ($plannings as $planning) {
-                    if ($date >= $planning->getStartDate() && $date <= $planning->getEndDate()) {
-                        $totalHours += (float) $planning->getDailyHours();
+                    if (!($date >= $planning->getStartDate() && $date <= $planning->getEndDate())) {
+                        continue;
                     }
+
+                    $totalHours += (float) $planning->getDailyHours();
                 }
             }
         }

@@ -15,19 +15,19 @@ final class AiUsageLogTest extends TestCase
         $company = new Company();
         $log = new AiUsageLog($company);
 
-        $this->assertSame($company, $log->getCompany());
-        $this->assertNotNull($log->occurredAt);
+        static::assertSame($company, $log->getCompany());
+        static::assertNotNull($log->occurredAt);
     }
 
     public function testDefaults(): void
     {
         $log = new AiUsageLog(new Company());
 
-        $this->assertSame('anthropic', $log->provider);
-        $this->assertSame('', $log->model);
-        $this->assertSame(0, $log->promptTokens);
-        $this->assertSame(0, $log->completionTokens);
-        $this->assertSame('0', $log->costUsd);
+        static::assertSame('anthropic', $log->provider);
+        static::assertSame('', $log->model);
+        static::assertSame(0, $log->promptTokens);
+        static::assertSame(0, $log->completionTokens);
+        static::assertSame('0', $log->costUsd);
     }
 
     public function testFieldAssignment(): void
@@ -39,11 +39,11 @@ final class AiUsageLogTest extends TestCase
         $log->completionTokens = 250;
         $log->costUsd = '0.012345';
 
-        $this->assertSame('openai', $log->provider);
-        $this->assertSame('gpt-4o', $log->model);
-        $this->assertSame(1500, $log->promptTokens);
-        $this->assertSame(250, $log->completionTokens);
-        $this->assertSame('0.012345', $log->costUsd);
+        static::assertSame('openai', $log->provider);
+        static::assertSame('gpt-4o', $log->model);
+        static::assertSame(1500, $log->promptTokens);
+        static::assertSame(250, $log->completionTokens);
+        static::assertSame('0.012345', $log->costUsd);
     }
 
     public function testCompanySetter(): void
@@ -52,9 +52,9 @@ final class AiUsageLogTest extends TestCase
         $companyB = new Company();
         $log = new AiUsageLog($companyA);
 
-        $this->assertSame($companyA, $log->getCompany());
+        static::assertSame($companyA, $log->getCompany());
 
         $log->setCompany($companyB);
-        $this->assertSame($companyB, $log->getCompany());
+        static::assertSame($companyB, $log->getCompany());
     }
 }

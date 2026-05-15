@@ -44,7 +44,7 @@ class ProjectDetailController extends AbstractController
         $contributorHoursData = $this->getContributorHoursData($projectContributors);
 
         // Timeline de consommation (hebdomadaire entre bornes du projet)
-        $start = $project->getStartDate() ?: (function () use ($project) {
+        $start = $project->getStartDate() ?: (static function () use ($project) {
             $min = null;
             foreach ($project->getTimesheets() as $t) {
                 $d = $t->getDate();
@@ -55,7 +55,7 @@ class ProjectDetailController extends AbstractController
 
             return $min ?: new DateTime(date('Y-01-01'));
         })();
-        $end = $project->getEndDate() ?: (function () use ($project) {
+        $end = $project->getEndDate() ?: (static function () use ($project) {
             $max = null;
             foreach ($project->getTimesheets() as $t) {
                 $d = $t->getDate();
@@ -230,13 +230,15 @@ class ProjectDetailController extends AbstractController
         $remainingHours = [];
 
         foreach ($tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $labels[] =
-                    substr((string) $task->getName(), 0, 20).(strlen((string) $task->getName()) > 20 ? '...' : '');
-                $progressData[] = (float) $task->getProgressPercentage();
-                $spentHours[] = (float) $task->getTotalHours();
-                $remainingHours[] = (float) $task->getRemainingHours();
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $labels[] =
+                                substr((string) $task->getName(), 0, 20).(strlen((string) $task->getName()) > 20 ? '...' : '');
+            $progressData[] = (float) $task->getProgressPercentage();
+            $spentHours[] = (float) $task->getTotalHours();
+            $remainingHours[] = (float) $task->getRemainingHours();
         }
 
         return [

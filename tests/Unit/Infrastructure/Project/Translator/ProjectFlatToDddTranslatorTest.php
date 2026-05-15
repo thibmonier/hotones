@@ -42,32 +42,32 @@ final class ProjectFlatToDddTranslatorTest extends TestCase
 
         $ddd = $translator->translate($flat);
 
-        $this->assertSame('legacy:42', $ddd->getId()->value());
-        $this->assertSame('Acme Project', $ddd->getName());
-        $this->assertSame(ProjectStatus::ACTIVE, $ddd->getStatus());
-        $this->assertFalse($ddd->isInternal());
-        $this->assertSame('legacy:7', $ddd->getClientId()->getValue());
+        static::assertSame('legacy:42', $ddd->getId()->value());
+        static::assertSame('Acme Project', $ddd->getName());
+        static::assertSame(ProjectStatus::ACTIVE, $ddd->getStatus());
+        static::assertFalse($ddd->isInternal());
+        static::assertSame('legacy:7', $ddd->getClientId()->getValue());
     }
 
     public function testStatusMappingCompleted(): void
     {
         $translator = new ProjectFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatProject(1, 'X1', 'completed', 1));
-        $this->assertSame(ProjectStatus::COMPLETED, $ddd->getStatus());
+        static::assertSame(ProjectStatus::COMPLETED, $ddd->getStatus());
     }
 
     public function testStatusMappingCancelled(): void
     {
         $translator = new ProjectFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatProject(1, 'X1', 'cancelled', 1));
-        $this->assertSame(ProjectStatus::CANCELLED, $ddd->getStatus());
+        static::assertSame(ProjectStatus::CANCELLED, $ddd->getStatus());
     }
 
     public function testInternalProjectWhenNoClient(): void
     {
         $translator = new ProjectFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatProject(1, 'Internal', 'active', null));
-        $this->assertTrue($ddd->isInternal());
+        static::assertTrue($ddd->isInternal());
     }
 
     public function testTranslateUnsavedThrows(): void
@@ -84,6 +84,6 @@ final class ProjectFlatToDddTranslatorTest extends TestCase
     {
         $translator = new ProjectFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatProject(1, 'X1', 'active', 1));
-        $this->assertSame([], $ddd->pullDomainEvents());
+        static::assertSame([], $ddd->pullDomainEvents());
     }
 }

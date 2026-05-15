@@ -29,13 +29,13 @@ class ContributorTechnologyType extends AbstractType
                 'attr' => ['class' => 'form-select'],
                 'placeholder' => 'Sélectionnez une technologie',
                 'required' => true,
-                'query_builder' => fn ($repository) => $repository
+                'query_builder' => static fn ($repository) => $repository
                     ->createQueryBuilder('t')
                     ->where('t.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('t.category', 'ASC')
                     ->addOrderBy('t.name', 'ASC'),
-                'group_by' => fn (Technology $technology): string => ucfirst($technology->getCategory()),
+                'group_by' => static fn (Technology $technology): string => ucfirst($technology->getCategory()),
             ])
             ->add('selfAssessmentLevel', ChoiceType::class, [
                 'label' => 'Niveau auto-évalué',

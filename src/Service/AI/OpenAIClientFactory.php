@@ -7,6 +7,7 @@ namespace App\Service\AI;
 use GuzzleHttp\Client as GuzzleClient;
 use OpenAI;
 use OpenAI\Client;
+use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class OpenAIClientFactory
 {
     public function __construct(
-        #[Autowire(param: 'env(OPENAI_API_KEY)')]
+        #[SensitiveParameter] #[Autowire(param: 'env(OPENAI_API_KEY)')]
         private readonly string $openaiApiKey,
         private readonly string $baseUri = 'https://api.openai.com/v1',
     ) {

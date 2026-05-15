@@ -11,19 +11,19 @@ final class ContractStatusTest extends TestCase
 {
     public function testActive(): void
     {
-        $this->assertTrue(ContractStatus::ACTIVE->isActive());
-        $this->assertSame('Actif', ContractStatus::ACTIVE->getLabel());
+        static::assertTrue(ContractStatus::ACTIVE->isActive());
+        static::assertSame('Actif', ContractStatus::ACTIVE->getLabel());
     }
 
     public function testInactive(): void
     {
-        $this->assertFalse(ContractStatus::INACTIVE->isActive());
-        $this->assertSame('Inactif', ContractStatus::INACTIVE->getLabel());
+        static::assertFalse(ContractStatus::INACTIVE->isActive());
+        static::assertSame('Inactif', ContractStatus::INACTIVE->getLabel());
     }
 
     public function testValues(): void
     {
-        $this->assertSame('active', ContractStatus::ACTIVE->value);
-        $this->assertSame('inactive', ContractStatus::INACTIVE->value);
+        static::assertSame('active', ContractStatus::ACTIVE->value);
+        static::assertSame('inactive', ContractStatus::INACTIVE->value);
     }
 }

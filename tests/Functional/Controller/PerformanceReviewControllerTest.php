@@ -175,13 +175,13 @@ class PerformanceReviewControllerTest extends WebTestCase
     // TODO: Implement edit route in PerformanceReviewController
     public function testEditRequiresManagerRole(): void
     {
-        $this->markTestSkipped('Edit route not yet implemented in PerformanceReviewController');
+        static::markTestSkipped('Edit route not yet implemented in PerformanceReviewController');
     }
 
     // TODO: Implement edit route in PerformanceReviewController
     public function testEditSubmitUpdatesReview(): void
     {
-        $this->markTestSkipped('Edit route not yet implemented in PerformanceReviewController');
+        static::markTestSkipped('Edit route not yet implemented in PerformanceReviewController');
     }
 
     public function testValidateRequiresManagerRole(): void
@@ -243,16 +243,16 @@ class PerformanceReviewControllerTest extends WebTestCase
         // Verify status changed
         $em->clear();
         $validatedReview = $this->reviewRepository->find($review->getId());
-        $this->assertEquals('validee', $validatedReview->getStatus());
+        static::assertSame('validee', $validatedReview->getStatus());
     }
 
     public function testDeleteRequiresAdminRole(): void
     {
-        $this->markTestIncomplete('Delete route not yet implemented');
+        static::markTestIncomplete('Delete route not yet implemented');
     }
 
     public function testDeleteRemovesReview(): void
     {
-        $this->markTestIncomplete('Delete route not yet implemented');
+        static::markTestIncomplete('Delete route not yet implemented');
     }
 }

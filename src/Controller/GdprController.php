@@ -14,6 +14,7 @@ use App\Service\GdprEmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use SensitiveParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -209,7 +210,7 @@ class GdprController extends AbstractController
      */
     #[Route('/confirm-account-deletion/{token}', name: 'gdpr_confirm_deletion', methods: ['GET'])]
     public function confirmAccountDeletion(
-        string $token,
+        #[SensitiveParameter] string $token,
         EntityManagerInterface $em,
         AccountDeletionRequestRepository $deletionRepository,
         GdprEmailService $emailService,

@@ -43,7 +43,7 @@ final class WorkItemWorkflowTest extends KernelTestCase
         $workItem = $this->makeDraft();
         $workflow = $this->registry->get($workItem);
 
-        self::assertSame('work_item', $workflow->getName());
+        static::assertSame('work_item', $workflow->getName());
     }
 
     public function testCanValidateFromDraft(): void
@@ -51,9 +51,9 @@ final class WorkItemWorkflowTest extends KernelTestCase
         $workItem = $this->makeDraft();
         $workflow = $this->registry->get($workItem);
 
-        self::assertTrue($workflow->can($workItem, 'validate'));
-        self::assertFalse($workflow->can($workItem, 'bill'));
-        self::assertFalse($workflow->can($workItem, 'mark_paid'));
+        static::assertTrue($workflow->can($workItem, 'validate'));
+        static::assertFalse($workflow->can($workItem, 'bill'));
+        static::assertFalse($workflow->can($workItem, 'mark_paid'));
     }
 
     public function testCanBillFromValidated(): void
@@ -63,9 +63,9 @@ final class WorkItemWorkflowTest extends KernelTestCase
 
         $workflow = $this->registry->get($workItem);
 
-        self::assertTrue($workflow->can($workItem, 'bill'));
-        self::assertFalse($workflow->can($workItem, 'validate')); // no self-loop
-        self::assertFalse($workflow->can($workItem, 'mark_paid'));
+        static::assertTrue($workflow->can($workItem, 'bill'));
+        static::assertFalse($workflow->can($workItem, 'validate')); // no self-loop
+        static::assertFalse($workflow->can($workItem, 'mark_paid'));
     }
 
     public function testCannotBillFromDraft(): void
@@ -73,7 +73,7 @@ final class WorkItemWorkflowTest extends KernelTestCase
         $workItem = $this->makeDraft();
         $workflow = $this->registry->get($workItem);
 
-        self::assertFalse($workflow->can($workItem, 'bill'));
+        static::assertFalse($workflow->can($workItem, 'bill'));
     }
 
     public function testWorkflowDefinitionMatchesDomainState(): void
@@ -83,15 +83,15 @@ final class WorkItemWorkflowTest extends KernelTestCase
         $definition = $workflow->getDefinition();
 
         $places = $definition->getPlaces();
-        self::assertContains('draft', $places);
-        self::assertContains('validated', $places);
-        self::assertContains('billed', $places);
-        self::assertContains('paid', $places);
+        static::assertContains('draft', $places);
+        static::assertContains('validated', $places);
+        static::assertContains('billed', $places);
+        static::assertContains('paid', $places);
 
         $transitions = array_map(static fn ($t) => $t->getName(), $definition->getTransitions());
-        self::assertContains('validate', $transitions);
-        self::assertContains('bill', $transitions);
-        self::assertContains('mark_paid', $transitions);
+        static::assertContains('validate', $transitions);
+        static::assertContains('bill', $transitions);
+        static::assertContains('mark_paid', $transitions);
     }
 
     public function testInitialMarkingIsDraft(): void
@@ -99,8 +99,8 @@ final class WorkItemWorkflowTest extends KernelTestCase
         $workItem = $this->makeDraft();
 
         // Domain : marking via getStatus() (BackedEnum)
-        self::assertSame(WorkItemStatus::DRAFT, $workItem->getStatus());
-        self::assertSame('draft', $workItem->getStatus()->value);
+        static::assertSame(WorkItemStatus::DRAFT, $workItem->getStatus());
+        static::assertSame('draft', $workItem->getStatus()->value);
     }
 
     private function makeDraft(): WorkItem

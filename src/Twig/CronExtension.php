@@ -36,7 +36,7 @@ class CronExtension extends AbstractExtension
         [$min, $hour, $dom, $mon, $dow] = $parts;
 
         // Helpers
-        $isStar = fn (string $s): bool => $s === '*';
+        $isStar = static fn (string $s): bool => $s === '*';
         $fmtTime = function (string $h, string $m, string $loc): string {
             if ($h === '*' && $m === '*') {
                 return $this->t('any time', $loc);
@@ -92,7 +92,7 @@ class CronExtension extends AbstractExtension
         }
         // 4c) At specific hours list
         if ($hourInfo['type'] === 'list' && $dom === '*' && $mon === '*' && $dow === '*') {
-            $times = array_map(fn ($h): string => sprintf(
+            $times = array_map(static fn ($h): string => sprintf(
                 '%02d:%02d',
                 $h,
                 (int) ($min === '*' ? 0 : $min),
@@ -122,7 +122,7 @@ class CronExtension extends AbstractExtension
                 $minuteTxt = $min === '*' ? $this->t('any minute', $locale) : sprintf('%02d', (int) $min);
                 $timeTxt = sprintf($this->t('every %d hours at minute %s', $locale), $hourInfo['step'], $minuteTxt);
             } elseif ($hourInfo['type'] === 'list') {
-                $times = array_map(fn ($h): string => sprintf(
+                $times = array_map(static fn ($h): string => sprintf(
                     '%02d:%02d',
                     $h,
                     (int) ($min === '*' ? 0 : $min),
@@ -267,7 +267,7 @@ class CronExtension extends AbstractExtension
     {
         // For day-of-month numbers
         $parts = array_map(trim(...), explode(',', $expr));
-        $fmt = function (string $n) use ($locale) {
+        $fmt = static function (string $n) use ($locale) {
             $i = (int) $n;
             if ($locale === 'en') {
                 return

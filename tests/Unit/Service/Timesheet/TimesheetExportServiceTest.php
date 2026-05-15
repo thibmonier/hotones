@@ -81,8 +81,8 @@ final class TimesheetExportServiceTest extends TestCase
             new DateTime('2026-05-31'),
         );
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
+        static::assertInstanceOf(Response::class, $response);
+        static::assertSame(200, $response->getStatusCode());
     }
 
     public function testExportToExcelIncludesTimesheetRowsAndTotal(): void
@@ -109,9 +109,9 @@ final class TimesheetExportServiceTest extends TestCase
             new DateTime('2026-05-31'),
         );
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertNotEmpty($response->getContent());
+        static::assertInstanceOf(Response::class, $response);
+        static::assertSame(200, $response->getStatusCode());
+        static::assertNotEmpty($response->getContent());
     }
 
     public function testExportToExcelFiltersByProjectId(): void
@@ -140,7 +140,7 @@ final class TimesheetExportServiceTest extends TestCase
 
         // No exception + valid response. Filtering tested implicitly via lack of error
         // when only one timesheet matches projectId=42.
-        $this->assertInstanceOf(Response::class, $response);
+        static::assertInstanceOf(Response::class, $response);
     }
 
     public function testExportToPdfDelegatesToPdfGenerator(): void
@@ -161,8 +161,8 @@ final class TimesheetExportServiceTest extends TestCase
             ->expects($this->once())
             ->method('createPdfResponse')
             ->with(
-                $this->equalTo('timesheet/export_pdf.html.twig'),
-                $this->callback(fn (array $context): bool => isset(
+                static::equalTo('timesheet/export_pdf.html.twig'),
+                static::callback(static fn (array $context): bool => isset(
                     $context['contributor'],
                     $context['timesheets'],
                     $context['totalHours'],
@@ -170,7 +170,7 @@ final class TimesheetExportServiceTest extends TestCase
                     $context['hoursPerDay'],
                     $context['projectSummary'],
                 )),
-                $this->stringContains('temps_'),
+                static::stringContains('temps_'),
             )
             ->willReturn($expectedResponse);
 
@@ -181,7 +181,7 @@ final class TimesheetExportServiceTest extends TestCase
             new DateTime('2026-05-31'),
         );
 
-        $this->assertSame($expectedResponse, $response);
+        static::assertSame($expectedResponse, $response);
     }
 
     public function testExportToPdfWithProjectIdResolvesProjectReference(): void

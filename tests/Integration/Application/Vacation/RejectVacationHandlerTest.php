@@ -57,8 +57,8 @@ final class RejectVacationHandlerTest extends KernelTestCase
         ($this->rejectHandler)(new RejectVacationCommand($vacationId->getValue(), 'Planning sature'));
 
         $vacation = $this->repository->findById($vacationId);
-        self::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
-        self::assertSame('Planning sature', $vacation->getRejectionReason());
+        static::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
+        static::assertSame('Planning sature', $vacation->getRejectionReason());
     }
 
     public function testHandlerKeepsNullRejectionReasonWhenOmitted(): void
@@ -76,7 +76,7 @@ final class RejectVacationHandlerTest extends KernelTestCase
         ($this->rejectHandler)(new RejectVacationCommand($vacationId->getValue()));
 
         $vacation = $this->repository->findById($vacationId);
-        self::assertNull($vacation->getRejectionReason());
+        static::assertNull($vacation->getRejectionReason());
     }
 
     private function createContributor(): Contributor

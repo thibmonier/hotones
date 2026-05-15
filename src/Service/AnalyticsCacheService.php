@@ -36,7 +36,7 @@ class AnalyticsCacheService
     {
         $cacheKey = self::CACHE_KEY_PREFIX.$key;
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($callback, $ttl) {
+        return $this->cache->get($cacheKey, static function (ItemInterface $item) use ($callback, $ttl) {
             $item->expiresAfter($ttl);
 
             return $callback();

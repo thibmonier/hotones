@@ -38,14 +38,14 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         $result = $this->service->analyzeProject($project);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('healthScore', $result);
-        $this->assertArrayHasKey('riskLevel', $result);
-        $this->assertArrayHasKey('risks', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('healthScore', $result);
+        static::assertArrayHasKey('riskLevel', $result);
+        static::assertArrayHasKey('risks', $result);
 
         // Healthy project should have decent score (may detect missing timesheets = -15)
-        $this->assertGreaterThanOrEqual(50, $result['healthScore']);
-        $this->assertContains($result['riskLevel'], ['low', 'medium', 'high']);
+        static::assertGreaterThanOrEqual(50, $result['healthScore']);
+        static::assertContains($result['riskLevel'], ['low', 'medium', 'high']);
     }
 
     public function testAnalyzeProjectDetectsBudgetOverrun(): void
@@ -63,11 +63,11 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect budget overrun
-        $budgetRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'budget'));
-        $this->assertNotEmpty($budgetRisks);
+        $budgetRisks = array_filter($result['risks'], static fn ($r): bool => str_contains((string) $r['type'], 'budget'));
+        static::assertNotEmpty($budgetRisks);
 
         // Health score should be impacted
-        $this->assertLessThan(80, $result['healthScore']);
+        static::assertLessThan(80, $result['healthScore']);
     }
 
     public function testAnalyzeProjectDetectsScheduleDelay(): void
@@ -88,10 +88,10 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect schedule delay
-        $scheduleRisks = array_filter($result['risks'], fn ($r): bool => $r['type'] === 'schedule_delay');
-        $this->assertNotEmpty($scheduleRisks);
+        $scheduleRisks = array_filter($result['risks'], static fn ($r): bool => $r['type'] === 'schedule_delay');
+        static::assertNotEmpty($scheduleRisks);
 
-        $this->assertContains($result['riskLevel'], ['high', 'critical']);
+        static::assertContains($result['riskLevel'], ['high', 'critical']);
     }
 
     public function testAnalyzeProjectDetectsLowMargin(): void
@@ -109,8 +109,8 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect low/negative margin
-        $marginRisks = array_filter($result['risks'], fn ($r): bool => str_contains((string) $r['type'], 'margin'));
-        $this->assertNotEmpty($marginRisks);
+        $marginRisks = array_filter($result['risks'], static fn ($r): bool => str_contains((string) $r['type'], 'margin'));
+        static::assertNotEmpty($marginRisks);
     }
 
     public function testAnalyzeProjectDetectsMissingTimesheets(): void
@@ -131,11 +131,11 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect missing timesheets
-        $timesheetRisks = array_filter($result['risks'], fn ($r): bool => str_contains(
+        $timesheetRisks = array_filter($result['risks'], static fn ($r): bool => str_contains(
             (string) $r['type'],
             'timesheet',
         ));
-        $this->assertNotEmpty($timesheetRisks);
+        static::assertNotEmpty($timesheetRisks);
     }
 
     public function testAnalyzeProjectDetectsStagnation(): void
@@ -156,8 +156,8 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeProject($project);
 
         // Should detect project not started
-        $stagnationRisks = array_filter($result['risks'], fn ($r): bool => $r['type'] === 'not_started');
-        $this->assertNotEmpty($stagnationRisks);
+        $stagnationRisks = array_filter($result['risks'], static fn ($r): bool => $r['type'] === 'not_started');
+        static::assertNotEmpty($stagnationRisks);
     }
 
     public function testAnalyzeProjectReturnsCorrectRiskLevels(): void
@@ -168,14 +168,14 @@ class ProjectRiskAnalyzerTest extends TestCase
         // Project with minimal issues should have high score
         $project = $this->createHealthyProject(90);
         $result = $this->service->analyzeProject($project);
-        $this->assertGreaterThanOrEqual(70, $result['healthScore']); // Allow for some penalties
-        $this->assertContains($result['riskLevel'], ['low', 'medium']);
+        static::assertGreaterThanOrEqual(70, $result['healthScore']); // Allow for some penalties
+        static::assertContains($result['riskLevel'], ['low', 'medium']);
 
         // Project with multiple issues should have low score
         $project = $this->createHealthyProject(30);
         $result = $this->service->analyzeProject($project);
-        $this->assertLessThan(60, $result['healthScore']);
-        $this->assertContains($result['riskLevel'], ['high', 'critical']);
+        static::assertLessThan(60, $result['healthScore']);
+        static::assertContains($result['riskLevel'], ['high', 'critical']);
     }
 
     public function testAnalyzeMultipleProjectsFiltersAndSortsCorrectly(): void
@@ -190,12 +190,12 @@ class ProjectRiskAnalyzerTest extends TestCase
         $result = $this->service->analyzeMultipleProjects($projects);
 
         // Should only return projects with score < 80 (some penalties may apply)
-        $this->assertGreaterThanOrEqual(2, count($result)); // At least 2 at-risk projects
-        $this->assertLessThanOrEqual(4, count($result)); // At most all 4
+        static::assertGreaterThanOrEqual(2, count($result)); // At least 2 at-risk projects
+        static::assertLessThanOrEqual(4, count($result)); // At most all 4
 
         // Should be sorted by health score (ascending) - verify first is lowest or equal
         if (count($result) > 1) {
-            $this->assertLessThanOrEqual($result[1]['analysis']['healthScore'], $result[0]['analysis']['healthScore']);
+            static::assertLessThanOrEqual($result[1]['analysis']['healthScore'], $result[0]['analysis']['healthScore']);
         }
     }
 
@@ -263,16 +263,16 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         $entity = $service->calculateHealthScore($project);
 
-        $this->assertInstanceOf(\App\Entity\ProjectHealthScore::class, $entity);
-        $this->assertSame($project, $entity->getProject());
-        $this->assertGreaterThanOrEqual(0, $entity->budgetScore);
-        $this->assertLessThanOrEqual(100, $entity->budgetScore);
-        $this->assertGreaterThanOrEqual(0, $entity->timelineScore);
-        $this->assertGreaterThanOrEqual(0, $entity->velocityScore);
-        $this->assertGreaterThanOrEqual(0, $entity->qualityScore);
-        $this->assertGreaterThanOrEqual(0, $entity->score);
-        $this->assertLessThanOrEqual(100, $entity->score);
-        $this->assertContains($entity->healthLevel, ['healthy', 'warning', 'critical']);
+        static::assertInstanceOf(\App\Entity\ProjectHealthScore::class, $entity);
+        static::assertSame($project, $entity->getProject());
+        static::assertGreaterThanOrEqual(0, $entity->budgetScore);
+        static::assertLessThanOrEqual(100, $entity->budgetScore);
+        static::assertGreaterThanOrEqual(0, $entity->timelineScore);
+        static::assertGreaterThanOrEqual(0, $entity->velocityScore);
+        static::assertGreaterThanOrEqual(0, $entity->qualityScore);
+        static::assertGreaterThanOrEqual(0, $entity->score);
+        static::assertLessThanOrEqual(100, $entity->score);
+        static::assertContains($entity->healthLevel, ['healthy', 'warning', 'critical']);
     }
 
     public function testCalculateHealthScoreAppliesWeightedFormula(): void
@@ -298,14 +298,14 @@ class ProjectRiskAnalyzerTest extends TestCase
         $entity = $service->calculateHealthScore($project);
 
         // Score must be in [0, 100], healthLevel coherent with thresholds 50 and 80.
-        $this->assertGreaterThanOrEqual(0, $entity->score);
-        $this->assertLessThanOrEqual(100, $entity->score);
+        static::assertGreaterThanOrEqual(0, $entity->score);
+        static::assertLessThanOrEqual(100, $entity->score);
         if ($entity->score > 80) {
-            $this->assertSame('healthy', $entity->healthLevel);
+            static::assertSame('healthy', $entity->healthLevel);
         } elseif ($entity->score >= 50) {
-            $this->assertSame('warning', $entity->healthLevel);
+            static::assertSame('warning', $entity->healthLevel);
         } else {
-            $this->assertSame('critical', $entity->healthLevel);
+            static::assertSame('critical', $entity->healthLevel);
         }
     }
 
@@ -329,8 +329,8 @@ class ProjectRiskAnalyzerTest extends TestCase
 
         $entity = $service->calculateHealthScore($project);
 
-        $this->assertNotEmpty($entity->recommendations);
-        $this->assertIsArray($entity->recommendations);
+        static::assertNotEmpty($entity->recommendations);
+        static::assertIsArray($entity->recommendations);
     }
 
     public function testCalculateHealthScorePersistsViaEntityManager(): void
@@ -340,7 +340,7 @@ class ProjectRiskAnalyzerTest extends TestCase
         $em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->isInstanceOf(\App\Entity\ProjectHealthScore::class));
+            ->with(static::isInstanceOf(\App\Entity\ProjectHealthScore::class));
         $em->expects($this->once())->method('flush');
 
         $companyContext = $this->createStub(CompanyContext::class);

@@ -30,7 +30,7 @@ final readonly class ProjectMarginSnapshotRecord
             return null;
         }
 
-        $secondsPerDay = 86400;
+        $secondsPerDay = 86_400;
         $diff = $now->getTimestamp() - $this->marginCalculatedAt->getTimestamp();
 
         return $diff / $secondsPerDay;

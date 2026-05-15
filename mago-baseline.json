@@ -1,0 +1,5299 @@
+variant = "loose"
+
+[[issues]]
+file = "src/AI/Tool/ClientHistoryTool.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/AI/Tool/ProjectStatsTool.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Application/Client/UseCase/CreateClient/CreateClientUseCase.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Application/Contributor/Query/ListActiveContributors/ContributorListItemDto.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Invoice/UseCase/CreateInvoiceDraft/CreateInvoiceDraftUseCase.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Application/Order/UseCase/CreateOrderQuote/CreateOrderQuoteCommand.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Order/UseCase/CreateOrderQuote/CreateOrderQuoteUseCase.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Application/Project/Query/BillingLeadTimeKpi/BillingLeadTimeKpiDto.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Project/Query/BillingLeadTimeKpi/ComputeBillingLeadTimeKpiHandler.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Application/Project/Query/DsoKpi/DsoKpiDto.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Project/UseCase/CreateProject/CreateProjectUseCase.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Application/Vacation/Command/RequestVacation/RequestVacationCommand.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Vacation/DTO/VacationDTO.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/WorkItem/UseCase/RecordWorkItem/RecordWorkItemCommand.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Command/AnalyzeProjectRisksCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/AnalyzeProjectRisksCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/AnalyzeProjectRisksCommand.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Command/AssignTaskProfilesCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/AssignTaskProfilesCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/AssignTaskProfilesCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/AssignTaskProfilesCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/AssignTaskProfilesCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/AuditContributorsCjmCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/AuditContributorsCjmCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/AuditContributorsCjmCommand.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Command/AuditContributorsCjmCommand.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Command/AuditContributorsCjmCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 4
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "no-error-control-operator"
+message = "Unsafe use of error control operator `@`."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Command/BackupDumpCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupRestoreCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupRestoreCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/BackupRestoreCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/BackupRestoreCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/CalculateMetricsCommand.php"
+code = "halstead"
+message = "Method has a high halstead difficulty and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/CalculateMetricsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/CalculateMetricsCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/CalculateStaffingMetricsCommand.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 1
+
+[[issues]]
+file = "src/Command/CalculateStaffingMetricsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/CalculateStaffingMetricsCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/CheckAlertsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/CheckPhpLimitsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 4
+
+[[issues]]
+file = "src/Command/CheckPhpLimitsCommand.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 3
+
+[[issues]]
+file = "src/Command/ContributorSatisfactionReminderCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/ContributorSatisfactionReminderCommand.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 2
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 7
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestDataCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestSubTasksCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestSubTasksCommand.php"
+code = "halstead"
+message = "Method has a high halstead difficulty and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestSubTasksCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestSubTasksCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestSubTasksCommand.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateTestUsersCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/CreateTestUsersCommand.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "src/Command/CreateUserCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/DebugPlanningOptimizationCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/DebugPlanningOptimizationCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/DebugPlanningOptimizationCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/DebugPlanningSuggestionsCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Command/DebugPlanningSuggestionsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/DebugTaskAssignmentCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/DebugTaskAssignmentCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/GamificationSeedBadgesCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Command/GamificationSeedBadgesCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateEmploymentPeriodsCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateEmploymentPeriodsCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/GenerateForecastTestDataCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateInvoicesFromSchedulesCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateInvoicesFromSchedulesCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/GenerateInvoicesFromSchedulesCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/GenerateMockForecastsCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateMonthlyRegieInvoicesCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateMonthlyRegieInvoicesCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateTestInvoicesCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/GenerateTestInvoicesCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 5
+
+[[issues]]
+file = "src/Command/ImportTheTribeNotionCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/ImportTheTribePlanningCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "assert-description"
+message = "Missing description in assert function."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 6
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeProjectsCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeStaffingCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeStaffingCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeStaffingCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/ImportTheTribeStaffingCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 6
+
+[[issues]]
+file = "src/Command/ImportTheTribeStaffingCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/LoadReferenceDataCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Command/MigrateWorkItemLegacyCostCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrateWorkItemLegacyCostCommand.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrateWorkItemLegacyCostCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrateWorkItemLegacyCostCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrateWorkItemLegacyCostCommand.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 3
+
+[[issues]]
+file = "src/Command/MigrationsSyncCommand.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Command/NpsMarkExpiredCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/ProcessAccountDeletionsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/ProcessAccountDeletionsCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/ProcessAccountDeletionsCommand.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Command/ProjectAnalyzeRisksCommand.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Command/SaasRenewSubscriptionsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/SaasRenewSubscriptionsCommand.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/SaasRenewSubscriptionsCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedBlogCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedBlogCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedBlogCommand.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 2
+
+[[issues]]
+file = "src/Command/SeedProjects2025Command.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Command/SendNurturingEmailsCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/SendNurturingEmailsCommand.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 1
+
+[[issues]]
+file = "src/Command/SendNurturingEmailsCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 4
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 8
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/SyncBoondManagerCommand.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 5
+
+[[issues]]
+file = "src/Command/TestS3ConnectionCommand.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Command/TestS3ConnectionCommand.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Command/TestS3ConnectionCommand.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 4
+
+[[issues]]
+file = "src/Controller/AboutController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BackofficeDashboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BlogCategoryCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BlogPostCrudController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BlogPostCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BlogPostCrudController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BlogTagCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BoondManagerSettingsController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BoondManagerSettingsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/BoondManagerSettingsController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Controller/Admin/CompanyCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/CompanySettingsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/CrmLeadController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/CrmLeadController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/CrmLeadController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/CrmLeadController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/HubSpotSettingsController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/HubSpotSettingsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/HubSpotSettingsController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Controller/Admin/NotificationSettingsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/OnboardingTemplateController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/OnboardingTemplateController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/OnboardingTemplateController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 6
+
+[[issues]]
+file = "src/Controller/Admin/ProfileCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/SaasProviderCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/SaasServiceCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/SaasSubscriptionCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/SchedulerEntryCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/ServiceCategoryCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/SkillCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Admin/TechnologyCrudController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/AdminUserController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Analytics/DashboardController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Analytics/DashboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Analytics/DashboardController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/Analytics/DashboardController.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 2
+
+[[issues]]
+file = "src/Controller/Analytics/DashboardController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 2
+
+[[issues]]
+file = "src/Controller/Analytics/PredictionsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Api/DependentFieldsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Api/TaskApiController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ApiDocController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/AvatarController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/BadgeController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/BadgeController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/BillingController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/BillingController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/BillingController.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Controller/BillingController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 5
+
+[[issues]]
+file = "src/Controller/BlogController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ChatbotController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ChatbotController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 4
+
+[[issues]]
+file = "src/Controller/ChatbotController.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 2
+
+[[issues]]
+file = "src/Controller/ClientContactController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 4
+
+[[issues]]
+file = "src/Controller/ClientController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 8
+
+[[issues]]
+file = "src/Controller/ContributorSatisfactionController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorSatisfactionController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorSatisfactionController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/ContributorSatisfactionController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorSatisfactionController.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorSkillController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorSkillController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorTechnologyController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorTechnologyController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorTechnologyController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ContributorTechnologyController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 3
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 3
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/EmploymentPeriodController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 4
+
+[[issues]]
+file = "src/Controller/ErrorTestController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ExpenseReportController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Controller/ExpenseReportController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ExpenseReportController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/ForecastingController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/GdprController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/GdprController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/HealthCheckController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/HealthCheckController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/HomeController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/HrDashboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/HrDashboardController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Controller/InvoiceController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/InvoiceController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/InvoiceController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 2
+
+[[issues]]
+file = "src/Controller/InvoiceController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/LeadMagnetController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/LeaderboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/MyTasksController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/MyTasksController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/NotificationController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/NotificationController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/NotificationController.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/NpsController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/NpsController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/NpsController.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/NpsController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/NpsPublicController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/OnboardingController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 7
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 6
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 4
+
+[[issues]]
+file = "src/Controller/OrderController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/PerformanceReviewController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/PerformanceReviewController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/PerformanceReviewController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/PerformanceReviewController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 10
+
+[[issues]]
+file = "src/Controller/PlanningController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 10
+
+[[issues]]
+file = "src/Controller/PlanningOptimizationController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningOptimizationController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningOptimizationController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/PlanningOptimizationController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/PlanningOptimizationController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Controller/ProfileController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProfileController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProfileController.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectBillingController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 3
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 4
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 22
+
+[[issues]]
+file = "src/Controller/ProjectController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectDetailController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectDetailController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectDetailController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectDetailController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 4
+
+[[issues]]
+file = "src/Controller/ProjectHealthController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectSubTaskController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectSubTaskController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 2
+
+[[issues]]
+file = "src/Controller/ProjectTaskController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ProjectTechnologyController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/PublicController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/PublicController.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Controller/RiskController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/SaasController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/SalesDashboardController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/SalesDashboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/SalesDashboardController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/SearchController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Security/CspReportController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/Security/CspReportController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Security/CspReportController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/Security/CspReportController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/Security/CspReportController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Controller/SecurityController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Staffing/StaffingDashboardController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/Staffing/StaffingDashboardController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/Staffing/StaffingDashboardController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/SubscriptionController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/SubscriptionController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/SubscriptionController.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Controller/SubscriptionController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Controller/SubscriptionController.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 8
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/TimesheetController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Controller/TreasuryController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/TwoFactorController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ValidationController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Controller/ValidationController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Controller/ValidationController.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Controller/WorkloadPredictionController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/DataFixtures/AppFixtures.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/DataFixtures/AppFixtures.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/DataFixtures/AppFixtures.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/DataFixtures/SkillFixtures.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/DataFixtures/TechnologyFixtures.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Domain/Client/Entity/Client.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Domain/Client/Entity/Client.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Domain/Client/Entity/Client.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 3
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 5
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/Invoice.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Domain/Invoice/Entity/InvoiceLine.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Domain/Invoice/ValueObject/TaxRate.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 3
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/Order.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/OrderLine.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Domain/Order/Entity/OrderLine.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Order/Entity/OrderSection.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Domain/Order/Entity/OrderSection.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 5
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Project/Entity/Project.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Domain/Project/Event/MarginThresholdExceededEvent.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Domain/Project/Repository/ProjectRepositoryInterface.php"
+code = "too-many-methods"
+message = "Interface has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Shared/ValueObject/Money.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Domain/Shared/ValueObject/Money.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Vacation/Entity/Vacation.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Domain/Vacation/Entity/Vacation.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/Vacation/ValueObject/DateRange.php"
+code = "identity-comparison"
+message = "Use identity comparison `===` instead of equality comparison `==`."
+count = 2
+
+[[issues]]
+file = "src/Domain/WorkItem/Entity/WorkItem.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 3
+
+[[issues]]
+file = "src/Domain/WorkItem/Entity/WorkItem.php"
+code = "halstead"
+message = "Method has a high halstead difficulty"
+count = 1
+
+[[issues]]
+file = "src/Domain/WorkItem/Entity/WorkItem.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Domain/WorkItem/Migration/LegacyTimesheetReadModelRepositoryInterface.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Domain/WorkItem/Migration/LegacyTimesheetRecord.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Domain/WorkItem/Migration/WorkItemMigrationResult.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Entity/AccountDeletionRequest.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Achievement.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/DimContributor.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/DimContributor.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/DimProfile.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Entity/Analytics/DimProfile.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/DimProjectType.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/FactProjectMetrics.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/FactProjectMetrics.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Analytics/FactStaffingMetrics.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Entity/Analytics/FactStaffingMetrics.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Badge.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Badge.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/BillingMarker.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/BlogCategory.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/BlogPost.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/BlogPost.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/BoondManagerSettings.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Entity/BoondManagerSettings.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/BusinessUnit.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/BusinessUnit.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/BusinessUnit.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ClientContact.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Company.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/Company.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/CompanySettings.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/Contributor.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorProgress.php"
+code = "halstead"
+message = "Method has a high halstead difficulty"
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorProgress.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorSatisfaction.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorSatisfaction.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorSatisfaction.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorTechnology.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Entity/ContributorTechnology.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/ContributorTechnology.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/CookieConsent.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Entity/CookieConsent.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/EmployeeLevel.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/EmployeeLevel.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/EmploymentPeriod.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/EmploymentPeriod.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ExpenseReport.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/ExpenseReport.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/ExpenseReport.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/FactForecast.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/HubSpotSettings.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 5
+
+[[issues]]
+file = "src/Entity/HubSpotSettings.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Invoice.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/Invoice.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/InvoiceLine.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/LeadCapture.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/LeadCapture.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/LeadCapture.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Notification.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/NotificationPreference.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Entity/NpsSurvey.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/OnboardingTask.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/OnboardingTemplate.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/Order.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderLine.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderLine.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderLine.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderSection.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderSection.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/OrderTask.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/PerformanceReview.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Entity/PerformanceReview.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Planning.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/PlanningSkill.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Profile.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Profile.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/Project.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectHealthScore.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectSubTask.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectTask.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectTask.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectTask.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Entity/ProjectTask.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/ProjectTask.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Provider.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasProvider.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasProvider.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasService.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasSubscription.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasSubscription.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasSubscription.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/SaasSubscription.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/SchedulerEntry.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/ServiceCategory.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Skill.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Subscription.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Entity/Subscription.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Entity/Subscription.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/Subscription.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Technology.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Timesheet.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/User.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/User.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Entity/User.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Entity/User.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Entity/Vendor.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Entity/Vendor.php"
+code = "too-many-properties"
+message = "Class has too many properties."
+count = 1
+
+[[issues]]
+file = "src/Event/NotificationEvent.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/EventListener/EmploymentPeriodCreatedListener.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/EventSubscriber/ApiRateLimiterSubscriber.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/EventSubscriber/BlameableSubscriber.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/EventSubscriber/NotificationSubscriber.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/EventSubscriber/ProjectEventSubscriber.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 5
+
+[[issues]]
+file = "src/Factory/ClientFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/ContributorFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/EmployeeLevelFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/InvoiceFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/OrderFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/OrderTaskFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/PlanningFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/ProfileFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/ProjectFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/ProjectSubTaskFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/ProjectTaskFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/TimesheetFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/UserFactory.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Factory/UserFactory.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "src/Factory/UserFactory.php"
+code = "prefer-first-class-callable"
+message = "Use first-class callable syntax `...` instead of a arrow function."
+count = 1
+
+[[issues]]
+file = "src/Form/ContributorType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Form/EmploymentPeriodType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Form/ProjectTaskType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Form/ProjectType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Form/SaasSubscriptionType.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Client/Persistence/Doctrine/DoctrineDddClientRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Invoice/Persistence/Doctrine/DoctrineDddInvoiceRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Order/Persistence/Doctrine/DoctrineDddOrderRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Project/Persistence/Doctrine/DoctrineDddProjectRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Vacation/Persistence/Doctrine/DoctrineVacationRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/WorkItem/Migration/DoctrineLegacyTimesheetReadModelRepository.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Menu/MenuBuilder.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Menu/MenuBuilder.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Menu/MenuBuilder.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Presentation/Vacation/Controller/VacationApprovalController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Presentation/Vacation/Controller/VacationApprovalController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Presentation/Vacation/Controller/VacationRequestController.php"
+code = "final-controller"
+message = "Controller classes should be declared as `final`."
+count = 1
+
+[[issues]]
+file = "src/Presentation/WorkItem/Controller/WeeklyTimesheetController.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Presentation/WorkItem/Controller/WeeklyTimesheetController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Presentation/WorkItem/Controller/WeeklyTimesheetController.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Presentation/WorkItem/Controller/WeeklyTimesheetController.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/BillingMarkerRepository.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/BlogPostRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/BlogPostRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/BusinessUnitRepository.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Repository/CompanyAwareRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Repository/ContributorRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorRepository.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 3
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Repository/ContributorSatisfactionRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorSkillRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorTechnologyRepository.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Repository/ContributorTechnologyRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Repository/ContributorTechnologyRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/EmployeeLevelRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/EmploymentPeriodRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/EmploymentPeriodRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/EmploymentPeriodRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/ExpenseReportRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/ExpenseReportRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/ExpenseReportRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 12
+
+[[issues]]
+file = "src/Repository/NotificationPreferenceRepository.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Repository/NotificationSettingRepository.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "src/Repository/NpsSurveyRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/NpsSurveyRepository.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Repository/NpsSurveyRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/OnboardingTaskRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 6
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/OrderRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/PlanningSkillRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/PlanningSkillRepository.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Repository/PlanningSkillRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/ProjectRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/ProjectRepository.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Repository/ProjectRepository.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Repository/ProjectRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Repository/ProjectRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/ProjectSkillRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/SaasSubscriptionRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/StaffingMetricsRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/StaffingMetricsRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Repository/StaffingMetricsRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Repository/SubscriptionRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 4
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 2
+
+[[issues]]
+file = "src/Repository/TimesheetRepository.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Security/CompanyContext.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/AI/BlogImageGenerationService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/AI/BlogImageGenerationService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/AI/BlogImageGenerationService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/AlertDetectionService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/AlertDetectionService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/AlertDetectionService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/AlertDetectionService.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/AlertDetectionService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/BusinessKpiService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/DashboardReadService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/DashboardReadService.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/DashboardReadService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/DashboardReadService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 9
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "halstead"
+message = "Method has a high halstead difficulty and effort"
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 3
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/Analytics/MetricsCalculationService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/BillingService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/BillingService.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerClient.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerClient.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerClient.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerClient.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 4
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 15
+
+[[issues]]
+file = "src/Service/BoondManager/BoondManagerSyncService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/ClientServiceLevelCalculator.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ExcelExportService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ExcelExportService.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Service/ExcelExportService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ExcelExportService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 4
+
+[[issues]]
+file = "src/Service/ExpenseReportService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ExpenseReportService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ExpenseReportService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 17
+
+[[issues]]
+file = "src/Service/ExpenseReportService.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 5
+
+[[issues]]
+file = "src/Service/ExpenseReportService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Service/ForecastingService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/GamificationService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/GamificationService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/GamificationService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/GamificationService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/GamificationService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 6
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 7
+
+[[issues]]
+file = "src/Service/HrMetricsService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 2
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotClient.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotClient.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotClient.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 3
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotClient.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotSyncService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotSyncService.php"
+code = "halstead"
+message = "Method has a high halstead effort"
+count = 2
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotSyncService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotSyncService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "src/Service/HubSpot/HubSpotSyncService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceGeneratorService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceGeneratorService.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceGeneratorService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceGeneratorService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "src/Service/InvoiceGeneratorService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceReminderService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceReminderService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceReminderService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/InvoiceReminderService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Service/InvoiceReminderService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/MetricsCalculationService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/MetricsCalculationService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/MetricsCalculationService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 4
+
+[[issues]]
+file = "src/Service/MetricsCalculationService.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/MetricsCalculationService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 3
+
+[[issues]]
+file = "src/Service/NotificationService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/NotificationService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/OnboardingService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/OnboardingService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/OnboardingService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/PdfGeneratorService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 2
+
+[[issues]]
+file = "src/Service/PerformanceReviewService.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Service/PerformanceReviewService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/PerformanceReviewService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/PerformanceReviewService.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Service/PerformanceReviewService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Service/Planning/AI/PlanningAIAssistant.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 2
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "halstead"
+message = "Method has a high halstead volume and effort"
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "loop-does-not-iterate"
+message = "Loop is unconditionally terminated and will not iterate."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 4
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/PlanningOptimizer.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 2
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/ProjectPlanningAssistant.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/TaceAnalyzer.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/TaceAnalyzer.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/Planning/TaceAnalyzer.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Service/Planning/TaceAnalyzer.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityPredictor.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityPredictor.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
+file = "src/Service/ProfitabilityPredictor.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 4
+
+[[issues]]
+file = "src/Service/ProfitabilityService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityService.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/ProfitabilityService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/ProjectRiskAnalyzer.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/ProjectRiskAnalyzer.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/ProjectRiskAnalyzer.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "src/Service/ProjectRiskAnalyzer.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/SecureFileUploadService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/SecureFileUploadService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Service/SecureFileUploadService.php"
+code = "no-empty-catch-clause"
+message = "Do not use empty `catch` blocks."
+count = 1
+
+[[issues]]
+file = "src/Service/SkillGapAnalyzer.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/SkillGapAnalyzer.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/SkillGapAnalyzer.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/SkillGapAnalyzer.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "src/Service/StaffingMetricsCalculationService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/StaffingMetricsCalculationService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/StaffingMetricsCalculationService.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 1
+
+[[issues]]
+file = "src/Service/StaffingMetricsCalculationService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Service/Timesheet/TimesheetExportService.php"
+code = "halstead"
+message = "Method has a high halstead volume"
+count = 1
+
+[[issues]]
+file = "src/Service/Timesheet/TimesheetExportService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/Timesheet/TimesheetExportService.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "src/Service/TreasuryService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 6
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 6
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 3
+
+[[issues]]
+file = "src/Service/WorkloadPredictionService.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "cyclomatic-complexity"
+message = "Class has high complexity."
+count = 1
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "halstead"
+message = "Method has a high halstead volume, difficulty, and effort"
+count = 1
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "kan-defect"
+message = "Class has a high kan defect score."
+count = 1
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 5
+
+[[issues]]
+file = "src/Twig/CronExtension.php"
+code = "no-sprintf-concat"
+message = "String concatenation with `sprintf` can be simplified."
+count = 3
+
+[[issues]]
+file = "tests/Api/ProjectApiTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Api/ProjectApiTest.php"
+code = "no-redundant-method-override"
+message = "Redundant method override."
+count = 1
+
+[[issues]]
+file = "tests/Api/ProjectApiTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/E2E/LoginAndNavigationE2ETest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 4
+
+[[issues]]
+file = "tests/E2E/OrderPaymentScheduleE2ETest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 2
+
+[[issues]]
+file = "tests/E2E/ProjectCreationE2ETest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 2
+
+[[issues]]
+file = "tests/E2E/TimesheetE2ETest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 8
+
+[[issues]]
+file = "tests/Functional/Controller/Admin/OnboardingTemplateControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/Analytics/DashboardControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/OnboardingControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/PerformanceReviewControllerTest.php"
+code = "tagged-todo"
+message = "TODO should be tagged with (@username) or (#issue)."
+count = 2
+
+[[issues]]
+file = "tests/Functional/Controller/PerformanceReviewControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/ProjectControllerFilterTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/SecurityControllerTest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "tests/Functional/Controller/TimesheetControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/Project/InvoiceCreatedEventBillingLeadTimeFlowTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `BillingLeadTimeSlackAlertingSpy` but class `InvoiceCreatedEventBillingLeadTimeFlowTest` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/Project/InvoicePaidEventDsoFlowTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `SlackAlertingSpy` but class `InvoicePaidEventDsoFlowTest` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/Project/MarginAdoptionFlowTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `MarginAdoptionSlackAlertingSpy` but class `MarginAdoptionFlowTest` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/WorkItem/Migration/MigrateWorkItemLegacyCostCommandTest.php"
+code = "no-error-control-operator"
+message = "Unsafe use of error control operator `@`."
+count = 2
+
+[[issues]]
+file = "tests/Integration/Application/WorkItem/Migration/MigrateWorkItemLegacyCostCommandTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/WorkItem/Migration/MigrateWorkItemLegacyCostCommandTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Command/BackupRestoreCycleTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Infrastructure/Project/Persistence/Doctrine/DoctrineBillingLeadTimeReadModelRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/MultiTenant/CompanyIsolationTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/MultiTenant/EntityCreationTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/ContributorRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/EmploymentPeriodRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/OrderRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/ProjectRepositoryFilterTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/ProjectRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/TimesheetRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Repository/VacationRepositoryTest.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 2
+
+[[issues]]
+file = "tests/Integration/Repository/VacationRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Security/CompanyContextTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Service/BoondManager/BoondManagerClientTest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Service/BoondManager/BoondManagerClientTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Service/HubSpot/HubSpotClientTest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Service/HubSpot/HubSpotClientTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Service/NotificationEventChainTest.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "tests/Security/CsrfProtectionTest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 1
+
+[[issues]]
+file = "tests/Security/SecurityHeadersTest.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Application/Project/EventListener/SendBillingLeadTimeRedAlertOnInvoiceCreatedTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Application/Project/EventListener/SendDsoRedAlertOnInvoicePaidTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Application/WorkItem/Migration/DriftReportCsvExporterTest.php"
+code = "no-error-control-operator"
+message = "Unsafe use of error control operator `@`."
+count = 5
+
+[[issues]]
+file = "tests/Unit/Application/WorkItem/Migration/DriftReportCsvExporterTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Command/CheckPhpLimitsCommandTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Command/CreateUserCommandTest.php"
+code = "no-literal-password"
+message = "Literal passwords or sensitive data should not be stored in code."
+count = 10
+
+[[issues]]
+file = "tests/Unit/Command/DispatchMetricsRecalculationCommandTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Controller/HealthCheckControllerTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Controller/HealthCheckControllerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Client/Entity/ClientTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Invoice/Entity/InvoiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Invoice/ValueObject/InvoiceNumberTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Invoice/ValueObject/TaxRateTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Order/Entity/OrderLineTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Order/Entity/OrderSectionTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Order/Entity/OrderTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Entity/ProjectTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Shared/ValueObject/MoneyTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Shared/ValueObject/TenantIdTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Vacation/Entity/VacationTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Vacation/ValueObject/DateRangeTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/Entity/WorkItemTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/Entity/WorkItemTransitionsTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/Migration/WorkItemMigratorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/ValueObject/HourlyRateTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Entity/ProjectTaskTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/EventSubscriber/LoginSecuritySubscriberTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/EventSubscriber/RequestIdSubscriberTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Client/Persistence/Doctrine/DoctrineDddClientRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Invoice/Persistence/Doctrine/DoctrineDddInvoiceRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Multitenant/EventListener/TenantBootstrapListenerTest.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Order/Translator/OrderFlatToDddTranslatorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Persistence/Doctrine/Type/AbstractTypesTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `AbstractTypesTest` but enum `TestStatusEnum` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Persistence/Doctrine/Type/AbstractTypesTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `TestStringValueObject` but enum `TestStatusEnum` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/Project/Persistence/Doctrine/DoctrineDddProjectRepositoryTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Infrastructure/WorkItem/Translator/WorkItemFlatToDddTranslatorTest.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Security/Voter/ClientContributorExpenseVoterTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Security/Voter/CompanyVoterTest.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Security/Voter/CompanyVoterTest.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 3
+
+[[issues]]
+file = "tests/Unit/Security/Voter/CompanyVoterTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Security/Voter/OrderVoterTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/AlertDetectionServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/Analytics/MetricsCalculationServiceTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/ForecastingServiceTest.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/ForecastingServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/HrMetricsServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/NotificationServiceTest.php"
+code = "no-boolean-flag-parameter"
+message = "Avoid boolean flag parameters."
+count = 5
+
+[[issues]]
+file = "tests/Unit/Service/NotificationServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/OnboardingServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/PerformanceReviewServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/Planning/TaceAnalyzerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/ProfitabilityServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/ProjectRiskAnalyzerTest.php"
+code = "no-else-clause"
+message = "Avoid `else` clauses."
+count = 2
+
+[[issues]]
+file = "tests/Unit/Service/ProjectRiskAnalyzerTest.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 3
+
+[[issues]]
+file = "tests/Unit/Service/ProjectRiskAnalyzerTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/SecureFileUploadServiceTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Service/Timesheet/TimesheetExportServiceTest.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "tests/bootstrap.php"
+code = "no-empty"
+message = "Use of the `empty` construct."
+count = 1
+
+[[issues]]
+file = "tests/bootstrap.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 2
+
+[[issues]]
+file = "tests/console-application.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1
+
+[[issues]]
+file = "tests/object-manager.php"
+code = "no-else-clause"
+message = "Avoid `elseif` clauses."
+count = 1

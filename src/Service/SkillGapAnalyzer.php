@@ -71,7 +71,7 @@ class SkillGapAnalyzer
         }
 
         // Trier les gaps par sévérité décroissante
-        usort($gaps, fn ($a, $b): int => $b['gap'] <=> $a['gap']);
+        usort($gaps, static fn ($a, $b): int => $b['gap'] <=> $a['gap']);
 
         return [
             'gaps' => $gaps,
@@ -79,7 +79,7 @@ class SkillGapAnalyzer
             'balanced' => $balanced,
             'summary' => [
                 'totalGaps' => count($gaps),
-                'criticalGaps' => count(array_filter($gaps, fn ($g): bool => $g['severity'] === 'critical')),
+                'criticalGaps' => count(array_filter($gaps, static fn ($g): bool => $g['severity'] === 'critical')),
                 'totalSurplus' => count($surplus),
                 'totalBalanced' => count($balanced),
             ],
@@ -146,30 +146,31 @@ class SkillGapAnalyzer
         $trainingNeeds = [];
 
         foreach ($gaps['gaps'] as $gap) {
-            if ($gap['severity'] === 'critical' || $gap['severity'] === 'high') {
-                // Trouver les contributeurs qui ont cette compétence à un niveau débutant ou intermédiaire
-                $contributors = $this->contributorSkillRepository->findBySkill($gap['skill']);
-
-                $contributorsToTrain = [];
-                foreach ($contributors as $contributorSkill) {
-                    $level = $contributorSkill->getEffectiveLevel();
-                    if ($level < ContributorSkill::LEVEL_CONFIRMED) {
-                        $contributorsToTrain[] = [
-                            'contributor' => $contributorSkill->getContributor(),
-                            'currentLevel' => $level,
-                            'targetLevel' => ContributorSkill::LEVEL_CONFIRMED,
-                        ];
-                    }
-                }
-
-                $trainingNeeds[] = [
-                    'skill' => $gap['skill'],
-                    'gap' => $gap['gap'],
-                    'severity' => $gap['severity'],
-                    'contributorsToTrain' => $contributorsToTrain,
-                    'priority' => $gap['severity'],
-                ];
+            if (!($gap['severity'] === 'critical' || $gap['severity'] === 'high')) {
+                continue;
             }
+
+            $contributors = $this->contributorSkillRepository->findBySkill($gap['skill']);
+
+            $contributorsToTrain = [];
+            foreach ($contributors as $contributorSkill) {
+                $level = $contributorSkill->getEffectiveLevel();
+                if ($level < ContributorSkill::LEVEL_CONFIRMED) {
+                    $contributorsToTrain[] = [
+                        'contributor' => $contributorSkill->getContributor(),
+                        'currentLevel' => $level,
+                        'targetLevel' => ContributorSkill::LEVEL_CONFIRMED,
+                    ];
+                }
+            }
+
+            $trainingNeeds[] = [
+                'skill' => $gap['skill'],
+                'gap' => $gap['gap'],
+                'severity' => $gap['severity'],
+                'contributorsToTrain' => $contributorsToTrain,
+                'priority' => $gap['severity'],
+            ];
         }
 
         return [
@@ -190,19 +191,21 @@ class SkillGapAnalyzer
 
         foreach ($gaps['gaps'] as $gap) {
             // Si le gap est important et qu'on n'a pas assez de contributeurs à former
-            if ($gap['gap'] >= 2 && $gap['severity'] !== 'low') {
-                $recruitmentNeeds[] = [
-                    'skill' => $gap['skill'],
-                    'gap' => $gap['gap'],
-                    'severity' => $gap['severity'],
-                    'recommendedHires' => (int) ceil($gap['gap'] / 2),
-                    'urgency' => $gap['severity'] === 'critical' ? 'Immédiat' : 'Court terme',
-                ];
+            if (!($gap['gap'] >= 2 && $gap['severity'] !== 'low')) {
+                continue;
             }
+
+            $recruitmentNeeds[] = [
+                'skill' => $gap['skill'],
+                'gap' => $gap['gap'],
+                'severity' => $gap['severity'],
+                'recommendedHires' => (int) ceil($gap['gap'] / 2),
+                'urgency' => $gap['severity'] === 'critical' ? 'Immédiat' : 'Court terme',
+            ];
         }
 
         // Trier par sévérité
-        usort($recruitmentNeeds, function ($a, $b) {
+        usort($recruitmentNeeds, static function ($a, $b) {
             $severityOrder = ['critical' => 3, 'high' => 2, 'medium' => 1, 'low' => 0];
 
             return $severityOrder[$b['severity']] <=> $severityOrder[$a['severity']];
@@ -228,12 +231,14 @@ class SkillGapAnalyzer
             // Rechercher si la compétence correspond à une technologie du projet
             foreach ($project->getTechnologies() as $technology) {
                 if (
-                    stripos((string) $technology->getName(), (string) $skill->getName()) !== false
-                    || stripos((string) $skill->getName(), (string) $technology->getName()) !== false
+                    !(stripos((string) $technology->getName(), (string) $skill->getName()) !== false
+                    || stripos((string) $skill->getName(), (string) $technology->getName()) !== false)
                 ) {
-                    ++$demandCount;
-                    break;
+                    continue;
                 }
+
+                ++$demandCount;
+                break;
             }
         }
 
@@ -292,7 +297,7 @@ class SkillGapAnalyzer
         // Vérifier si certaines compétences ont peu de contributeurs disponibles
         $lowAvailability = array_filter(
             $requiredSkills,
-            fn ($rs): bool => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2,
+            static fn ($rs): bool => $rs['availableCount'] > 0 && $rs['availableCount'] <= 2,
         );
         if (count($lowAvailability) > 0) {
             $recommendations[] = [

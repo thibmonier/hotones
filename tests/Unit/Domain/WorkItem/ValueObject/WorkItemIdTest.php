@@ -13,15 +13,15 @@ final class WorkItemIdTest extends TestCase
     public function testGenerateProducesValidUuid(): void
     {
         $id = WorkItemId::generate();
-        self::assertFalse($id->isLegacy());
+        static::assertFalse($id->isLegacy());
     }
 
     public function testFromLegacyIntStoresPrefix(): void
     {
         $id = WorkItemId::fromLegacyInt(42);
-        self::assertTrue($id->isLegacy());
-        self::assertSame(42, $id->toLegacyInt());
-        self::assertSame('legacy:42', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->getValue());
     }
 
     public function testFromLegacyIntZeroThrows(): void
@@ -45,8 +45,8 @@ final class WorkItemIdTest extends TestCase
     public function testFromStringValidLegacyAcceptsPrefix(): void
     {
         $id = WorkItemId::fromString('legacy:99');
-        self::assertTrue($id->isLegacy());
-        self::assertSame(99, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(99, $id->toLegacyInt());
     }
 
     public function testToLegacyIntOnNonLegacyThrows(): void
@@ -63,13 +63,13 @@ final class WorkItemIdTest extends TestCase
         $b = WorkItemId::fromLegacyInt(7);
         $c = WorkItemId::fromLegacyInt(8);
 
-        self::assertTrue($a->equals($b));
-        self::assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testToStringReturnsValue(): void
     {
         $id = WorkItemId::fromLegacyInt(42);
-        self::assertSame('legacy:42', (string) $id);
+        static::assertSame('legacy:42', (string) $id);
     }
 }

@@ -73,15 +73,15 @@ Exemples :
                 $year = (int) $matches[1];
 
                 if ($forceRecalculate) {
-                    $io->info("Re-calcul complet de l'année $year...");
+                    $io->info("Re-calcul complet de l'année {$year}...");
                     $this->metricsService->recalculateMetricsForYear($year);
                 } else {
-                    $io->info("Calcul des métriques pour l'année $year ($granularity)...");
+                    $io->info("Calcul des métriques pour l'année {$year} ({$granularity})...");
 
                     switch ($granularity) {
                         case 'monthly':
                             for ($month = 1; $month <= 12; ++$month) {
-                                $date = new DateTime("$year-$month-01");
+                                $date = new DateTime("{$year}-{$month}-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'monthly');
                                 $io->writeln('  ✓ '.$date->format('F Y'));
                             }
@@ -90,16 +90,16 @@ Exemples :
                         case 'quarterly':
                             for ($quarter = 1; $quarter <= 4; ++$quarter) {
                                 $month = (($quarter - 1) * 3) + 1;
-                                $date = new DateTime("$year-$month-01");
+                                $date = new DateTime("{$year}-{$month}-01");
                                 $this->metricsService->calculateMetricsForPeriod($date, 'quarterly');
-                                $io->writeln("  ✓ Q$quarter $year");
+                                $io->writeln("  ✓ Q{$quarter} {$year}");
                             }
                             break;
 
                         case 'yearly':
-                            $date = new DateTime("$year-01-01");
+                            $date = new DateTime("{$year}-01-01");
                             $this->metricsService->calculateMetricsForPeriod($date, 'yearly');
-                            $io->writeln("  ✓ Année $year");
+                            $io->writeln("  ✓ Année {$year}");
                             break;
                     }
                 }
@@ -114,7 +114,7 @@ Exemples :
                     return Command::FAILURE;
                 }
 
-                $date = new DateTime("$year-$month-01");
+                $date = new DateTime("{$year}-{$month}-01");
                 $io->info('Calcul des métriques pour '.$date->format('F Y').'...');
 
                 $this->metricsService->calculateMetricsForPeriod($date, $granularity);

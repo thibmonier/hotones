@@ -44,11 +44,11 @@ class AnalyticsCacheCommandTest extends TestCase
             '--clear' => true,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Invalidation du cache analytics', $output);
-        $this->assertStringContainsString('Cache analytics vidé avec succès', $output);
+        static::assertStringContainsString('Invalidation du cache analytics', $output);
+        static::assertStringContainsString('Cache analytics vidé avec succès', $output);
     }
 
     public function testExecuteWithWarmupOption(): void
@@ -60,11 +60,11 @@ class AnalyticsCacheCommandTest extends TestCase
             '--warmup' => true,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Préchauffage du cache analytics', $output);
-        $this->assertStringContainsString('métriques précalculées', $output);
+        static::assertStringContainsString('Préchauffage du cache analytics', $output);
+        static::assertStringContainsString('métriques précalculées', $output);
     }
 
     public function testExecuteWithBothOptions(): void
@@ -78,11 +78,11 @@ class AnalyticsCacheCommandTest extends TestCase
             '--warmup' => true,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Cache analytics vidé avec succès', $output);
-        $this->assertStringContainsString('métriques précalculées', $output);
+        static::assertStringContainsString('Cache analytics vidé avec succès', $output);
+        static::assertStringContainsString('métriques précalculées', $output);
     }
 
     public function testExecuteWithNoOptionsShowsUsage(): void
@@ -93,10 +93,10 @@ class AnalyticsCacheCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString(
+        static::assertStringContainsString(
             'Utilisation: php bin/console app:analytics:cache [--clear] [--warmup]',
             $output,
         );
@@ -111,8 +111,8 @@ class AnalyticsCacheCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute(['--clear' => true]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertEquals(0, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertSame(0, $exitCode);
     }
 
     public function testConfigureDefinesOptions(): void
@@ -123,16 +123,16 @@ class AnalyticsCacheCommandTest extends TestCase
 
         $definition = $this->command->getDefinition();
 
-        $this->assertTrue($definition->hasOption('clear'));
-        $this->assertTrue($definition->hasOption('warmup'));
+        static::assertTrue($definition->hasOption('clear'));
+        static::assertTrue($definition->hasOption('warmup'));
 
         // Verify shortcuts
-        $this->assertTrue($definition->hasShortcut('c'));
-        $this->assertTrue($definition->hasShortcut('w'));
+        static::assertTrue($definition->hasShortcut('c'));
+        static::assertTrue($definition->hasShortcut('w'));
 
         // Verify they are flags (no value required)
-        $this->assertFalse($definition->getOption('clear')->acceptValue());
-        $this->assertFalse($definition->getOption('warmup')->acceptValue());
+        static::assertFalse($definition->getOption('clear')->acceptValue());
+        static::assertFalse($definition->getOption('warmup')->acceptValue());
     }
 
     public function testExecuteWithClearShortOption(): void
@@ -143,7 +143,7 @@ class AnalyticsCacheCommandTest extends TestCase
         $this->commandTester->execute(['-c' => true]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Cache analytics vidé avec succès', $output);
+        static::assertStringContainsString('Cache analytics vidé avec succès', $output);
     }
 
     public function testExecuteWithWarmupShortOption(): void
@@ -154,7 +154,7 @@ class AnalyticsCacheCommandTest extends TestCase
         $this->commandTester->execute(['-w' => true]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('métriques précalculées', $output);
+        static::assertStringContainsString('métriques précalculées', $output);
     }
 
     public function testExecutePassesCorrectMetricsArrayToWarmup(): void
@@ -165,14 +165,14 @@ class AnalyticsCacheCommandTest extends TestCase
         $cacheService
             ->expects($this->once())
             ->method('warmup')
-            ->willReturnCallback(function ($metrics) use (&$capturedMetrics): void {
+            ->willReturnCallback(static function ($metrics) use (&$capturedMetrics): void {
                 $capturedMetrics = $metrics;
             });
 
         $this->commandTester->execute(['--warmup' => true]);
 
-        $this->assertIsArray($capturedMetrics);
+        static::assertIsArray($capturedMetrics);
         // Current implementation has empty array
-        $this->assertCount(0, $capturedMetrics);
+        static::assertCount(0, $capturedMetrics);
     }
 }

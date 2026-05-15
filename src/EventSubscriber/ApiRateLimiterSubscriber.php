@@ -84,7 +84,7 @@ class ApiRateLimiterSubscriber implements EventSubscriberInterface
             '/tasks/api/',
         ];
 
-        return array_any($apiPatterns, fn ($pattern): bool => str_starts_with($path, (string) $pattern));
+        return array_any($apiPatterns, static fn ($pattern): bool => str_starts_with($path, (string) $pattern));
     }
 
     private function getLimiterKey($request): string

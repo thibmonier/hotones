@@ -77,7 +77,7 @@ final readonly class DocumentationSearchTool
         }
 
         // Trier par pertinence (high > medium > low)
-        usort($results, function ($a, $b) {
+        usort($results, static function ($a, $b) {
             $relevanceOrder = ['high' => 3, 'medium' => 2, 'low' => 1];
 
             return ($relevanceOrder[$b['relevance']] ?? 0) <=> ($relevanceOrder[$a['relevance']] ?? 0);

@@ -14,14 +14,14 @@ final class DsoDaysTest extends TestCase
     {
         $dso = DsoDays::fromDays(0.0);
 
-        self::assertSame(0.0, $dso->getDays());
+        static::assertSame(0.0, $dso->getDays());
     }
 
     public function testFromDaysAcceptsPositiveValues(): void
     {
         $dso = DsoDays::fromDays(45.7);
 
-        self::assertSame(45.7, $dso->getDays());
+        static::assertSame(45.7, $dso->getDays());
     }
 
     public function testFromDaysRejectsNegative(): void
@@ -38,29 +38,29 @@ final class DsoDaysTest extends TestCase
         $b = DsoDays::fromDays(45.0);
         $c = DsoDays::fromDays(46.0);
 
-        self::assertTrue($a->equals($b));
-        self::assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testStringification(): void
     {
         $dso = DsoDays::fromDays(45.7);
 
-        self::assertSame('45.7', (string) $dso);
+        static::assertSame('45.7', (string) $dso);
     }
 
     public function testRoundedToOneDecimal(): void
     {
         $dso = DsoDays::fromDays(45.789);
 
-        self::assertSame(45.8, $dso->getDays());
+        static::assertSame(45.8, $dso->getDays());
     }
 
     public function testZeroValueFactory(): void
     {
         $dso = DsoDays::zero();
 
-        self::assertSame(0.0, $dso->getDays());
-        self::assertTrue($dso->equals(DsoDays::fromDays(0.0)));
+        static::assertSame(0.0, $dso->getDays());
+        static::assertTrue($dso->equals(DsoDays::fromDays(0.0)));
     }
 }

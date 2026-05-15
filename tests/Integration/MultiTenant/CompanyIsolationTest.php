@@ -130,9 +130,9 @@ class CompanyIsolationTest extends KernelTestCase
         $projects = $projectRepo->findAllForCurrentCompany();
 
         // Company 1 ne doit voir QUE ses 2 projets
-        $this->assertCount(2, $projects);
+        static::assertCount(2, $projects);
         foreach ($projects as $project) {
-            $this->assertEquals($this->company1->getId(), $project->getCompany()->getId());
+            static::assertEquals($this->company1->getId(), $project->getCompany()->getId());
         }
 
         // Simuler le context de Company 2
@@ -141,9 +141,9 @@ class CompanyIsolationTest extends KernelTestCase
         $projects = $projectRepo->findAllForCurrentCompany();
 
         // Company 2 ne doit voir QUE son projet
-        $this->assertCount(1, $projects);
-        $this->assertEquals('Project Beta 1', $projects[0]->getName());
-        $this->assertEquals($this->company2->getId(), $projects[0]->getCompany()->getId());
+        static::assertCount(1, $projects);
+        static::assertSame('Project Beta 1', $projects[0]->getName());
+        static::assertEquals($this->company2->getId(), $projects[0]->getCompany()->getId());
     }
 
     /**
@@ -168,15 +168,15 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $clients = $clientRepo->findAllForCurrentCompany();
 
-        $this->assertCount(1, $clients);
-        $this->assertEquals('Client Alpha', $clients[0]->getName());
+        static::assertCount(1, $clients);
+        static::assertSame('Client Alpha', $clients[0]->getName());
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $clients = $clientRepo->findAllForCurrentCompany();
 
-        $this->assertCount(1, $clients);
-        $this->assertEquals('Client Beta', $clients[0]->getName());
+        static::assertCount(1, $clients);
+        static::assertSame('Client Beta', $clients[0]->getName());
     }
 
     /**
@@ -203,15 +203,15 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $contributors = $contributorRepo->findAllForCurrentCompany();
 
-        $this->assertCount(1, $contributors);
-        $this->assertEquals('Alice', $contributors[0]->getFirstName());
+        static::assertCount(1, $contributors);
+        static::assertSame('Alice', $contributors[0]->getFirstName());
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $contributors = $contributorRepo->findAllForCurrentCompany();
 
-        $this->assertCount(1, $contributors);
-        $this->assertEquals('Bob', $contributors[0]->getFirstName());
+        static::assertCount(1, $contributors);
+        static::assertSame('Bob', $contributors[0]->getFirstName());
     }
 
     /**
@@ -245,18 +245,18 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $timesheets = $timesheetRepo->findAllForCurrentCompany();
 
-        $this->assertCount(3, $timesheets);
+        static::assertCount(3, $timesheets);
         foreach ($timesheets as $timesheet) {
-            $this->assertEquals($this->company1->getId(), $timesheet->getCompany()->getId());
+            static::assertEquals($this->company1->getId(), $timesheet->getCompany()->getId());
         }
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $timesheets = $timesheetRepo->findAllForCurrentCompany();
 
-        $this->assertCount(2, $timesheets);
+        static::assertCount(2, $timesheets);
         foreach ($timesheets as $timesheet) {
-            $this->assertEquals($this->company2->getId(), $timesheet->getCompany()->getId());
+            static::assertEquals($this->company2->getId(), $timesheet->getCompany()->getId());
         }
     }
 
@@ -280,7 +280,7 @@ class CompanyIsolationTest extends KernelTestCase
         $result = $projectRepo->findOneByIdForCompany($project2->getId());
 
         // Company 1 ne doit PAS voir le projet de Company 2
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     /**
@@ -305,15 +305,15 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $results = $projectRepo->searchProjects('e-commerce');
 
-        $this->assertCount(1, $results);
-        $this->assertEquals('E-commerce Platform', $results[0]->getName());
+        static::assertCount(1, $results);
+        static::assertSame('E-commerce Platform', $results[0]->getName());
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $results = $projectRepo->searchProjects('e-commerce');
 
-        $this->assertCount(1, $results);
-        $this->assertEquals('E-commerce Shop', $results[0]->getName());
+        static::assertCount(1, $results);
+        static::assertSame('E-commerce Shop', $results[0]->getName());
     }
 
     /**
@@ -332,13 +332,13 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $count = $projectRepo->countForCurrentCompany();
 
-        $this->assertEquals(5, $count);
+        static::assertSame(5, $count);
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $count = $projectRepo->countForCurrentCompany();
 
-        $this->assertEquals(3, $count);
+        static::assertSame(3, $count);
     }
 
     /**
@@ -363,13 +363,13 @@ class CompanyIsolationTest extends KernelTestCase
         $this->companyContext->switchCompany($this->company1);
         $activeCount = $projectRepo->countActiveProjects();
 
-        $this->assertEquals(4, $activeCount);
+        static::assertSame(4, $activeCount);
 
         // Context Company 2
         $this->companyContext->switchCompany($this->company2);
         $activeCount = $projectRepo->countActiveProjects();
 
-        $this->assertEquals(2, $activeCount);
+        static::assertSame(2, $activeCount);
     }
 
     /**
@@ -385,14 +385,14 @@ class CompanyIsolationTest extends KernelTestCase
 
         // Switch vers Company 1
         $this->companyContext->switchCompany($this->company1);
-        $this->assertEquals(2, $projectRepo->countForCurrentCompany());
+        static::assertSame(2, $projectRepo->countForCurrentCompany());
 
         // Switch vers Company 2
         $this->companyContext->switchCompany($this->company2);
-        $this->assertEquals(3, $projectRepo->countForCurrentCompany());
+        static::assertSame(3, $projectRepo->countForCurrentCompany());
 
         // Re-switch vers Company 1
         $this->companyContext->switchCompany($this->company1);
-        $this->assertEquals(2, $projectRepo->countForCurrentCompany());
+        static::assertSame(2, $projectRepo->countForCurrentCompany());
     }
 }

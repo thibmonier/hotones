@@ -38,10 +38,10 @@ final class DriftReportCsvExporterTest extends TestCase
             alreadyMigrated: 0,
             missingRate: 0,
             drifts: [
-                new MigrationDriftDetail(timesheetId: 10, contributorId: 1, legacyCostCents: 40000, recomputedCostCents: 48000),
+                new MigrationDriftDetail(timesheetId: 10, contributorId: 1, legacyCostCents: 40_000, recomputedCostCents: 48_000),
                 new MigrationDriftDetail(timesheetId: 11, contributorId: 2, legacyCostCents: 5000, recomputedCostCents: 4500),
             ],
-            totalLegacyCostCents: 45000,
+            totalLegacyCostCents: 45_000,
             totalDriftCents: 8500,
         );
 
@@ -50,13 +50,13 @@ final class DriftReportCsvExporterTest extends TestCase
         $exporter = new DriftReportCsvExporter();
         $returnedPath = $exporter->export($result, $path);
 
-        self::assertSame($path, $returnedPath);
-        self::assertFileExists($path);
+        static::assertSame($path, $returnedPath);
+        static::assertFileExists($path);
 
         $content = file_get_contents($path);
-        self::assertStringContainsString('timesheet_id,contributor_id,legacy_cost_cents,recomputed_cost_cents,delta_cents,abs_delta_cents', (string) $content);
-        self::assertStringContainsString('10,1,40000,48000,8000,8000', (string) $content);
-        self::assertStringContainsString('11,2,5000,4500,-500,500', (string) $content);
+        static::assertStringContainsString('timesheet_id,contributor_id,legacy_cost_cents,recomputed_cost_cents,delta_cents,abs_delta_cents', (string) $content);
+        static::assertStringContainsString('10,1,40000,48000,8000,8000', (string) $content);
+        static::assertStringContainsString('11,2,5000,4500,-500,500', (string) $content);
     }
 
     public function testExportsEmptyCsvWithHeaderOnlyWhenNoDrifts(): void
@@ -74,8 +74,8 @@ final class DriftReportCsvExporterTest extends TestCase
         (new DriftReportCsvExporter())->export($result, $path);
 
         $lines = file($path);
-        self::assertCount(1, $lines, 'header only');
-        self::assertStringContainsString('timesheet_id', $lines[0]);
+        static::assertCount(1, $lines, 'header only');
+        static::assertStringContainsString('timesheet_id', $lines[0]);
     }
 
     public function testCreatesDirectoryIfMissing(): void
@@ -89,8 +89,8 @@ final class DriftReportCsvExporterTest extends TestCase
             $path,
         );
 
-        self::assertDirectoryExists($nested);
-        self::assertFileExists($path);
+        static::assertDirectoryExists($nested);
+        static::assertFileExists($path);
 
         // Cleanup nested dirs
         @unlink($path);
@@ -103,6 +103,6 @@ final class DriftReportCsvExporterTest extends TestCase
         $now = new DateTimeImmutable('2026-05-13T14:30:45+00:00');
         $path = DriftReportCsvExporter::defaultPath('/var/www/html', $now);
 
-        self::assertSame('/var/www/html/var/migration/workitem-cost-drift-2026-05-13-143045.csv', $path);
+        static::assertSame('/var/www/html/var/migration/workitem-cost-drift-2026-05-13-143045.csv', $path);
     }
 }

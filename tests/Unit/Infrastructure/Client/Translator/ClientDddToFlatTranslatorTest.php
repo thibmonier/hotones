@@ -39,9 +39,9 @@ final class ClientDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, $company);
 
-        $this->assertSame($company, $flat->company);
-        $this->assertSame('Acme Corp', $flat->name);
-        $this->assertSame('standard', $flat->serviceLevel);
+        static::assertSame($company, $flat->company);
+        static::assertSame('Acme Corp', $flat->name);
+        static::assertSame('standard', $flat->serviceLevel);
     }
 
     public function testServiceLevelMappingEnterprise(): void
@@ -52,7 +52,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, $this->makeCompany());
 
-        $this->assertSame('vip', $flat->serviceLevel);
+        static::assertSame('vip', $flat->serviceLevel);
     }
 
     public function testServiceLevelMappingStandard(): void
@@ -63,7 +63,7 @@ final class ClientDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, $this->makeCompany());
 
-        $this->assertSame('low', $flat->serviceLevel);
+        static::assertSame('low', $flat->serviceLevel);
     }
 
     public function testNotesArePropagated(): void
@@ -75,6 +75,6 @@ final class ClientDddToFlatTranslatorTest extends TestCase
         $flat = new FlatClient();
         $translator->applyTo($ddd, $flat, $this->makeCompany());
 
-        $this->assertSame('Important notes', $flat->description);
+        static::assertSame('Important notes', $flat->description);
     }
 }

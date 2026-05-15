@@ -237,10 +237,12 @@ class ExpenseReportService
         $count = 0;
 
         foreach ($expenses as $expense) {
-            if ($expense->canBeValidated()) {
-                $this->validate($expense, $validator, $comment);
-                ++$count;
+            if (!$expense->canBeValidated()) {
+                continue;
             }
+
+            $this->validate($expense, $validator, $comment);
+            ++$count;
         }
 
         return $count;

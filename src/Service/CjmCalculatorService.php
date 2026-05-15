@@ -31,7 +31,7 @@ class CjmCalculatorService
         $settings = $this->companySettingsRepository->getSettings();
 
         // Nombre total de jours dans l'année
-        $totalDays = new DateTime("$year-12-31")->format('z') + 1;
+        $totalDays = new DateTime("{$year}-12-31")->format('z') + 1;
 
         // Calculer le nombre de weekends
         $weekends = $this->countWeekendsInYear($year);
@@ -53,8 +53,8 @@ class CjmCalculatorService
     private function countWeekendsInYear(int $year): int
     {
         $weekendDays = 0;
-        $start = new DateTime("$year-01-01");
-        $end = new DateTime("$year-12-31");
+        $start = new DateTime("{$year}-01-01");
+        $end = new DateTime("{$year}-12-31");
 
         $interval = new DateInterval('P1D');
         $period = new DatePeriod($start, $interval, $end->modify('+1 day'));
@@ -111,17 +111,17 @@ class CjmCalculatorService
         $easter = $this->getEasterDate($year);
 
         return [
-            new DateTime("$year-01-01"), // Jour de l'an
+            new DateTime("{$year}-01-01"), // Jour de l'an
             (clone $easter)->modify('+1 day'), // Lundi de Pâques
-            new DateTime("$year-05-01"), // Fête du travail
-            new DateTime("$year-05-08"), // Victoire 1945
+            new DateTime("{$year}-05-01"), // Fête du travail
+            new DateTime("{$year}-05-08"), // Victoire 1945
             (clone $easter)->modify('+39 days'), // Ascension
             (clone $easter)->modify('+50 days'), // Lundi de Pentecôte
-            new DateTime("$year-07-14"), // Fête nationale
-            new DateTime("$year-08-15"), // Assomption
-            new DateTime("$year-11-01"), // Toussaint
-            new DateTime("$year-11-11"), // Armistice 1918
-            new DateTime("$year-12-25"), // Noël
+            new DateTime("{$year}-07-14"), // Fête nationale
+            new DateTime("{$year}-08-15"), // Assomption
+            new DateTime("{$year}-11-01"), // Toussaint
+            new DateTime("{$year}-11-11"), // Armistice 1918
+            new DateTime("{$year}-12-25"), // Noël
         ];
     }
 
@@ -176,9 +176,7 @@ class CjmCalculatorService
         $workingDays = $this->calculateWorkingDaysInYear($year);
 
         // CJM = coût annuel / jours ouvrés
-        $cjm = bcdiv($annualCost, (string) $workingDays, 2);
-
-        return $cjm;
+        return bcdiv($annualCost, (string) $workingDays, 2);
     }
 
     /**
@@ -200,7 +198,7 @@ class CjmCalculatorService
     public function getCalculationReport(int $year): array
     {
         $settings = $this->companySettingsRepository->getSettings();
-        $totalDays = new DateTime("$year-12-31")->format('z') + 1;
+        $totalDays = new DateTime("{$year}-12-31")->format('z') + 1;
         $weekends = $this->countWeekendsInYear($year);
         $publicHolidays = $this->countPublicHolidaysInYear($year);
 

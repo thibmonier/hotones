@@ -15,7 +15,7 @@ final class ClientCreatedEventTest extends TestCase
         $id = ClientId::fromLegacyInt(42);
         $event = ClientCreatedEvent::create($id, 'Acme Corp');
 
-        $this->assertSame(42, $event->getClientId()->toLegacyInt());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertSame(42, $event->getClientId()->toLegacyInt());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

@@ -261,7 +261,7 @@ class TimesheetE2ETest extends PantherTestCase
 
         // Vérifier que l'en-tête a changé
         $newWeekText = $client->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('.card-title'))->getText();
-        $this->assertNotEquals($currentWeekText, $newWeekText);
+        static::assertNotEquals($currentWeekText, $newWeekText);
 
         // Cliquer sur "Semaine suivante" pour revenir
         $nextWeekLink = $client->findElement(\Facebook\WebDriver\WebDriverBy::linkText('Semaine suivante'));
@@ -273,6 +273,6 @@ class TimesheetE2ETest extends PantherTestCase
         $backToCurrentText = $client
             ->findElement(\Facebook\WebDriver\WebDriverBy::cssSelector('.card-title'))
             ->getText();
-        $this->assertEquals($currentWeekText, $backToCurrentText);
+        static::assertEquals($currentWeekText, $backToCurrentText);
     }
 }

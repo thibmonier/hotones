@@ -27,13 +27,13 @@ final class ContributorTest extends TestCase
     {
         $c = $this->makeContributor();
 
-        $this->assertSame(42, $c->getId()->toLegacyInt());
-        $this->assertSame('Jean Dupont', $c->getName()->getFullName());
-        $this->assertSame(ContractStatus::ACTIVE, $c->getStatus());
-        $this->assertTrue($c->isActive());
-        $this->assertNull($c->getEmail());
-        $this->assertNull($c->getManagerId());
-        $this->assertNull($c->getUpdatedAt());
+        static::assertSame(42, $c->getId()->toLegacyInt());
+        static::assertSame('Jean Dupont', $c->getName()->getFullName());
+        static::assertSame(ContractStatus::ACTIVE, $c->getStatus());
+        static::assertTrue($c->isActive());
+        static::assertNull($c->getEmail());
+        static::assertNull($c->getManagerId());
+        static::assertNull($c->getUpdatedAt());
     }
 
     public function testCreateRecordsEvent(): void
@@ -41,8 +41,8 @@ final class ContributorTest extends TestCase
         $c = $this->makeContributor();
         $events = $c->pullDomainEvents();
 
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ContributorCreatedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ContributorCreatedEvent::class, $events[0]);
     }
 
     public function testRename(): void
@@ -52,8 +52,8 @@ final class ContributorTest extends TestCase
 
         $c->rename(PersonName::fromParts('Marie', 'Dupont'));
 
-        $this->assertSame('Marie Dupont', $c->getName()->getFullName());
-        $this->assertNotNull($c->getUpdatedAt());
+        static::assertSame('Marie Dupont', $c->getName()->getFullName());
+        static::assertNotNull($c->getUpdatedAt());
     }
 
     public function testRenameSameNameNoOp(): void
@@ -63,7 +63,7 @@ final class ContributorTest extends TestCase
 
         $c->rename(PersonName::fromParts('Jean', 'Dupont'));
 
-        $this->assertNull($c->getUpdatedAt());
+        static::assertNull($c->getUpdatedAt());
     }
 
     public function testSetEmail(): void
@@ -71,8 +71,8 @@ final class ContributorTest extends TestCase
         $c = $this->makeContributor();
         $c->setEmail('jean@example.com');
 
-        $this->assertSame('jean@example.com', $c->getEmail());
-        $this->assertNotNull($c->getUpdatedAt());
+        static::assertSame('jean@example.com', $c->getEmail());
+        static::assertNotNull($c->getUpdatedAt());
     }
 
     public function testDeactivate(): void
@@ -80,8 +80,8 @@ final class ContributorTest extends TestCase
         $c = $this->makeContributor();
         $c->deactivate();
 
-        $this->assertSame(ContractStatus::INACTIVE, $c->getStatus());
-        $this->assertFalse($c->isActive());
+        static::assertSame(ContractStatus::INACTIVE, $c->getStatus());
+        static::assertFalse($c->isActive());
     }
 
     public function testReactivate(): void
@@ -90,7 +90,7 @@ final class ContributorTest extends TestCase
         $c->deactivate();
         $c->reactivate();
 
-        $this->assertTrue($c->isActive());
+        static::assertTrue($c->isActive());
     }
 
     public function testSetManager(): void
@@ -99,7 +99,7 @@ final class ContributorTest extends TestCase
         $managerId = ContributorId::fromLegacyInt(7);
         $c->setManager($managerId);
 
-        $this->assertSame(7, $c->getManagerId()->toLegacyInt());
+        static::assertSame(7, $c->getManagerId()->toLegacyInt());
     }
 
     public function testReconstituteNoEvents(): void
@@ -111,7 +111,7 @@ final class ContributorTest extends TestCase
             ContractStatus::INACTIVE,
         );
 
-        $this->assertCount(0, $c->pullDomainEvents());
-        $this->assertSame(ContractStatus::INACTIVE, $c->getStatus());
+        static::assertCount(0, $c->pullDomainEvents());
+        static::assertSame(ContractStatus::INACTIVE, $c->getStatus());
     }
 }

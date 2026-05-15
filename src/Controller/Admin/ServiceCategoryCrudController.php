@@ -58,7 +58,7 @@ class ServiceCategoryCrudController extends AbstractCrudController
         yield ColorField::new('color', 'Couleur');
 
         yield IntegerField::new('projects.count', 'Nombre de projets')->hideOnForm()->formatValue(
-            fn ($value, ServiceCategory $entity) => $entity->getProjects()->count(),
+            static fn ($value, ServiceCategory $entity) => $entity->getProjects()->count(),
         );
 
         yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);

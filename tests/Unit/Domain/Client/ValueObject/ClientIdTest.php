@@ -13,15 +13,15 @@ final class ClientIdTest extends TestCase
     public function testGenerateProducesValidUuid(): void
     {
         $id = ClientId::generate();
-        $this->assertNotEmpty($id->getValue());
-        $this->assertMatchesRegularExpression('/^[0-9a-f-]{36}$/i', $id->getValue());
+        static::assertNotEmpty($id->getValue());
+        static::assertMatchesRegularExpression('/^[0-9a-f-]{36}$/i', $id->getValue());
     }
 
     public function testFromStringValid(): void
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
         $id = ClientId::fromString($uuid);
-        $this->assertSame($uuid, $id->getValue());
+        static::assertSame($uuid, $id->getValue());
     }
 
     public function testFromStringInvalidThrows(): void
@@ -38,13 +38,13 @@ final class ClientIdTest extends TestCase
         $b = ClientId::fromString($uuid);
         $c = ClientId::generate();
 
-        $this->assertTrue($a->equals($b));
-        $this->assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testToString(): void
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $this->assertSame($uuid, (string) ClientId::fromString($uuid));
+        static::assertSame($uuid, (string) ClientId::fromString($uuid));
     }
 }

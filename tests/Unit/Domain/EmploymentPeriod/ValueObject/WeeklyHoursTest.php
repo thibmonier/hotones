@@ -13,14 +13,14 @@ final class WeeklyHoursTest extends TestCase
     public function testFromFloatPositive(): void
     {
         $h = WeeklyHours::fromFloat(35.0);
-        self::assertSame(35.0, $h->getValue());
-        self::assertSame('35.00', (string) $h);
+        static::assertSame(35.0, $h->getValue());
+        static::assertSame('35.00', (string) $h);
     }
 
     public function testFromDecimalString(): void
     {
         $h = WeeklyHours::fromDecimalString('35.00');
-        self::assertSame(35.0, $h->getValue());
+        static::assertSame(35.0, $h->getValue());
     }
 
     public function testZeroThrows(): void
@@ -46,20 +46,20 @@ final class WeeklyHoursTest extends TestCase
     public function testExactly80HoursAccepted(): void
     {
         $h = WeeklyHours::fromFloat(80.0);
-        self::assertSame(80.0, $h->getValue());
+        static::assertSame(80.0, $h->getValue());
     }
 
     public function testEqualsTrueWithSameValue(): void
     {
         $a = WeeklyHours::fromFloat(35.0);
         $b = WeeklyHours::fromFloat(35.0);
-        self::assertTrue($a->equals($b));
+        static::assertTrue($a->equals($b));
     }
 
     public function testEqualsFalseWithDifferentValue(): void
     {
         $a = WeeklyHours::fromFloat(35.0);
         $b = WeeklyHours::fromFloat(40.0);
-        self::assertFalse($a->equals($b));
+        static::assertFalse($a->equals($b));
     }
 }

@@ -71,11 +71,11 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateTurnover($startDate, $endDate);
 
         // Then: 0% turnover rate
-        $this->assertSame(0.0, $result['turnoverRate']);
-        $this->assertSame(0, $result['departures']);
-        $this->assertSame(10.0, $result['averageHeadcount']);
-        $this->assertSame(10, $result['headcountStart']);
-        $this->assertSame(10, $result['headcountEnd']);
+        static::assertSame(0.0, $result['turnoverRate']);
+        static::assertSame(0, $result['departures']);
+        static::assertSame(10.0, $result['averageHeadcount']);
+        static::assertSame(10, $result['headcountStart']);
+        static::assertSame(10, $result['headcountEnd']);
     }
 
     /**
@@ -106,11 +106,11 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateTurnover($startDate, $endDate);
 
         // Then: 22.22% turnover rate
-        $this->assertSame(22.22, $result['turnoverRate']);
-        $this->assertSame(2, $result['departures']);
-        $this->assertSame(9.0, $result['averageHeadcount']);
-        $this->assertSame(10, $result['headcountStart']);
-        $this->assertSame(8, $result['headcountEnd']);
+        static::assertSame(22.22, $result['turnoverRate']);
+        static::assertSame(2, $result['departures']);
+        static::assertSame(9.0, $result['averageHeadcount']);
+        static::assertSame(10, $result['headcountStart']);
+        static::assertSame(8, $result['headcountEnd']);
     }
 
     /**
@@ -136,9 +136,9 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateTurnover($startDate, $endDate);
 
         // Then: 0% turnover (division by zero protection)
-        $this->assertSame(0.0, $result['turnoverRate']);
-        $this->assertSame(0, $result['departures']);
-        $this->assertSame(0.0, $result['averageHeadcount']);
+        static::assertSame(0.0, $result['turnoverRate']);
+        static::assertSame(0, $result['departures']);
+        static::assertSame(0.0, $result['averageHeadcount']);
     }
 
     /**
@@ -168,10 +168,10 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateAbsenteeism($startDate, $endDate);
 
         // Then: 0% absenteeism
-        $this->assertSame(0.0, $result['absenteeismRate']);
-        $this->assertSame(0.0, $result['absentDays']);
-        $this->assertGreaterThan(0, $result['workingDays']);
-        $this->assertGreaterThan(0, $result['theoreticalDays']);
+        static::assertSame(0.0, $result['absenteeismRate']);
+        static::assertSame(0.0, $result['absentDays']);
+        static::assertGreaterThan(0, $result['workingDays']);
+        static::assertGreaterThan(0, $result['theoreticalDays']);
     }
 
     /**
@@ -203,9 +203,9 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateAbsenteeism($startDate, $endDate);
 
         // Then: ~25% absenteeism (depends on actual working days in Jan 2025)
-        $this->assertGreaterThan(0, $result['absenteeismRate']);
-        $this->assertSame(50.0, $result['absentDays']);
-        $this->assertGreaterThan(0, $result['theoreticalDays']);
+        static::assertGreaterThan(0, $result['absenteeismRate']);
+        static::assertSame(50.0, $result['absentDays']);
+        static::assertGreaterThan(0, $result['theoreticalDays']);
     }
 
     /**
@@ -231,9 +231,9 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateAbsenteeism($startDate, $endDate);
 
         // Then: 0% absenteeism (division by zero protection)
-        $this->assertSame(0.0, $result['absenteeismRate']);
-        $this->assertSame(0.0, $result['absentDays']);
-        $this->assertSame(0.0, $result['theoreticalDays']);
+        static::assertSame(0.0, $result['absenteeismRate']);
+        static::assertSame(0.0, $result['absentDays']);
+        static::assertSame(0.0, $result['theoreticalDays']);
     }
 
     /**
@@ -255,9 +255,9 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateAverageSeniority();
 
         // Then: 0 average, empty distribution
-        $this->assertSame(0, $result['averageSeniority']);
-        $this->assertSame([], $result['bySeniority']);
-        $this->assertSame(0, $result['totalActive']);
+        static::assertSame(0, $result['averageSeniority']);
+        static::assertSame([], $result['bySeniority']);
+        static::assertSame(0, $result['totalActive']);
     }
 
     /**
@@ -296,13 +296,13 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->calculateAverageSeniority();
 
         // Then: average = (0.5 + 1.5 + 3 + 7 + 12) / 5 = 4.8 years
-        $this->assertSame(4.8, $result['averageSeniority']);
-        $this->assertSame(1, $result['bySeniority']['< 1 an']);
-        $this->assertSame(1, $result['bySeniority']['1-2 ans']);
-        $this->assertSame(1, $result['bySeniority']['2-5 ans']);
-        $this->assertSame(1, $result['bySeniority']['5-10 ans']);
-        $this->assertSame(1, $result['bySeniority']['> 10 ans']);
-        $this->assertSame(5, $result['totalActive']);
+        static::assertSame(4.8, $result['averageSeniority']);
+        static::assertSame(1, $result['bySeniority']['< 1 an']);
+        static::assertSame(1, $result['bySeniority']['1-2 ans']);
+        static::assertSame(1, $result['bySeniority']['2-5 ans']);
+        static::assertSame(1, $result['bySeniority']['5-10 ans']);
+        static::assertSame(1, $result['bySeniority']['> 10 ans']);
+        static::assertSame(5, $result['totalActive']);
     }
 
     /**
@@ -338,9 +338,9 @@ class HrMetricsServiceTest extends TestCase
 
         // Then: average = (2 + 3) / 3 = 1.67 years (divided by total active contributors)
         // Note: Service divides by count($activeContributors), not count of those with periods
-        $this->assertSame(1.7, $result['averageSeniority']);
-        $this->assertSame(2, $result['bySeniority']['2-5 ans']);
-        $this->assertSame(3, $result['totalActive']); // Count all active, even those without period
+        static::assertSame(1.7, $result['averageSeniority']);
+        static::assertSame(2, $result['bySeniority']['2-5 ans']);
+        static::assertSame(3, $result['totalActive']); // Count all active, even those without period
     }
 
     /**
@@ -362,11 +362,11 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getAgePyramid();
 
         // Then: empty structure
-        $this->assertSame([], $result['ageRanges']);
-        $this->assertSame(0, $result['averageAge']); // Service returns 0 (int) when count=0
-        $this->assertSame(0, $result['totalActive']);
-        $this->assertSame(['male' => 0, 'female' => 0, 'other' => 0], $result['byGender']);
-        $this->assertSame(0, $result['parityRate']); // Service returns 0 (int) when totalGendered=0
+        static::assertSame([], $result['ageRanges']);
+        static::assertSame(0, $result['averageAge']); // Service returns 0 (int) when count=0
+        static::assertSame(0, $result['totalActive']);
+        static::assertSame(['male' => 0, 'female' => 0, 'other' => 0], $result['byGender']);
+        static::assertSame(0, $result['parityRate']); // Service returns 0 (int) when totalGendered=0
     }
 
     /**
@@ -397,25 +397,25 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getAgePyramid();
 
         // Then: correct distribution
-        $this->assertSame(1, $result['ageRanges']['< 25 ans']);
-        $this->assertSame(1, $result['ageRanges']['25-30 ans']);
-        $this->assertSame(1, $result['ageRanges']['30-40 ans']);
-        $this->assertSame(1, $result['ageRanges']['40-50 ans']);
-        $this->assertSame(1, $result['ageRanges']['50-60 ans']);
-        $this->assertSame(1, $result['ageRanges']['> 60 ans']);
+        static::assertSame(1, $result['ageRanges']['< 25 ans']);
+        static::assertSame(1, $result['ageRanges']['25-30 ans']);
+        static::assertSame(1, $result['ageRanges']['30-40 ans']);
+        static::assertSame(1, $result['ageRanges']['40-50 ans']);
+        static::assertSame(1, $result['ageRanges']['50-60 ans']);
+        static::assertSame(1, $result['ageRanges']['> 60 ans']);
 
         // Average age = (22 + 28 + 35 + 45 + 55 + 65) / 6 = 41.7
-        $this->assertSame(41.7, $result['averageAge']);
+        static::assertSame(41.7, $result['averageAge']);
 
         // Gender distribution
-        $this->assertSame(3, $result['byGender']['male']);
-        $this->assertSame(2, $result['byGender']['female']);
-        $this->assertSame(1, $result['byGender']['other']);
+        static::assertSame(3, $result['byGender']['male']);
+        static::assertSame(2, $result['byGender']['female']);
+        static::assertSame(1, $result['byGender']['other']);
 
         // Parity rate = 2 / (3 + 2) * 100 = 40%
-        $this->assertSame(40.0, $result['parityRate']);
-        $this->assertSame(6, $result['totalActive']);
-        $this->assertSame(6, $result['countWithBirthDate']);
+        static::assertSame(40.0, $result['parityRate']);
+        static::assertSame(6, $result['totalActive']);
+        static::assertSame(6, $result['countWithBirthDate']);
     }
 
     /**
@@ -443,9 +443,9 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getAgePyramid();
 
         // Then: average = (30 + 40) / 2 = 35 (third contributor excluded from age calculation)
-        $this->assertSame(35.0, $result['averageAge']);
-        $this->assertSame(3, $result['totalActive']); // Count all active
-        $this->assertSame(2, $result['countWithBirthDate']); // But only 2 have birthDate
+        static::assertSame(35.0, $result['averageAge']);
+        static::assertSame(3, $result['totalActive']); // Count all active
+        static::assertSame(2, $result['countWithBirthDate']); // But only 2 have birthDate
     }
 
     /**
@@ -473,10 +473,10 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getAgePyramid();
 
         // Then: parity = 3 / (7 + 3) * 100 = 30% (other excluded from parity)
-        $this->assertSame(30.0, $result['parityRate']);
-        $this->assertSame(7, $result['byGender']['male']);
-        $this->assertSame(3, $result['byGender']['female']);
-        $this->assertSame(2, $result['byGender']['other']);
+        static::assertSame(30.0, $result['parityRate']);
+        static::assertSame(7, $result['byGender']['male']);
+        static::assertSame(3, $result['byGender']['female']);
+        static::assertSame(2, $result['byGender']['other']);
     }
 
     /**
@@ -498,8 +498,8 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getSkillsPyramid();
 
         // Then: empty structure
-        $this->assertSame([], $result['byProfile']);
-        $this->assertSame(0, $result['totalActive']);
+        static::assertSame([], $result['byProfile']);
+        static::assertSame(0, $result['totalActive']);
     }
 
     /**
@@ -532,15 +532,15 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getSkillsPyramid();
 
         // Then: Developer: 2, Designer: 1, Manager: 1 (sorted descending)
-        $this->assertCount(3, $result['byProfile']);
-        $this->assertSame(2, $result['byProfile']['Developer']);
-        $this->assertSame(1, $result['byProfile']['Designer']);
-        $this->assertSame(1, $result['byProfile']['Manager']);
-        $this->assertSame(3, $result['totalActive']);
+        static::assertCount(3, $result['byProfile']);
+        static::assertSame(2, $result['byProfile']['Developer']);
+        static::assertSame(1, $result['byProfile']['Designer']);
+        static::assertSame(1, $result['byProfile']['Manager']);
+        static::assertSame(3, $result['totalActive']);
 
         // Verify sorting (descending by count)
         $keys = array_keys($result['byProfile']);
-        $this->assertSame('Developer', $keys[0]); // Most common first
+        static::assertSame('Developer', $keys[0]); // Most common first
     }
 
     /**
@@ -568,8 +568,8 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getSkillsPyramid();
 
         // Then: only contributor1 counted
-        $this->assertSame(1, $result['byProfile']['Developer']);
-        $this->assertSame(2, $result['totalActive']); // Count all active
+        static::assertSame(1, $result['byProfile']['Developer']);
+        static::assertSame(2, $result['totalActive']); // Count all active
     }
 
     /**
@@ -593,18 +593,18 @@ class HrMetricsServiceTest extends TestCase
         $result = $this->service->getAllMetrics($startDate, $endDate);
 
         // Then: all 5 metrics present
-        $this->assertArrayHasKey('turnover', $result);
-        $this->assertArrayHasKey('absenteeism', $result);
-        $this->assertArrayHasKey('seniority', $result);
-        $this->assertArrayHasKey('agePyramid', $result);
-        $this->assertArrayHasKey('skillsPyramid', $result);
+        static::assertArrayHasKey('turnover', $result);
+        static::assertArrayHasKey('absenteeism', $result);
+        static::assertArrayHasKey('seniority', $result);
+        static::assertArrayHasKey('agePyramid', $result);
+        static::assertArrayHasKey('skillsPyramid', $result);
 
         // Verify structure of each metric
-        $this->assertArrayHasKey('turnoverRate', $result['turnover']);
-        $this->assertArrayHasKey('absenteeismRate', $result['absenteeism']);
-        $this->assertArrayHasKey('averageSeniority', $result['seniority']);
-        $this->assertArrayHasKey('averageAge', $result['agePyramid']);
-        $this->assertArrayHasKey('byProfile', $result['skillsPyramid']);
+        static::assertArrayHasKey('turnoverRate', $result['turnover']);
+        static::assertArrayHasKey('absenteeismRate', $result['absenteeism']);
+        static::assertArrayHasKey('averageSeniority', $result['seniority']);
+        static::assertArrayHasKey('averageAge', $result['agePyramid']);
+        static::assertArrayHasKey('byProfile', $result['skillsPyramid']);
     }
 
     // ========== Helper Methods ==========

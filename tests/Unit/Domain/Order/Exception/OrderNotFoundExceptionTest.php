@@ -17,8 +17,8 @@ final class OrderNotFoundExceptionTest extends TestCase
 
         $exception = OrderNotFoundException::withId($id);
 
-        self::assertInstanceOf(OrderNotFoundException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
+        static::assertInstanceOf(OrderNotFoundException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
     }
 
     public function testWithIdMessageContainsId(): void
@@ -27,7 +27,7 @@ final class OrderNotFoundExceptionTest extends TestCase
 
         $exception = OrderNotFoundException::withId($id);
 
-        self::assertStringContainsString($id->getValue(), $exception->getMessage());
-        self::assertStringContainsString('not found', $exception->getMessage());
+        static::assertStringContainsString($id->getValue(), $exception->getMessage());
+        static::assertStringContainsString('not found', $exception->getMessage());
     }
 }

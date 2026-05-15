@@ -14,19 +14,19 @@ final class LeadTimeDaysTest extends TestCase
     {
         $lead = LeadTimeDays::fromDays(15.7);
 
-        self::assertSame(15.7, $lead->getDays());
+        static::assertSame(15.7, $lead->getDays());
     }
 
     public function testRoundsToOneDecimal(): void
     {
-        $lead = LeadTimeDays::fromDays(15.71234);
+        $lead = LeadTimeDays::fromDays(15.712_34);
 
-        self::assertSame(15.7, $lead->getDays());
+        static::assertSame(15.7, $lead->getDays());
     }
 
     public function testZeroReturnsZeroDays(): void
     {
-        self::assertSame(0.0, LeadTimeDays::zero()->getDays());
+        static::assertSame(0.0, LeadTimeDays::zero()->getDays());
     }
 
     public function testRejectsNegativeDays(): void
@@ -39,12 +39,12 @@ final class LeadTimeDaysTest extends TestCase
 
     public function testEqualsWithinDelta(): void
     {
-        self::assertTrue(LeadTimeDays::fromDays(15.0)->equals(LeadTimeDays::fromDays(15.005)));
-        self::assertFalse(LeadTimeDays::fromDays(15.0)->equals(LeadTimeDays::fromDays(15.5)));
+        static::assertTrue(LeadTimeDays::fromDays(15.0)->equals(LeadTimeDays::fromDays(15.005)));
+        static::assertFalse(LeadTimeDays::fromDays(15.0)->equals(LeadTimeDays::fromDays(15.5)));
     }
 
     public function testStringable(): void
     {
-        self::assertSame('15.5', (string) LeadTimeDays::fromDays(15.5));
+        static::assertSame('15.5', (string) LeadTimeDays::fromDays(15.5));
     }
 }

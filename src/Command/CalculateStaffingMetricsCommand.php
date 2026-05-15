@@ -93,10 +93,10 @@ Exemples :
             if (preg_match('/^(\d{4})$/', (string) $period, $matches)) {
                 // Année complète
                 $year = (int) $matches[1];
-                $startDate = new DateTime("$year-01-01");
-                $endDate = new DateTime("$year-12-31");
+                $startDate = new DateTime("{$year}-01-01");
+                $endDate = new DateTime("{$year}-12-31");
 
-                $io->info("Calcul des métriques de staffing pour l'année $year ($granularity)...");
+                $io->info("Calcul des métriques de staffing pour l'année {$year} ({$granularity})...");
             } elseif (preg_match('/^(\d{4})-(\d{1,2})$/', (string) $period, $matches)) {
                 // Mois spécifique
                 $year = (int) $matches[1];
@@ -108,7 +108,7 @@ Exemples :
                     return Command::FAILURE;
                 }
 
-                $startDate = new DateTime("$year-$month-01");
+                $startDate = new DateTime("{$year}-{$month}-01");
                 $endDate = clone $startDate;
                 $endDate->modify('last day of this month');
 
@@ -122,14 +122,14 @@ Exemples :
                 $endDate = new DateTime();
                 $endDate->modify('last day of this month');
 
-                $io->info("Calcul des métriques de staffing pour les $range derniers mois ($granularity)...");
+                $io->info("Calcul des métriques de staffing pour les {$range} derniers mois ({$granularity})...");
             }
 
             // Si force recalculate, supprimer les anciennes données
             if ($forceRecalculate) {
                 $io->writeln('Suppression des anciennes métriques...');
                 $deleted = $this->staffingRepo->deleteForDateRange($startDate, $endDate, $granularity);
-                $io->info("$deleted métriques supprimées.");
+                $io->info("{$deleted} métriques supprimées.");
             } elseif ($this->staffingRepo->existsForPeriod($startDate, $granularity)) {
                 $io->warning(
                     'Des métriques existent déjà pour cette période. Utilisez --force-recalculate pour recalculer.',
@@ -141,7 +141,7 @@ Exemples :
             // Calculer et enregistrer les métriques
             $metricsCreated = $this->staffingService->calculateAndStoreMetrics($startDate, $endDate, $granularity);
 
-            $io->success("Calcul terminé ! $metricsCreated métriques créées.");
+            $io->success("Calcul terminé ! {$metricsCreated} métriques créées.");
 
             // Statistiques
             $io->section('Prochaines étapes');

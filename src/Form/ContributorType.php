@@ -121,7 +121,7 @@ class ContributorType extends AbstractType
             ->add('user', EntityType::class, [
                 'label' => 'Compte utilisateur associé',
                 'class' => User::class,
-                'choice_label' => fn (User $user): string => $user->getFirstName().' '.$user->getLastName().' ('.$user->getEmail().')',
+                'choice_label' => static fn (User $user): string => $user->getFirstName().' '.$user->getLastName().' ('.$user->getEmail().')',
                 'required' => false,
                 'placeholder' => '-- Aucun compte --',
                 'attr' => ['class' => 'form-select'],
@@ -129,12 +129,12 @@ class ContributorType extends AbstractType
             ->add('manager', EntityType::class, [
                 'label' => 'Manager responsable',
                 'class' => Contributor::class,
-                'choice_label' => fn (Contributor $contributor): string => $contributor->getFullName(),
+                'choice_label' => static fn (Contributor $contributor): string => $contributor->getFullName(),
                 'required' => false,
                 'placeholder' => '-- Aucun manager --',
                 'attr' => ['class' => 'form-select'],
                 'help' => 'Sélectionnez le manager qui validera les demandes de congés de ce collaborateur',
-                'query_builder' => fn ($er) => $er
+                'query_builder' => static fn ($er) => $er
                     ->createQueryBuilder('c')
                     ->where('c.active = :active')
                     ->setParameter('active', true)
@@ -152,7 +152,7 @@ class ContributorType extends AbstractType
                     'class' => 'form-select select2-multiple',
                     'data-placeholder' => 'Sélectionnez un ou plusieurs profils',
                 ],
-                'query_builder' => fn ($er) => $er
+                'query_builder' => static fn ($er) => $er
                     ->createQueryBuilder('p')
                     ->where('p.active = :active')
                     ->setParameter('active', true)

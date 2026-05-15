@@ -15,6 +15,10 @@ use-tabs = false
 
 [linter]
 integrations = ["symfony", "phpunit"]
+# MAGO-LINT-BATCH-001 (sprint-025) — baseline 1307 issues résiduels après
+# cleanup auto-fix batch initial (4110 issues résolus). Cleanup progressif
+# sur sprints futurs (cf CONTRIBUTING.md section Mago lint).
+baseline = "mago-baseline.json"
 
 [linter.rules]
 ambiguous-function-call = { enabled = false }

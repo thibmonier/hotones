@@ -109,14 +109,14 @@ final class VacationRequestControllerTest extends WebTestCase
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $found = $repo->findByContributor($this->loadContributor());
 
-        self::assertCount(1, $found);
-        self::assertSame(VacationStatus::PENDING, $found[0]->getStatus());
+        static::assertCount(1, $found);
+        static::assertSame(VacationStatus::PENDING, $found[0]->getStatus());
     }
 
     public function testCancelOnPendingVacationFlashesSuccess(): void
     {
         // Voir ADR-0003 : SessionNotFoundException sur CSRF token via container test.
-        self::markTestSkipped('ADR-0003 : CSRF session bridge isolation Symfony 7+/8+');
+        static::markTestSkipped('ADR-0003 : CSRF session bridge isolation Symfony 7+/8+');
 
         $vacation = $this->createPendingVacationFor($this->loadContributor());
 
@@ -136,7 +136,7 @@ final class VacationRequestControllerTest extends WebTestCase
     {
         // Voir ADR-0003 : isolation cross-tenant via createPendingVacationFor échoue
         // (500 au lieu de 403 attendu) — bloqueur même catégorie que CSRF.
-        self::markTestSkipped('ADR-0003 : cross-tenant Vacation flow isolation');
+        static::markTestSkipped('ADR-0003 : cross-tenant Vacation flow isolation');
 
         $em = $this->getEntityManager();
         $otherCompany = $this->createTestCompany('Other Co');
@@ -163,9 +163,8 @@ final class VacationRequestControllerTest extends WebTestCase
     private function loadContributor(): Contributor
     {
         $em = $this->getEntityManager();
-        /** @var Contributor $contributor */
-        $contributor = $em->getRepository(Contributor::class)->findOneBy(['user' => $this->testUser]);
 
-        return $contributor;
+        /* @var Contributor $contributor */
+        return $em->getRepository(Contributor::class)->findOneBy(['user' => $this->testUser]);
     }
 }

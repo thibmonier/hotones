@@ -87,11 +87,11 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher
             ->expects(self::once())
             ->method('dispatch')
-            ->with(self::isInstanceOf(ProjectBudgetAlertEvent::class));
+            ->with(static::isInstanceOf(ProjectBudgetAlertEvent::class));
 
         $stats = $this->service->checkAllAlerts();
 
-        self::assertSame(1, $stats['budget_alerts']);
+        static::assertSame(1, $stats['budget_alerts']);
     }
 
     public function testBudgetAlertNotDispatchedBelowConsumedThreshold(): void
@@ -105,7 +105,7 @@ final class AlertDetectionServiceTest extends TestCase
 
         $stats = $this->service->checkAllAlerts();
 
-        self::assertSame(0, $stats['budget_alerts']);
+        static::assertSame(0, $stats['budget_alerts']);
     }
 
     public function testBudgetAlertNotDispatchedWhenStillEarlyInTheTimeline(): void
@@ -120,7 +120,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(0, $stats['budget_alerts']);
+        static::assertSame(0, $stats['budget_alerts']);
     }
 
     public function testBudgetAlertSkipsProjectsWithoutBudget(): void
@@ -133,7 +133,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(0, $stats['budget_alerts']);
+        static::assertSame(0, $stats['budget_alerts']);
     }
 
     public function testMarginAlertDispatchedAtCriticalSeverityViaDomainEvent(): void
@@ -164,9 +164,9 @@ final class AlertDetectionServiceTest extends TestCase
 
         $stats = $this->service->checkAllAlerts();
 
-        self::assertSame(1, $stats['margin_alerts']);
-        self::assertNotNull($domainEventCaptured);
-        self::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical = threshold 10
+        static::assertSame(1, $stats['margin_alerts']);
+        static::assertNotNull($domainEventCaptured);
+        static::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical = threshold 10
     }
 
     public function testMarginAlertDispatchedAtWarningSeverityViaDomainEvent(): void
@@ -194,9 +194,9 @@ final class AlertDetectionServiceTest extends TestCase
 
         $stats = $this->service->checkAllAlerts();
 
-        self::assertSame(1, $stats['margin_alerts']);
-        self::assertNotNull($domainEventCaptured);
-        self::assertSame(20.0, $domainEventCaptured->thresholdPercent); // warning = threshold 20
+        static::assertSame(1, $stats['margin_alerts']);
+        static::assertNotNull($domainEventCaptured);
+        static::assertSame(20.0, $domainEventCaptured->thresholdPercent); // warning = threshold 20
     }
 
     public function testMarginAlertNoLegacyEventDispatched(): void
@@ -229,10 +229,10 @@ final class AlertDetectionServiceTest extends TestCase
 
         $stats = $this->service->checkAllAlerts();
 
-        self::assertSame(1, $stats['margin_alerts']);
-        self::assertNotNull($domainEventCaptured);
-        self::assertSame(5.0, $domainEventCaptured->marginPercent);
-        self::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical
+        static::assertSame(1, $stats['margin_alerts']);
+        static::assertNotNull($domainEventCaptured);
+        static::assertSame(5.0, $domainEventCaptured->marginPercent);
+        static::assertSame(10.0, $domainEventCaptured->thresholdPercent); // critical
     }
 
     public function testMarginAlertSkippedAboveWarningThreshold(): void
@@ -251,7 +251,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->messageBus->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(0, $stats['margin_alerts']);
+        static::assertSame(0, $stats['margin_alerts']);
     }
 
     public function testMarginAlertSkippedWhenPredictorCannotPredict(): void
@@ -264,7 +264,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(0, $stats['margin_alerts']);
+        static::assertSame(0, $stats['margin_alerts']);
     }
 
     public function testPaymentAlertDispatchedWhenScheduleDueWithinSevenDays(): void
@@ -283,10 +283,10 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher
             ->expects(self::once())
             ->method('dispatch')
-            ->with(self::isInstanceOf(PaymentDueAlertEvent::class));
+            ->with(static::isInstanceOf(PaymentDueAlertEvent::class));
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(1, $stats['payment_alerts']);
+        static::assertSame(1, $stats['payment_alerts']);
     }
 
     public function testPaymentAlertSkippedWhenScheduleFarInFuture(): void
@@ -305,7 +305,7 @@ final class AlertDetectionServiceTest extends TestCase
         $this->eventDispatcher->expects(self::never())->method('dispatch');
 
         $stats = $this->service->checkAllAlerts();
-        self::assertSame(0, $stats['payment_alerts']);
+        static::assertSame(0, $stats['payment_alerts']);
     }
 
     private function makeProject(

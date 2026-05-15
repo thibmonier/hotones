@@ -405,7 +405,7 @@ class Company implements Stringable
 
     public function disableFeature(string $feature): self
     {
-        $this->enabledFeatures = array_values(array_filter($this->enabledFeatures, fn ($f): bool => $f !== $feature));
+        $this->enabledFeatures = array_values(array_filter($this->enabledFeatures, static fn ($f): bool => $f !== $feature));
 
         return $this;
     }

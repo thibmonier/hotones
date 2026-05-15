@@ -22,9 +22,9 @@ class ExcelExportServiceTest extends TestCase
     {
         $kpis = [
             'revenue' => [
-                'total_revenue' => 100000.00,
-                'total_cost' => 60000.00,
-                'total_margin' => 40000.00,
+                'total_revenue' => 100_000.00,
+                'total_cost' => 60_000.00,
+                'total_margin' => 40_000.00,
                 'margin_rate' => 40.00,
             ],
             'projects' => [
@@ -37,13 +37,13 @@ class ExcelExportServiceTest extends TestCase
         $monthlyEvolution = [
             [
                 'month' => 'Janvier 2025',
-                'revenue' => 10000.00,
+                'revenue' => 10_000.00,
                 'costs' => 6000.00,
                 'margin' => 4000.00,
             ],
             [
                 'month' => 'Février 2025',
-                'revenue' => 12000.00,
+                'revenue' => 12_000.00,
                 'costs' => 7000.00,
                 'margin' => 5000.00,
             ],
@@ -55,16 +55,16 @@ class ExcelExportServiceTest extends TestCase
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate, $filters);
 
-        $this->assertInstanceOf(StreamedResponse::class, $response);
+        static::assertInstanceOf(StreamedResponse::class, $response);
     }
 
     public function testExportDashboardSetsCorrectHeaders(): void
     {
         $kpis = [
             'revenue' => [
-                'total_revenue' => 50000.00,
-                'total_cost' => 30000.00,
-                'total_margin' => 20000.00,
+                'total_revenue' => 50_000.00,
+                'total_cost' => 30_000.00,
+                'total_margin' => 20_000.00,
                 'margin_rate' => 40.00,
             ],
         ];
@@ -77,19 +77,19 @@ class ExcelExportServiceTest extends TestCase
 
         $headers = $response->headers;
 
-        $this->assertEquals(
+        static::assertSame(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             $headers->get('Content-Type'),
         );
 
-        $this->assertStringContainsString('attachment', $headers->get('Content-Disposition'));
-        $this->assertStringContainsString('dashboard_analytics', $headers->get('Content-Disposition'));
-        $this->assertStringContainsString('max-age=0', $headers->get('Cache-Control'));
+        static::assertStringContainsString('attachment', $headers->get('Content-Disposition'));
+        static::assertStringContainsString('dashboard_analytics', $headers->get('Content-Disposition'));
+        static::assertStringContainsString('max-age=0', $headers->get('Cache-Control'));
     }
 
     public function testExportDashboardGeneratesCorrectFilename(): void
     {
-        $kpis = ['revenue' => ['total_revenue' => 10000.00]];
+        $kpis = ['revenue' => ['total_revenue' => 10_000.00]];
         $monthlyEvolution = [];
         $startDate = new DateTime('2025-03-15');
         $endDate = new DateTime('2025-06-20');
@@ -98,15 +98,15 @@ class ExcelExportServiceTest extends TestCase
 
         $contentDisposition = $response->headers->get('Content-Disposition');
 
-        $this->assertStringContainsString('dashboard_analytics_2025-03-15_2025-06-20.xlsx', $contentDisposition);
+        static::assertStringContainsString('dashboard_analytics_2025-03-15_2025-06-20.xlsx', $contentDisposition);
     }
 
     public function testExportDashboardWithAllOptionalData(): void
     {
         $kpis = [
             'revenue' => [
-                'total_revenue' => 100000.00,
-                'total_cost' => 60000.00,
+                'total_revenue' => 100_000.00,
+                'total_cost' => 60_000.00,
             ],
             'projectsByType' => [
                 'forfait' => 5,
@@ -123,7 +123,7 @@ class ExcelExportServiceTest extends TestCase
         ];
 
         $monthlyEvolution = [
-            ['month' => 'Jan', 'revenue' => 10000.00],
+            ['month' => 'Jan', 'revenue' => 10_000.00],
         ];
 
         $startDate = new DateTime('2025-01-01');
@@ -131,8 +131,8 @@ class ExcelExportServiceTest extends TestCase
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate);
 
-        $this->assertInstanceOf(StreamedResponse::class, $response);
-        $this->assertEquals(
+        static::assertInstanceOf(StreamedResponse::class, $response);
+        static::assertSame(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             $response->headers->get('Content-Type'),
         );
@@ -140,7 +140,7 @@ class ExcelExportServiceTest extends TestCase
 
     public function testExportDashboardWithFilters(): void
     {
-        $kpis = ['revenue' => ['total_revenue' => 75000.00]];
+        $kpis = ['revenue' => ['total_revenue' => 75_000.00]];
         $monthlyEvolution = [];
         $startDate = new DateTime('2025-01-01');
         $endDate = new DateTime('2025-03-31');
@@ -151,6 +151,6 @@ class ExcelExportServiceTest extends TestCase
 
         $response = $this->service->exportDashboard($kpis, $monthlyEvolution, $startDate, $endDate, $filters);
 
-        $this->assertInstanceOf(StreamedResponse::class, $response);
+        static::assertInstanceOf(StreamedResponse::class, $response);
     }
 }

@@ -69,7 +69,7 @@ final class ProjectVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_USER']);
         $project = $this->makeProject($company);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::VIEW));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::VIEW));
     }
 
     public function testEditGrantedForAdmin(): void
@@ -78,7 +78,7 @@ final class ProjectVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_ADMIN']);
         $project = $this->makeProject($company);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::EDIT));
     }
 
     public function testEditGrantedForChefDeProjetWhenAssignedAsManager(): void
@@ -87,7 +87,7 @@ final class ProjectVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_CHEF_PROJET'], userId: 7);
         $project = $this->makeProject($company, $user);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $project, ProjectVoter::EDIT));
     }
 
     public function testEditDeniedForChefDeProjetNotAssigned(): void
@@ -97,7 +97,7 @@ final class ProjectVoterTest extends TestCase
         $otherManager = $this->makeUser($company, ['ROLE_CHEF_PROJET'], userId: 99);
         $project = $this->makeProject($company, $otherManager);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $project, ProjectVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $project, ProjectVoter::EDIT));
     }
 
     public function testDeleteGrantedForAdminOnly(): void
@@ -106,9 +106,9 @@ final class ProjectVoterTest extends TestCase
         $project = $this->makeProject($company);
 
         $admin = $this->makeUser($company, ['ROLE_ADMIN']);
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $project, ProjectVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $project, ProjectVoter::DELETE));
 
         $manager = $this->makeUser($company, ['ROLE_MANAGER']);
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($manager, $project, ProjectVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($manager, $project, ProjectVoter::DELETE));
     }
 }

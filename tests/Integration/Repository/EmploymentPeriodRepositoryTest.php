@@ -40,7 +40,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithOptionalContributorFilter();
 
         // ContributorFactory auto-creates 1 period per contributor + 2 manual = 4 total
-        $this->assertCount(4, $results);
+        static::assertCount(4, $results);
     }
 
     public function testFindWithOptionalContributorFilterWithFilter(): void
@@ -54,8 +54,8 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithOptionalContributorFilter($contributor1->getId());
 
         // ContributorFactory auto-creates 1 period + 1 manual = 2 total
-        $this->assertCount(2, $results);
-        $this->assertEquals($contributor1->getId(), $results[0]->getContributor()->getId());
+        static::assertCount(2, $results);
+        static::assertEquals($contributor1->getId(), $results[0]->getContributor()->getId());
     }
 
     public function testHasOverlappingPeriodsWithNoOverlap(): void
@@ -74,7 +74,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $hasOverlap = $this->repository->hasOverlappingPeriods($period2);
 
-        $this->assertFalse($hasOverlap);
+        static::assertFalse($hasOverlap);
     }
 
     public function testHasOverlappingPeriodsWithOverlap(): void
@@ -93,7 +93,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $hasOverlap = $this->repository->hasOverlappingPeriods($period2);
 
-        $this->assertTrue($hasOverlap);
+        static::assertTrue($hasOverlap);
     }
 
     public function testHasOverlappingPeriodsWithOpenEndedPeriod(): void
@@ -112,7 +112,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $hasOverlap = $this->repository->hasOverlappingPeriods($period2);
 
-        $this->assertTrue($hasOverlap);
+        static::assertTrue($hasOverlap);
     }
 
     public function testHasOverlappingPeriodsExcludesSelf(): void
@@ -124,7 +124,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         // Check same period against itself (should not overlap when excluded)
         $hasOverlap = $this->repository->hasOverlappingPeriods($period1, $period1->getId());
 
-        $this->assertFalse($hasOverlap);
+        static::assertFalse($hasOverlap);
     }
 
     public function testFindActivePeriods(): void
@@ -145,7 +145,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $results = $this->repository->findActivePeriods();
 
         // Factory creates 2 active periods + 2 manual active = 4 total (1 inactive excluded)
-        $this->assertCount(4, $results);
+        static::assertCount(4, $results);
     }
 
     public function testFindByContributor(): void
@@ -161,10 +161,10 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $results = $this->repository->findByContributor($contributor1);
 
         // Factory creates 1 period + 2 manual = 3 total
-        $this->assertCount(3, $results);
+        static::assertCount(3, $results);
         // Should be ordered by startDate DESC
-        $this->assertEquals('2030-01-01', $results[0]->getStartDate()->format('Y-m-d'));
-        $this->assertEquals('2024-01-01', $results[2]->getStartDate()->format('Y-m-d'));
+        static::assertSame('2030-01-01', $results[0]->getStartDate()->format('Y-m-d'));
+        static::assertSame('2024-01-01', $results[2]->getStartDate()->format('Y-m-d'));
     }
 
     public function testFindCurrentPeriodForContributor(): void
@@ -179,9 +179,9 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findCurrentPeriodForContributor($contributor);
 
-        $this->assertNotNull($result);
+        static::assertNotNull($result);
         // Should return most recent active period that has started (2025-12-01)
-        $this->assertEquals($current->getId(), $result->getId());
+        static::assertEquals($current->getId(), $result->getId());
     }
 
     public function testFindCurrentPeriodForContributorWithOnlyPastPeriods(): void
@@ -200,7 +200,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findCurrentPeriodForContributor($contributor);
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testFindWithProfiles(): void
@@ -220,10 +220,10 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithProfiles();
 
         // Factory creates 1 period + 1 manual = 2 total
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
         // Find our period with profiles
-        $periodWithProfiles = array_filter($results, fn ($p): bool => $p->getProfiles()->count() === 2);
-        $this->assertCount(1, $periodWithProfiles);
+        $periodWithProfiles = array_filter($results, static fn ($p): bool => $p->getProfiles()->count() === 2);
+        static::assertCount(1, $periodWithProfiles);
     }
 
     public function testCalculatePeriodCost(): void
@@ -240,7 +240,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $cost = $this->repository->calculatePeriodCost($period);
 
-        $this->assertEquals(1200.0, $cost);
+        static::assertSame(1200.0, $cost);
     }
 
     public function testCalculatePeriodCostWithPartTime(): void
@@ -257,7 +257,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $cost = $this->repository->calculatePeriodCost($period);
 
-        $this->assertEqualsWithDelta(960.0, $cost, 0.0001); // Allow small float precision delta
+        static::assertEqualsWithDelta(960.0, $cost, 0.0001); // Allow small float precision delta
     }
 
     public function testCalculatePeriodCostReturnsNullWhenNoCjm(): void
@@ -269,7 +269,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $cost = $this->repository->calculatePeriodCost($period);
 
-        $this->assertNull($cost);
+        static::assertNull($cost);
     }
 
     public function testCalculateWorkingDays(): void
@@ -280,7 +280,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $workingDays = $this->repository->calculateWorkingDays($start, $end);
 
-        $this->assertEquals(3, $workingDays);
+        static::assertSame(3, $workingDays);
     }
 
     public function testCalculateWorkingDaysFullWeek(): void
@@ -291,7 +291,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $workingDays = $this->repository->calculateWorkingDays($start, $end);
 
-        $this->assertEquals(5, $workingDays);
+        static::assertSame(5, $workingDays);
     }
 
     public function testGetStatistics(): void
@@ -311,16 +311,16 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $stats = $this->repository->getStatistics();
 
-        $this->assertArrayHasKey('total_periods', $stats);
-        $this->assertArrayHasKey('active_periods', $stats);
-        $this->assertArrayHasKey('average_cjm', $stats);
+        static::assertArrayHasKey('total_periods', $stats);
+        static::assertArrayHasKey('active_periods', $stats);
+        static::assertArrayHasKey('average_cjm', $stats);
 
         // Factory creates 2 periods + 3 manual = 5 total
-        $this->assertEquals(5, $stats['total_periods']);
+        static::assertSame(5, $stats['total_periods']);
         // Factory creates 2 active + 2 manual active = 4 total
-        $this->assertEquals(4, $stats['active_periods']);
+        static::assertSame(4, $stats['active_periods']);
         // Average should account for all periods with CJM
-        $this->assertNotNull($stats['average_cjm']);
+        static::assertNotNull($stats['average_cjm']);
     }
 
     public function testCountDepartures(): void
@@ -339,7 +339,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $count = $this->repository->countDepartures(new DateTime('2025-01-01'), new DateTime('2025-03-31'));
 
-        $this->assertEquals(1, $count);
+        static::assertSame(1, $count);
     }
 
     public function testCountActiveAt(): void
@@ -361,7 +361,7 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $count = $this->repository->countActiveAt(new DateTime('2025-01-15'));
 
-        $this->assertEquals(2, $count);
+        static::assertSame(2, $count);
     }
 
     public function testFindFirstByContributor(): void
@@ -374,8 +374,8 @@ class EmploymentPeriodRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findFirstByContributor($contributor);
 
-        $this->assertNotNull($result);
-        $this->assertEquals($first->getId(), $result->getId());
+        static::assertNotNull($result);
+        static::assertEquals($first->getId(), $result->getId());
     }
 
     // Helper method

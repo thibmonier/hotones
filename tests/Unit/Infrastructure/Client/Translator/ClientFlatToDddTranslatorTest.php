@@ -31,37 +31,37 @@ final class ClientFlatToDddTranslatorTest extends TestCase
 
         $ddd = $translator->translate($flat);
 
-        $this->assertSame('legacy:42', $ddd->getId()->getValue());
-        $this->assertSame('Acme Corp', $ddd->getName()->getValue());
-        $this->assertSame(ServiceLevel::PREMIUM, $ddd->getServiceLevel());
+        static::assertSame('legacy:42', $ddd->getId()->getValue());
+        static::assertSame('Acme Corp', $ddd->getName()->getValue());
+        static::assertSame(ServiceLevel::PREMIUM, $ddd->getServiceLevel());
     }
 
     public function testServiceLevelMappingVip(): void
     {
         $translator = new ClientFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatClient(1, 'XY', 'vip'));
-        $this->assertSame(ServiceLevel::ENTERPRISE, $ddd->getServiceLevel());
+        static::assertSame(ServiceLevel::ENTERPRISE, $ddd->getServiceLevel());
     }
 
     public function testServiceLevelMappingPriority(): void
     {
         $translator = new ClientFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatClient(1, 'XY', 'priority'));
-        $this->assertSame(ServiceLevel::ENTERPRISE, $ddd->getServiceLevel());
+        static::assertSame(ServiceLevel::ENTERPRISE, $ddd->getServiceLevel());
     }
 
     public function testServiceLevelMappingLow(): void
     {
         $translator = new ClientFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatClient(1, 'XY', 'low'));
-        $this->assertSame(ServiceLevel::STANDARD, $ddd->getServiceLevel());
+        static::assertSame(ServiceLevel::STANDARD, $ddd->getServiceLevel());
     }
 
     public function testServiceLevelMappingNullDefaults(): void
     {
         $translator = new ClientFlatToDddTranslator();
         $ddd = $translator->translate($this->makeFlatClient(1, 'XY', null));
-        $this->assertSame(ServiceLevel::STANDARD, $ddd->getServiceLevel());
+        static::assertSame(ServiceLevel::STANDARD, $ddd->getServiceLevel());
     }
 
     public function testTranslateUnsavedClientThrows(): void
@@ -80,6 +80,6 @@ final class ClientFlatToDddTranslatorTest extends TestCase
         $ddd = $translator->translate($this->makeFlatClient(1, 'XY'));
 
         // Reconstitute MUST NOT record events (entity exists in legacy store)
-        $this->assertSame([], $ddd->pullDomainEvents());
+        static::assertSame([], $ddd->pullDomainEvents());
     }
 }

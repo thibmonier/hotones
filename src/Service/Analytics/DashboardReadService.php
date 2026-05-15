@@ -139,7 +139,7 @@ readonly class DashboardReadService
 
             // Formatter les résultats
             return array_map(
-                fn ($row): array => [
+                static fn ($row): array => [
                     'month' => $row['monthName'],
                     'month_label' => $row['monthName'], // Pour le graphique Chart.js
                     'revenue' => (float) $row['totalRevenue'],
@@ -455,7 +455,7 @@ readonly class DashboardReadService
         $results = $qb->getQuery()->getResult();
 
         // Formater pour le template
-        return array_map(fn ($row): array => [
+        return array_map(static fn ($row): array => [
             'id' => $row['id'],
             'name' => $row['name'],
             'revenue' => (float) $row['totalRevenue'],

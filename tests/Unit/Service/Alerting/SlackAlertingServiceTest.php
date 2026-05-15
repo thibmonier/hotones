@@ -26,7 +26,7 @@ final class SlackAlertingServiceTest extends TestCase
             'https://hooks.slack.com/services/X/Y/Z',
         );
 
-        $this->assertTrue($service->sendAlert('Test', 'Body', AlertSeverity::INFO));
+        static::assertTrue($service->sendAlert('Test', 'Body', AlertSeverity::INFO));
     }
 
     public function testSendAlertReturnsFalseOnNon2xx(): void
@@ -39,7 +39,7 @@ final class SlackAlertingServiceTest extends TestCase
             'https://hooks.slack.com/services/X/Y/Z',
         );
 
-        $this->assertFalse($service->sendAlert('Test', 'Body'));
+        static::assertFalse($service->sendAlert('Test', 'Body'));
     }
 
     public function testSendAlertReturnsFalseWhenWebhookEmpty(): void
@@ -52,7 +52,7 @@ final class SlackAlertingServiceTest extends TestCase
             null,
         );
 
-        $this->assertFalse($service->sendAlert('Test', 'Body'));
+        static::assertFalse($service->sendAlert('Test', 'Body'));
     }
 
     public function testSendAlertReturnsFalseWhenWebhookEmptyString(): void
@@ -65,7 +65,7 @@ final class SlackAlertingServiceTest extends TestCase
             '   ',
         );
 
-        $this->assertFalse($service->sendAlert('Test', 'Body'));
+        static::assertFalse($service->sendAlert('Test', 'Body'));
     }
 
     public function testSendAlertCatchesNetworkException(): void
@@ -80,19 +80,19 @@ final class SlackAlertingServiceTest extends TestCase
             'https://hooks.slack.com/services/X/Y/Z',
         );
 
-        $this->assertFalse($service->sendAlert('Test', 'Body'));
+        static::assertFalse($service->sendAlert('Test', 'Body'));
     }
 
     public function testAllSeverityLevelsHaveEmojiAndColor(): void
     {
         foreach (AlertSeverity::cases() as $severity) {
-            $this->assertNotEmpty($severity->emoji());
-            $this->assertNotEmpty($severity->color());
+            static::assertNotEmpty($severity->emoji());
+            static::assertNotEmpty($severity->color());
         }
     }
 
     public function testCriticalSeverityIsDarkRed(): void
     {
-        $this->assertSame('#660000', AlertSeverity::CRITICAL->color());
+        static::assertSame('#660000', AlertSeverity::CRITICAL->color());
     }
 }

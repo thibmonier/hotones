@@ -88,7 +88,7 @@ class OrderPaymentScheduleE2ETest extends PantherTestCase
 
         // Expect row appears in schedule table and coverage shows 50%
         $client->waitFor('#amount_type'); // ensure reloaded
-        $this->assertGreaterThan(0, $client->getCrawler()->filter('table tbody tr')->count());
+        static::assertGreaterThan(0, $client->getCrawler()->filter('table tbody tr')->count());
         $this->assertSelectorTextContains('.alert', 'Couverture:');
     }
 }

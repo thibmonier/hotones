@@ -14,15 +14,15 @@ final class DailyHoursTest extends TestCase
     {
         $hours = DailyHours::fullDay();
 
-        self::assertEquals('8.00', $hours->getValue());
-        self::assertEquals(8.0, $hours->toFloat());
+        static::assertSame('8.00', $hours->getValue());
+        static::assertSame(8.0, $hours->toFloat());
     }
 
     public function testFromString(): void
     {
         $hours = DailyHours::fromString('4.00');
 
-        self::assertEquals('4.00', $hours->getValue());
+        static::assertSame('4.00', $hours->getValue());
     }
 
     public function testNegativeHoursThrows(): void
@@ -43,13 +43,13 @@ final class DailyHoursTest extends TestCase
     {
         $hours = DailyHours::fromString('8.00');
 
-        self::assertEquals('40.00', $hours->calculateTotalHours(5));
+        static::assertSame('40.00', $hours->calculateTotalHours(5));
     }
 
     public function testHalfDayCalculation(): void
     {
         $hours = DailyHours::fromString('4.00');
 
-        self::assertEquals('20.00', $hours->calculateTotalHours(5));
+        static::assertSame('20.00', $hours->calculateTotalHours(5));
     }
 }

@@ -898,6 +898,56 @@ Cf. `.snyk` policy pour la stratégie Snyk (US-088).
 
 ---
 
+## 🔧 Mago lint — cleanup progressif
+
+Mago est l'analyseur principal qualité code (config `mago.toml`).
+Baseline résiduel : `mago-baseline.json` (1307 issues — résultats du cleanup
+batch initial sprint-025, MAGO-LINT-BATCH-001).
+
+### Workflow contributeur
+
+```bash
+# Vérifier la conformité (la baseline filtre les issues existantes)
+make mago
+
+# Détail des issues filtrées (audit local — ne pas commit)
+docker compose exec app vendor/bin/mago lint  # sans --baseline override
+
+# Auto-fix safe sur fichiers ou dossier modifiés
+docker compose exec app vendor/bin/mago lint --fix <path>
+
+# Auto-fix incluant les changements potentiellement risqués
+# (vérifier le diff + tests verts avant commit)
+docker compose exec app vendor/bin/mago lint --fix --potentially-unsafe <path>
+```
+
+### Stratégie cleanup résiduel
+
+1. **Ne pas régénérer** la baseline globalement — chaque PR doit **réduire**
+   les issues, pas les masquer.
+2. Sur un fichier touché par un PR : run `mago lint --fix <fichier>` et commit
+   les fixes safe. Les remaining sur ce fichier sortent automatiquement du
+   baseline (le baseline ne match que les issues identiques au moment de
+   sa génération).
+3. Sprints futurs : poursuite du cleanup par lots ciblés (cf retro
+   sprint-025).
+
+### Procédure rebase stack PR adjacent
+
+Quand plusieurs PRs touchent les mêmes fichiers, merger **stack par stack
+complet** AVANT de rebaser le stack adjacent sur main MAJ (cf sprint-024
+retro A-3). Sinon : conflits silencieux (services.yaml, Controller, template,
+test) qui passent CI mais cassent la suite complète sur main.
+
+```bash
+# Stack US-X : 3 PRs interdépendantes
+gh pr merge X1 X2 X3 --squash --delete-branch  # tout le stack
+
+# Stack US-Y branché sur version pré-X
+git checkout feat/us-y && git rebase origin/main  # MAJ post-stack-X
+gh pr merge Y1 Y2 Y3 --squash --delete-branch
+```
+
 ## ❓ Questions ?
 
 Si vous avez des questions :

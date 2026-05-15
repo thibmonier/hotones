@@ -91,7 +91,7 @@ final class AbstractTenantAwareVoterTest extends TestCase
 
         $vote = $voter->vote($token, $this->makeSubject($company), ['TEST_VIEW']);
 
-        $this->assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_DENIED, $vote);
+        static::assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_DENIED, $vote);
     }
 
     public function testAllowsSameTenant(): void
@@ -108,7 +108,7 @@ final class AbstractTenantAwareVoterTest extends TestCase
 
         $vote = $voter->vote($token, $this->makeSubject($company), ['TEST_VIEW']);
 
-        $this->assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_GRANTED, $vote);
+        static::assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_GRANTED, $vote);
     }
 
     public function testDeniesCrossTenant(): void
@@ -127,7 +127,7 @@ final class AbstractTenantAwareVoterTest extends TestCase
 
         $vote = $voter->vote($token, $this->makeSubject($companyB), ['TEST_VIEW']);
 
-        $this->assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_DENIED, $vote);
+        static::assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_DENIED, $vote);
     }
 
     public function testSuperAdminBypassesCrossTenant(): void
@@ -146,6 +146,6 @@ final class AbstractTenantAwareVoterTest extends TestCase
 
         $vote = $voter->vote($token, $this->makeSubject($companyB), ['TEST_VIEW']);
 
-        $this->assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_GRANTED, $vote);
+        static::assertSame(\Symfony\Component\Security\Core\Authorization\Voter\VoterInterface::ACCESS_GRANTED, $vote);
     }
 }

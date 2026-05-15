@@ -32,7 +32,7 @@ class ProjectApiTest extends ApiTestCase
 
     public function testGetCollection(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Test de récupération de la collection de projets
         $response = static::createClient()->request('GET', '/api/projects', [
@@ -47,12 +47,12 @@ class ProjectApiTest extends ApiTestCase
         ]);
 
         // Vérifier qu'on a au moins un résultat dans la collection
-        $this->assertCount(0, $response->toArray()['member']);
+        static::assertCount(0, $response->toArray()['member']);
     }
 
     public function testCreateProject(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Test de création d'un projet
         $response = static::createClient()->request('POST', '/api/projects', [
@@ -78,7 +78,7 @@ class ProjectApiTest extends ApiTestCase
 
     public function testGetProject(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Créer un projet via le client
         $client = static::createClient();
@@ -98,7 +98,7 @@ class ProjectApiTest extends ApiTestCase
 
     public function testUpdateProject(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         $project = $this->createProject();
 
@@ -120,7 +120,7 @@ class ProjectApiTest extends ApiTestCase
 
     public function testDeleteProject(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         $project = $this->createProject();
 
@@ -147,7 +147,7 @@ class ProjectApiTest extends ApiTestCase
 
     public function testCreateProjectWithInsufficientRights(): void
     {
-        $this->markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
+        static::markTestIncomplete('API tests require proper JWT and client configuration - to be fixed');
 
         // Tenter de créer un projet avec un rôle insuffisant
         $client = static::createClient();

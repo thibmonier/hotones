@@ -28,7 +28,7 @@ class SaasSubscriptionType extends AbstractType
                 'class' => SaasService::class,
                 'label' => 'Service',
                 'required' => true,
-                'choice_label' => function (?SaasService $service) {
+                'choice_label' => static function (?SaasService $service) {
                     if (!$service) {
                         return null;
                     }
@@ -38,7 +38,7 @@ class SaasSubscriptionType extends AbstractType
                         ? sprintf('%s (%s)', $service->getName(), $provider->getName())
                         : $service->getName();
                 },
-                'query_builder' => fn ($repository) => $repository
+                'query_builder' => static fn ($repository) => $repository
                     ->createQueryBuilder('s')
                     ->leftJoin('s.provider', 'p')
                     ->where('s.active = :active')

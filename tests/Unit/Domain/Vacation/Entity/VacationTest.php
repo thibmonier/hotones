@@ -26,11 +26,11 @@ final class VacationTest extends TestCase
     {
         $vacation = $this->createVacation();
 
-        self::assertSame(VacationStatus::PENDING, $vacation->getStatus());
-        self::assertSame(VacationType::PAID_LEAVE, $vacation->getType());
-        self::assertNotNull($vacation->getCreatedAt());
-        self::assertNull($vacation->getApprovedAt());
-        self::assertNull($vacation->getApprovedBy());
+        static::assertSame(VacationStatus::PENDING, $vacation->getStatus());
+        static::assertSame(VacationType::PAID_LEAVE, $vacation->getType());
+        static::assertNotNull($vacation->getCreatedAt());
+        static::assertNull($vacation->getApprovedAt());
+        static::assertNull($vacation->getApprovedBy());
     }
 
     public function testRequestRecordsDomainEvent(): void
@@ -38,8 +38,8 @@ final class VacationTest extends TestCase
         $vacation = $this->createVacation();
         $events = $vacation->pullDomainEvents();
 
-        self::assertCount(1, $events);
-        self::assertInstanceOf(VacationRequested::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(VacationRequested::class, $events[0]);
     }
 
     public function testApproveChangesStatusAndRecordsEvent(): void
@@ -52,13 +52,13 @@ final class VacationTest extends TestCase
 
         $vacation->approve($user);
 
-        self::assertSame(VacationStatus::APPROVED, $vacation->getStatus());
-        self::assertNotNull($vacation->getApprovedAt());
-        self::assertSame($user, $vacation->getApprovedBy());
+        static::assertSame(VacationStatus::APPROVED, $vacation->getStatus());
+        static::assertNotNull($vacation->getApprovedAt());
+        static::assertSame($user, $vacation->getApprovedBy());
 
         $events = $vacation->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(VacationApproved::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(VacationApproved::class, $events[0]);
     }
 
     public function testRejectChangesStatusAndRecordsEvent(): void
@@ -68,11 +68,11 @@ final class VacationTest extends TestCase
 
         $vacation->reject();
 
-        self::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
+        static::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
 
         $events = $vacation->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(VacationRejected::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(VacationRejected::class, $events[0]);
     }
 
     public function testCancelChangesStatusAndRecordsEvent(): void
@@ -82,11 +82,11 @@ final class VacationTest extends TestCase
 
         $vacation->cancel();
 
-        self::assertSame(VacationStatus::CANCELLED, $vacation->getStatus());
+        static::assertSame(VacationStatus::CANCELLED, $vacation->getStatus());
 
         $events = $vacation->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(VacationCancelled::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(VacationCancelled::class, $events[0]);
     }
 
     public function testCannotApproveAlreadyApprovedVacation(): void
@@ -111,7 +111,7 @@ final class VacationTest extends TestCase
         $vacation->approve($user);
         $vacation->cancel();
 
-        self::assertSame(VacationStatus::CANCELLED, $vacation->getStatus());
+        static::assertSame(VacationStatus::CANCELLED, $vacation->getStatus());
     }
 
     public function testRejectStoresOptionalRejectionReason(): void
@@ -120,8 +120,8 @@ final class VacationTest extends TestCase
 
         $vacation->reject('Planning sature');
 
-        self::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
-        self::assertSame('Planning sature', $vacation->getRejectionReason());
+        static::assertSame(VacationStatus::REJECTED, $vacation->getStatus());
+        static::assertSame('Planning sature', $vacation->getRejectionReason());
     }
 
     public function testRejectWithoutReasonKeepsRejectionReasonNull(): void
@@ -130,7 +130,7 @@ final class VacationTest extends TestCase
 
         $vacation->reject();
 
-        self::assertNull($vacation->getRejectionReason());
+        static::assertNull($vacation->getRejectionReason());
     }
 
     public function testGetTotalHours(): void
@@ -138,7 +138,7 @@ final class VacationTest extends TestCase
         $vacation = $this->createVacation();
 
         // 5 days (Jan 10-14) * 8h = 40h
-        self::assertEquals('40.00', $vacation->getTotalHours());
+        static::assertSame('40.00', $vacation->getTotalHours());
     }
 
     public function testGetNumberOfWorkingDays(): void
@@ -153,7 +153,7 @@ final class VacationTest extends TestCase
             DailyHours::fullDay(),
         );
 
-        self::assertEquals(5, $vacation->getNumberOfWorkingDays());
+        static::assertSame(5, $vacation->getNumberOfWorkingDays());
     }
 
     public function testPullDomainEventsClearsEvents(): void
@@ -163,8 +163,8 @@ final class VacationTest extends TestCase
         $events1 = $vacation->pullDomainEvents();
         $events2 = $vacation->pullDomainEvents();
 
-        self::assertCount(1, $events1);
-        self::assertCount(0, $events2);
+        static::assertCount(1, $events1);
+        static::assertCount(0, $events2);
     }
 
     private function createVacation(): Vacation

@@ -30,16 +30,16 @@ final class ProjectReconstituteMargeTest extends TestCase
             isInternal: false,
             extra: [
                 'coutTotal' => Money::fromAmount(5000.00),
-                'factureTotal' => Money::fromAmount(10000.00),
+                'factureTotal' => Money::fromAmount(10_000.00),
                 'margeCalculatedAt' => $calculatedAt,
             ],
         );
 
-        self::assertSame(5000.0, $project->getCoutTotal()?->getAmount());
-        self::assertSame(10000.0, $project->getFactureTotal()?->getAmount());
-        self::assertSame(500000, $project->getMargeAbsoluteCents()); // 5000 € en centimes
-        self::assertSame(50.0, $project->getMargePercent());
-        self::assertSame($calculatedAt, $project->getMargeCalculatedAt());
+        static::assertSame(5000.0, $project->getCoutTotal()?->getAmount());
+        static::assertSame(10_000.0, $project->getFactureTotal()?->getAmount());
+        static::assertSame(500_000, $project->getMargeAbsoluteCents()); // 5000 € en centimes
+        static::assertSame(50.0, $project->getMargePercent());
+        static::assertSame($calculatedAt, $project->getMargeCalculatedAt());
     }
 
     public function testReconstituteWithoutMargeExtraLeavesNull(): void
@@ -53,9 +53,9 @@ final class ProjectReconstituteMargeTest extends TestCase
             extra: [],
         );
 
-        self::assertNull($project->getCoutTotal());
-        self::assertNull($project->getFactureTotal());
-        self::assertNull($project->getMargeCalculatedAt());
+        static::assertNull($project->getCoutTotal());
+        static::assertNull($project->getFactureTotal());
+        static::assertNull($project->getMargeCalculatedAt());
     }
 
     public function testReconstituteIgnoresInvalidMargeTypes(): void
@@ -72,7 +72,7 @@ final class ProjectReconstituteMargeTest extends TestCase
             ],
         );
 
-        self::assertNull($project->getCoutTotal());
-        self::assertNull($project->getMargeCalculatedAt());
+        static::assertNull($project->getCoutTotal());
+        static::assertNull($project->getMargeCalculatedAt());
     }
 }

@@ -19,7 +19,7 @@ final class EmploymentPeriodSnapshotTest extends TestCase
             workTimePercentage: WorkTimePercentage::fromFloat(100.0),
         );
 
-        self::assertSame(7.0, $snapshot->dailyMaxHours()->getValue());
+        static::assertSame(7.0, $snapshot->dailyMaxHours()->getValue());
     }
 
     public function testDailyMaxHours80PercentPartTime(): void
@@ -30,7 +30,7 @@ final class EmploymentPeriodSnapshotTest extends TestCase
             workTimePercentage: WorkTimePercentage::fromFloat(80.0),
         );
 
-        self::assertSame(5.6, $snapshot->dailyMaxHours()->getValue());
+        static::assertSame(5.6, $snapshot->dailyMaxHours()->getValue());
     }
 
     public function testDailyMaxHours50PercentPartTime(): void
@@ -41,6 +41,6 @@ final class EmploymentPeriodSnapshotTest extends TestCase
             workTimePercentage: WorkTimePercentage::fromFloat(50.0),
         );
 
-        self::assertSame(4.0, $snapshot->dailyMaxHours()->getValue());
+        static::assertSame(4.0, $snapshot->dailyMaxHours()->getValue());
     }
 }

@@ -65,7 +65,7 @@ class ExpenseReportType extends AbstractType
             ])
             ->add('project', EntityType::class, [
                 'class' => Project::class,
-                'choice_label' => fn (Project $project): string => $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : ''),
+                'choice_label' => static fn (Project $project): string => $project->getName().($project->getClient() ? ' - '.$project->getClient()->getName() : ''),
                 'required' => false,
                 'placeholder' => '-- Sélectionner un projet --',
                 'label' => 'Projet',
@@ -73,14 +73,14 @@ class ExpenseReportType extends AbstractType
                     'class' => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un projet...',
                 ],
-                'query_builder' => fn ($er) => $er
+                'query_builder' => static fn ($er) => $er
                     ->createQueryBuilder('p')
                     ->leftJoin('p.client', 'c')
                     ->orderBy('p.name', 'ASC'),
             ])
             ->add('order', EntityType::class, [
                 'class' => Order::class,
-                'choice_label' => function (Order $order) {
+                'choice_label' => static function (Order $order) {
                     $label = $order->getOrderNumber();
                     if ($order->getName()) {
                         $label .= ' - '.$order->getName();
@@ -98,7 +98,7 @@ class ExpenseReportType extends AbstractType
                     'class' => 'form-select select2-search',
                     'data-placeholder' => 'Rechercher un devis...',
                 ],
-                'query_builder' => fn ($er) => $er
+                'query_builder' => static fn ($er) => $er
                     ->createQueryBuilder('o')
                     ->leftJoin('o.project', 'p')
                     ->orderBy('o.orderNumber', 'DESC'),

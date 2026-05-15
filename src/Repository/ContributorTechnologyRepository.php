@@ -240,7 +240,7 @@ class ContributorTechnologyRepository extends CompanyAwareRepository
         }
 
         // Trier par score décroissant
-        usort($contributors, fn ($a, $b): int => $b['score'] <=> $a['score']);
+        usort($contributors, static fn ($a, $b): int => $b['score'] <=> $a['score']);
 
         return $contributors;
     }

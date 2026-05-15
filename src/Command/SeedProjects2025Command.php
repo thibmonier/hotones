@@ -64,7 +64,7 @@ class SeedProjects2025Command extends Command
         $year = (int) $input->getOption('year');
         $count = (int) $input->getOption('count');
 
-        $io->title("Génération de $count projets de test pour $year");
+        $io->title("Génération de {$count} projets de test pour {$year}");
 
         // Récupérer la Company
         $companyId = $input->getOption('company-id');
@@ -149,7 +149,7 @@ class SeedProjects2025Command extends Command
                 $p = new Profile();
                 $p->setName($name)->setDescription('Profil test')->setCompany($company);
                 $this->em->persist($p);
-                $io->writeln("✓ Profil créé: $name");
+                $io->writeln("✓ Profil créé: {$name}");
             }
             $profiles[] = $p;
         }
@@ -189,7 +189,7 @@ class SeedProjects2025Command extends Command
                     $c->addProfile($profiles[$i % count($profiles)]);
                 }
                 $this->em->persist($c);
-                $io->writeln("✓ Contributeur créé: $firstName $lastName");
+                $io->writeln("✓ Contributeur créé: {$firstName} {$lastName}");
             }
             $contributors[] = $c;
         }
@@ -216,7 +216,7 @@ class SeedProjects2025Command extends Command
                 $company = $this->em->getRepository(Company::class)->findOneBy([]);
                 $tech->setName($t)->setCategory('tool')->setActive(true)->setCompany($company);
                 $this->em->persist($tech);
-                $io->writeln("✓ Technologie créée: $t");
+                $io->writeln("✓ Technologie créée: {$t}");
             }
             $created[] = $tech;
         }
@@ -373,13 +373,13 @@ class SeedProjects2025Command extends Command
         if (empty($contributors)) {
             return;
         }
-        $start = $project->getStartDate() ?: new DateTime("$year-01-01");
-        $end = $project->getEndDate() ?: new DateTime("$year-12-20");
+        $start = $project->getStartDate() ?: new DateTime("{$year}-01-01");
+        $end = $project->getEndDate() ?: new DateTime("{$year}-12-20");
         if ((int) $start->format('Y') < $year) {
-            $start = new DateTime("$year-01-01");
+            $start = new DateTime("{$year}-01-01");
         }
         if ((int) $end->format('Y') > $year) {
-            $end = new DateTime("$year-12-20");
+            $end = new DateTime("{$year}-12-20");
         }
 
         $period = new DatePeriod($start, new DateInterval('P1D'), $end);

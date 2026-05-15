@@ -462,9 +462,11 @@ class Project implements CompanyOwnedInterface
         $validStatuses = ['signe', 'gagne', 'termine'];
 
         foreach ($this->orders as $order) {
-            if (in_array($order->status, $validStatuses, true)) {
-                $total = bcadd($total, (string) $order->totalAmount, 2);
+            if (!in_array($order->status, $validStatuses, true)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $order->totalAmount, 2);
         }
 
         return $total;
@@ -492,12 +494,14 @@ class Project implements CompanyOwnedInterface
         $total = '0';
         foreach ($this->tasks as $task) {
             if (
-                $task->getEstimatedHoursSold()
+                !($task->getEstimatedHoursSold()
                 && $task->getCountsForProfitability()
-                && $task->getType() === ProjectTask::TYPE_REGULAR
+                && $task->getType() === ProjectTask::TYPE_REGULAR)
             ) {
-                $total = bcadd($total, (string) $task->getEstimatedHoursSold(), 2);
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getEstimatedHoursSold(), 2);
         }
 
         return $total;
@@ -534,9 +538,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getTotalHours(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getTotalHours(), 2);
         }
 
         return $total;
@@ -549,9 +555,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getRemainingHours(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getRemainingHours(), 2);
         }
 
         return $total;
@@ -572,9 +580,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getSoldAmount(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getSoldAmount(), 2);
         }
 
         return $total;
@@ -587,9 +597,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getEstimatedCost(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getEstimatedCost(), 2);
         }
 
         return $total;
@@ -630,44 +642,46 @@ class Project implements CompanyOwnedInterface
         // Récupérer les contributeurs des tâches
         foreach ($this->tasks as $task) {
             if (
-                $task->getAssignedContributor()
+                !($task->getAssignedContributor()
                 && $task->getCountsForProfitability()
-                && $task->getType() === ProjectTask::TYPE_REGULAR
+                && $task->getType() === ProjectTask::TYPE_REGULAR)
             ) {
-                $contributor = $task->getAssignedContributor();
-                $contributorId = $contributor->id;
-
-                if (!isset($contributors[$contributorId])) {
-                    $contributors[$contributorId] = [
-                        'contributor' => $contributor,
-                        'spent_hours' => '0',
-                        'remaining_hours' => '0',
-                        'estimated_hours' => '0',
-                        'tasks' => [],
-                    ];
-                }
-
-                $contributors[$contributorId]['spent_hours'] = bcadd(
-                    $contributors[$contributorId]['spent_hours'],
-                    (string) $task->getTotalHours(),
-                    2,
-                );
-
-                $contributors[$contributorId]['remaining_hours'] = bcadd(
-                    $contributors[$contributorId]['remaining_hours'],
-                    (string) $task->getRemainingHours(),
-                    2,
-                );
-
-                $estimatedHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
-                $contributors[$contributorId]['estimated_hours'] = bcadd(
-                    $contributors[$contributorId]['estimated_hours'],
-                    $estimatedHours,
-                    2,
-                );
-
-                $contributors[$contributorId]['tasks'][] = $task;
+                continue;
             }
+
+            $contributor = $task->getAssignedContributor();
+            $contributorId = $contributor->id;
+
+            if (!isset($contributors[$contributorId])) {
+                $contributors[$contributorId] = [
+                    'contributor' => $contributor,
+                    'spent_hours' => '0',
+                    'remaining_hours' => '0',
+                    'estimated_hours' => '0',
+                    'tasks' => [],
+                ];
+            }
+
+            $contributors[$contributorId]['spent_hours'] = bcadd(
+                $contributors[$contributorId]['spent_hours'],
+                (string) $task->getTotalHours(),
+                2,
+            );
+
+            $contributors[$contributorId]['remaining_hours'] = bcadd(
+                $contributors[$contributorId]['remaining_hours'],
+                (string) $task->getRemainingHours(),
+                2,
+            );
+
+            $estimatedHours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '0';
+            $contributors[$contributorId]['estimated_hours'] = bcadd(
+                $contributors[$contributorId]['estimated_hours'],
+                $estimatedHours,
+                2,
+            );
+
+            $contributors[$contributorId]['tasks'][] = $task;
         }
 
         return array_values($contributors);
@@ -686,14 +700,16 @@ class Project implements CompanyOwnedInterface
         $weightedProgress = '0';
 
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
-                $weight = $hours;
-                $progress = $task->getProgressPercentage();
-
-                $totalWeight = bcadd($totalWeight, $weight, 2);
-                $weightedProgress = bcadd($weightedProgress, bcmul($weight, $progress, 4), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $hours = $task->getEstimatedHoursRevised() ?? $task->getEstimatedHoursSold() ?? '1';
+            $weight = $hours;
+            $progress = $task->getProgressPercentage();
+
+            $totalWeight = bcadd($totalWeight, $weight, 2);
+            $weightedProgress = bcadd($weightedProgress, bcmul($weight, $progress, 4), 2);
         }
 
         if (bccomp($totalWeight, '0', 2) <= 0) {
@@ -710,9 +726,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getTotalHours(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getTotalHours(), 2);
         }
 
         return $total;
@@ -725,9 +743,11 @@ class Project implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->tasks as $task) {
-            if ($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR) {
-                $total = bcadd($total, (string) $task->getRealCost(), 2);
+            if (!($task->getCountsForProfitability() && $task->getType() === ProjectTask::TYPE_REGULAR)) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $task->getRealCost(), 2);
         }
 
         return $total;
@@ -864,7 +884,7 @@ class Project implements CompanyOwnedInterface
      */
     public function getCriticalSkills(): Collection
     {
-        return $this->projectSkills->filter(fn (ProjectSkill $ps): bool => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH);
+        return $this->projectSkills->filter(static fn (ProjectSkill $ps): bool => $ps->getPriority() >= ProjectSkill::PRIORITY_HIGH);
     }
 
     /**

@@ -34,7 +34,7 @@ final class InvoiceFactory extends PersistentObjectFactory
         } catch (CompanyContextMissingException) {
         }
 
-        $amountHt = $faker->randomFloat(2, 100, 10000);
+        $amountHt = $faker->randomFloat(2, 100, 10_000);
         $tvaRate = 20.0;
         $amountTva = round($amountHt * $tvaRate / 100, 2);
         $amountTtc = round($amountHt + $amountTva, 2);

@@ -13,9 +13,9 @@ final class InvoiceIdLegacyTest extends TestCase
     public function testFromLegacyIntWrapsValue(): void
     {
         $id = InvoiceId::fromLegacyInt(42);
-        $this->assertSame('legacy:42', $id->getValue());
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testFromLegacyIntRejectsZero(): void
@@ -26,7 +26,7 @@ final class InvoiceIdLegacyTest extends TestCase
 
     public function testIsLegacyFalseForUuid(): void
     {
-        $this->assertFalse(InvoiceId::generate()->isLegacy());
+        static::assertFalse(InvoiceId::generate()->isLegacy());
     }
 
     public function testToLegacyIntRejectsUuid(): void

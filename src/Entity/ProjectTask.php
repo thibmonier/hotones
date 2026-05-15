@@ -8,7 +8,6 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -210,9 +209,11 @@ class ProjectTask implements CompanyOwnedInterface
 
         // 1. Temps passé directement sur la tâche (sans sous-tâche spécifiée)
         foreach ($this->project->getTimesheets() as $timesheet) {
-            if ($timesheet->task && $timesheet->task->getId() === $this->getId() && $timesheet->subTask === null) {
-                $totalHours = bcadd($totalHours, (string) $timesheet->hours, 2);
+            if (!($timesheet->task && $timesheet->task->getId() === $this->getId() && $timesheet->subTask === null)) {
+                continue;
             }
+
+            $totalHours = bcadd($totalHours, (string) $timesheet->hours, 2);
         }
 
         // 2. Temps passé sur les sous-tâches
@@ -410,15 +411,17 @@ class ProjectTask implements CompanyOwnedInterface
 
         // Calculer le coût basé sur les timesheets et les CJM des contributeurs
         foreach ($this->project->getTimesheets() as $timesheet) {
-            if ($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId()) {
-                $contributor = $timesheet->getContributor();
-                $cjm = $contributor->getCjm();
+            if (!($timesheet->getTask() && $timesheet->getTask()->getId() === $this->getId())) {
+                continue;
+            }
 
-                if ($cjm) {
-                    $hourlyRate = bcdiv((string) $cjm, '8', 4); // CJM / 8h
-                    $timeCost = bcmul((string) $timesheet->getHours(), $hourlyRate, 2);
-                    $totalCost = bcadd($totalCost, $timeCost, 2);
-                }
+            $contributor = $timesheet->getContributor();
+            $cjm = $contributor->getCjm();
+
+            if ($cjm) {
+                $hourlyRate = bcdiv((string) $cjm, '8', 4); // CJM / 8h
+                $timeCost = bcmul((string) $timesheet->getHours(), $hourlyRate, 2);
+                $totalCost = bcadd($totalCost, $timeCost, 2);
             }
         }
 

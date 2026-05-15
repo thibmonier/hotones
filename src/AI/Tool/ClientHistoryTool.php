@@ -55,7 +55,7 @@ final readonly class ClientHistoryTool
 
         // Formater les 5 derniers projets
         $recentProjects = array_slice(
-            array_map(fn ($project): array => [
+            array_map(static fn ($project): array => [
                 'name' => $project->getName(),
                 'status' => $project->getStatus(),
                 'type' => $project->getProjectType(),

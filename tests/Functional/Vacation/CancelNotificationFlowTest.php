@@ -94,14 +94,14 @@ final class CancelNotificationFlowTest extends WebTestCase
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $found = $repo->findByIdOrNull(VacationId::fromString($vacationId));
-        self::assertNotNull($found);
-        self::assertSame(VacationStatus::CANCELLED, $found->getStatus());
+        static::assertNotNull($found);
+        static::assertSame(VacationStatus::CANCELLED, $found->getStatus());
 
         // Email assertion: intervenant must have received "annulee par votre manager"
         self::assertEmailCount(2); // 1 vacation_created (manager) + 1 vacation_cancelled_by_manager (intervenant)
         $email = $this->findMailerMessageWithSubject('Votre demande de conge a ete annulee par votre manager');
-        self::assertNotNull($email, 'Expected the contributor to receive a cancellation email');
-        self::assertSame('cancel-employee@test.com', $email->getTo()[0]->getAddress());
+        static::assertNotNull($email, 'Expected the contributor to receive a cancellation email');
+        static::assertSame('cancel-employee@test.com', $email->getTo()[0]->getAddress());
     }
 
     public function testContributorCancelOfPendingRequestEmailsTheManager(): void
@@ -118,8 +118,8 @@ final class CancelNotificationFlowTest extends WebTestCase
 
         // Manager receives the heads-up email
         $email = $this->findMailerMessageWithSubject('Demande de conge annulee par le collaborateur');
-        self::assertNotNull($email, 'Expected the manager to be notified of the self-cancel');
-        self::assertSame('cancel-manager@test.com', $email->getTo()[0]->getAddress());
+        static::assertNotNull($email, 'Expected the manager to be notified of the self-cancel');
+        static::assertSame('cancel-manager@test.com', $email->getTo()[0]->getAddress());
     }
 
     private function submitAsEmployee(): string

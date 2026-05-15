@@ -78,13 +78,13 @@ class OnboardingServiceTest extends TestCase
             ->with($profile)
             ->willReturn($template);
 
-        $this->em->expects($this->exactly(2))->method('persist')->with($this->isInstanceOf(OnboardingTask::class));
+        $this->em->expects($this->exactly(2))->method('persist')->with(static::isInstanceOf(OnboardingTask::class));
 
         $this->em->expects($this->once())->method('flush');
 
         $taskCount = $this->service->createOnboardingFromTemplate($contributor, $employmentPeriod);
 
-        $this->assertEquals(2, $taskCount);
+        static::assertSame(2, $taskCount);
     }
 
     public function testCreateOnboardingFromTemplateWithDefaultTemplate(): void
@@ -108,13 +108,13 @@ class OnboardingServiceTest extends TestCase
 
         $this->templateRepository->expects($this->once())->method('findDefault')->willReturn($template);
 
-        $this->em->expects($this->once())->method('persist')->with($this->isInstanceOf(OnboardingTask::class));
+        $this->em->expects($this->once())->method('persist')->with(static::isInstanceOf(OnboardingTask::class));
 
         $this->em->expects($this->once())->method('flush');
 
         $taskCount = $this->service->createOnboardingFromTemplate($contributor, $employmentPeriod);
 
-        $this->assertEquals(1, $taskCount);
+        static::assertSame(1, $taskCount);
     }
 
     public function testCreateOnboardingFromTemplateNoTemplateFound(): void
@@ -128,7 +128,7 @@ class OnboardingServiceTest extends TestCase
 
         $taskCount = $this->service->createOnboardingFromTemplate($contributor, $employmentPeriod);
 
-        $this->assertEquals(0, $taskCount);
+        static::assertSame(0, $taskCount);
     }
 
     public function testCompleteTask(): void
@@ -136,16 +136,16 @@ class OnboardingServiceTest extends TestCase
         $task = new OnboardingTask();
         $task->setStatus('a_faire');
 
-        $this->assertFalse($task->isCompleted());
-        $this->assertNull($task->getCompletedAt());
+        static::assertFalse($task->isCompleted());
+        static::assertNull($task->getCompletedAt());
 
         $this->em->expects($this->once())->method('flush');
 
         $this->service->completeTask($task);
 
-        $this->assertTrue($task->isCompleted());
-        $this->assertInstanceOf(DateTimeImmutable::class, $task->getCompletedAt());
-        $this->assertEquals('termine', $task->getStatus());
+        static::assertTrue($task->isCompleted());
+        static::assertInstanceOf(DateTimeImmutable::class, $task->getCompletedAt());
+        static::assertSame('termine', $task->getStatus());
     }
 
     public function testCompleteTaskIdempotent(): void
@@ -160,8 +160,8 @@ class OnboardingServiceTest extends TestCase
         $this->service->completeTask($task);
 
         // Should remain completed
-        $this->assertTrue($task->isCompleted());
-        $this->assertInstanceOf(DateTimeImmutable::class, $task->getCompletedAt());
+        static::assertTrue($task->isCompleted());
+        static::assertInstanceOf(DateTimeImmutable::class, $task->getCompletedAt());
     }
 
     public function testCalculateProgress(): void
@@ -172,7 +172,7 @@ class OnboardingServiceTest extends TestCase
 
         $progress = $this->service->calculateProgress($contributor);
 
-        $this->assertEquals(50, $progress);
+        static::assertSame(50, $progress);
     }
 
     public function testCreateTemplate(): void
@@ -194,8 +194,8 @@ class OnboardingServiceTest extends TestCase
         $this->em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(
-                fn (OnboardingTemplate $template): bool => $template->getName() === $name
+            ->with(static::callback(
+                static fn (OnboardingTemplate $template): bool => $template->getName() === $name
                     && $template->getDescription() === $description
                     && $template->isActive() === true
                     && count($template->getTasks()) === 1,
@@ -205,11 +205,11 @@ class OnboardingServiceTest extends TestCase
 
         $template = $this->service->createTemplate($name, $description, $profileId, $tasks);
 
-        $this->assertInstanceOf(OnboardingTemplate::class, $template);
-        $this->assertEquals($name, $template->getName());
-        $this->assertEquals($description, $template->getDescription());
-        $this->assertTrue($template->isActive());
-        $this->assertCount(1, $template->getTasks());
+        static::assertInstanceOf(OnboardingTemplate::class, $template);
+        static::assertEquals($name, $template->getName());
+        static::assertEquals($description, $template->getDescription());
+        static::assertTrue($template->isActive());
+        static::assertCount(1, $template->getTasks());
     }
 
     public function testCreateTemplateWithoutProfile(): void
@@ -218,13 +218,13 @@ class OnboardingServiceTest extends TestCase
         $description = 'Default onboarding';
         $tasks = [];
 
-        $this->em->expects($this->once())->method('persist')->with($this->isInstanceOf(OnboardingTemplate::class));
+        $this->em->expects($this->once())->method('persist')->with(static::isInstanceOf(OnboardingTemplate::class));
 
         $this->em->expects($this->once())->method('flush');
 
         $template = $this->service->createTemplate($name, $description, null, $tasks);
 
-        $this->assertInstanceOf(OnboardingTemplate::class, $template);
+        static::assertInstanceOf(OnboardingTemplate::class, $template);
     }
 
     public function testDuplicateTemplate(): void
@@ -247,8 +247,8 @@ class OnboardingServiceTest extends TestCase
         $this->em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(
-                fn (OnboardingTemplate $duplicate): bool => str_contains($duplicate->getName(), 'Copie')
+            ->with(static::callback(
+                static fn (OnboardingTemplate $duplicate): bool => str_contains($duplicate->getName(), 'Copie')
                     && $duplicate->getDescription() === 'Original description'
                     && $duplicate->isActive() === true
                     && count($duplicate->getTasks()) === 1,
@@ -258,9 +258,9 @@ class OnboardingServiceTest extends TestCase
 
         $duplicate = $this->service->duplicateTemplate($original, 'Copie de Original Template');
 
-        $this->assertInstanceOf(OnboardingTemplate::class, $duplicate);
-        $this->assertNotSame($original, $duplicate);
-        $this->assertTrue($duplicate->isActive());
+        static::assertInstanceOf(OnboardingTemplate::class, $duplicate);
+        static::assertNotSame($original, $duplicate);
+        static::assertTrue($duplicate->isActive());
     }
 
     public function testDuplicateTemplateWithCustomName(): void
@@ -273,15 +273,15 @@ class OnboardingServiceTest extends TestCase
         $this->em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(
-                fn (OnboardingTemplate $duplicate): bool => $duplicate->getName() === 'Custom Copy Name',
+            ->with(static::callback(
+                static fn (OnboardingTemplate $duplicate): bool => $duplicate->getName() === 'Custom Copy Name',
             ));
 
         $this->em->expects($this->once())->method('flush');
 
         $duplicate = $this->service->duplicateTemplate($original, 'Custom Copy Name');
 
-        $this->assertEquals('Custom Copy Name', $duplicate->getName());
+        static::assertSame('Custom Copy Name', $duplicate->getName());
     }
 
     public function testGetTeamStatistics(): void
@@ -300,7 +300,7 @@ class OnboardingServiceTest extends TestCase
 
         $result = $this->service->getTeamStatistics($contributorIds);
 
-        $this->assertSame($stats, $result);
-        $this->assertCount(2, $result);
+        static::assertSame($stats, $result);
+        static::assertCount(2, $result);
     }
 }

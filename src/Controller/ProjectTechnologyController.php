@@ -37,11 +37,13 @@ class ProjectTechnologyController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Empêcher doublons (unique project+technology)
             foreach ($project->getProjectTechnologies() as $existing) {
-                if ($existing->getTechnology() === $pt->getTechnology()) {
-                    $this->addFlash('warning', 'Cette technologie existe déjà. Modifiez la version au besoin.');
-
-                    return $this->redirectToRoute('project_tech_index', ['id' => $project->getId()]);
+                if ($existing->getTechnology() !== $pt->getTechnology()) {
+                    continue;
                 }
+
+                $this->addFlash('warning', 'Cette technologie existe déjà. Modifiez la version au besoin.');
+
+                return $this->redirectToRoute('project_tech_index', ['id' => $project->getId()]);
             }
 
             $em->persist($pt);

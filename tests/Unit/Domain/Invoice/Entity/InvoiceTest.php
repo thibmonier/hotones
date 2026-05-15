@@ -41,13 +41,13 @@ final class InvoiceTest extends TestCase
     {
         $invoice = $this->newInvoice();
 
-        self::assertSame(InvoiceStatus::DRAFT, $invoice->getStatus());
-        self::assertTrue($invoice->getAmountHt()->equals(Money::zero()));
-        self::assertTrue($invoice->getAmountTva()->equals(Money::zero()));
-        self::assertTrue($invoice->getAmountTtc()->equals(Money::zero()));
-        self::assertNull($invoice->getIssuedAt());
-        self::assertNull($invoice->getDueDate());
-        self::assertNull($invoice->getPaidAt());
+        static::assertSame(InvoiceStatus::DRAFT, $invoice->getStatus());
+        static::assertTrue($invoice->getAmountHt()->equals(Money::zero()));
+        static::assertTrue($invoice->getAmountTva()->equals(Money::zero()));
+        static::assertTrue($invoice->getAmountTtc()->equals(Money::zero()));
+        static::assertNull($invoice->getIssuedAt());
+        static::assertNull($invoice->getDueDate());
+        static::assertNull($invoice->getPaidAt());
     }
 
     public function testCreateRecordsInvoiceCreatedEvent(): void
@@ -55,8 +55,8 @@ final class InvoiceTest extends TestCase
         $invoice = $this->newInvoice();
         $events = $invoice->pullDomainEvents();
 
-        self::assertCount(1, $events);
-        self::assertInstanceOf(InvoiceCreatedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(InvoiceCreatedEvent::class, $events[0]);
     }
 
     public function testReconstituteDoesNotRecordEvents(): void
@@ -68,7 +68,7 @@ final class InvoiceTest extends TestCase
             ClientId::fromLegacyInt(2),
         );
 
-        self::assertSame([], $invoice->pullDomainEvents());
+        static::assertSame([], $invoice->pullDomainEvents());
     }
 
     public function testAddLineRecalculatesTotals(): void
@@ -85,9 +85,9 @@ final class InvoiceTest extends TestCase
         );
 
         // 2 * 100 = 200 HT, TVA 20 % = 40, TTC = 240
-        self::assertSame(20000, $invoice->getAmountHt()->getAmountCents());
-        self::assertSame(4000, $invoice->getAmountTva()->getAmountCents());
-        self::assertSame(24000, $invoice->getAmountTtc()->getAmountCents());
+        static::assertSame(20_000, $invoice->getAmountHt()->getAmountCents());
+        static::assertSame(4000, $invoice->getAmountTva()->getAmountCents());
+        static::assertSame(24_000, $invoice->getAmountTtc()->getAmountCents());
     }
 
     public function testAddMultipleLinesAggregateTotals(): void
@@ -110,9 +110,9 @@ final class InvoiceTest extends TestCase
         );
 
         // (100 + 150) HT = 250, TVA 20 % = 50, TTC = 300
-        self::assertSame(25000, $invoice->getAmountHt()->getAmountCents());
-        self::assertSame(5000, $invoice->getAmountTva()->getAmountCents());
-        self::assertSame(30000, $invoice->getAmountTtc()->getAmountCents());
+        static::assertSame(25_000, $invoice->getAmountHt()->getAmountCents());
+        static::assertSame(5000, $invoice->getAmountTva()->getAmountCents());
+        static::assertSame(30_000, $invoice->getAmountTtc()->getAmountCents());
     }
 
     public function testUpdateLineMutatesTotals(): void
@@ -124,8 +124,8 @@ final class InvoiceTest extends TestCase
         $invoice->updateLine($lineId, 'Updated', 2.0, Money::fromAmount(150.0), TaxRate::standardFrance());
 
         // 2 * 150 = 300 HT, TVA 60, TTC 360
-        self::assertSame(30000, $invoice->getAmountHt()->getAmountCents());
-        self::assertSame(36000, $invoice->getAmountTtc()->getAmountCents());
+        static::assertSame(30_000, $invoice->getAmountHt()->getAmountCents());
+        static::assertSame(36_000, $invoice->getAmountTtc()->getAmountCents());
     }
 
     public function testRemoveLineRecalculatesTotals(): void
@@ -138,7 +138,7 @@ final class InvoiceTest extends TestCase
 
         $invoice->removeLine($remove);
 
-        self::assertSame(10000, $invoice->getAmountHt()->getAmountCents());
+        static::assertSame(10_000, $invoice->getAmountHt()->getAmountCents());
     }
 
     public function testRemoveUnknownLineThrows(): void
@@ -159,13 +159,13 @@ final class InvoiceTest extends TestCase
         $dueDate = new DateTimeImmutable('2026-01-31');
         $invoice->issue($issuedAt, $dueDate);
 
-        self::assertSame(InvoiceStatus::SENT, $invoice->getStatus());
-        self::assertEquals($issuedAt, $invoice->getIssuedAt());
-        self::assertEquals($dueDate, $invoice->getDueDate());
+        static::assertSame(InvoiceStatus::SENT, $invoice->getStatus());
+        static::assertEquals($issuedAt, $invoice->getIssuedAt());
+        static::assertEquals($dueDate, $invoice->getDueDate());
 
         $events = $invoice->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(InvoiceIssuedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(InvoiceIssuedEvent::class, $events[0]);
     }
 
     public function testIssueWithoutLinesThrows(): void
@@ -201,12 +201,12 @@ final class InvoiceTest extends TestCase
         $paidAt = new DateTimeImmutable('2026-01-15');
         $invoice->markAsPaid($paidAt, Money::fromAmount(60.0));
 
-        self::assertSame(InvoiceStatus::PAID, $invoice->getStatus());
-        self::assertEquals($paidAt, $invoice->getPaidAt());
+        static::assertSame(InvoiceStatus::PAID, $invoice->getStatus());
+        static::assertEquals($paidAt, $invoice->getPaidAt());
 
         $events = $invoice->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(InvoicePaidEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(InvoicePaidEvent::class, $events[0]);
     }
 
     public function testMarkAsPaidWithZeroAmountThrows(): void
@@ -230,7 +230,7 @@ final class InvoiceTest extends TestCase
         $invoice = $this->issuedInvoice();
         $invoice->markAsOverdue();
 
-        self::assertSame(InvoiceStatus::OVERDUE, $invoice->getStatus());
+        static::assertSame(InvoiceStatus::OVERDUE, $invoice->getStatus());
     }
 
     public function testCannotMarkPaidAsOverdue(): void
@@ -249,10 +249,10 @@ final class InvoiceTest extends TestCase
 
         $invoice->cancel('client mistake');
 
-        self::assertSame(InvoiceStatus::CANCELLED, $invoice->getStatus());
+        static::assertSame(InvoiceStatus::CANCELLED, $invoice->getStatus());
         $events = $invoice->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(InvoiceCancelledEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(InvoiceCancelledEvent::class, $events[0]);
     }
 
     public function testCancelSentRecordsEvent(): void
@@ -260,7 +260,7 @@ final class InvoiceTest extends TestCase
         $invoice = $this->issuedInvoice();
         $invoice->cancel('client refund');
 
-        self::assertSame(InvoiceStatus::CANCELLED, $invoice->getStatus());
+        static::assertSame(InvoiceStatus::CANCELLED, $invoice->getStatus());
     }
 
     public function testCannotCancelPaidInvoice(): void
@@ -288,8 +288,8 @@ final class InvoiceTest extends TestCase
         $invoice->setNotes('Internal note');
         $invoice->setPaymentTerms('Net 30');
 
-        self::assertSame('Internal note', $invoice->getNotes());
-        self::assertSame('Net 30', $invoice->getPaymentTerms());
+        static::assertSame('Internal note', $invoice->getNotes());
+        static::assertSame('Net 30', $invoice->getPaymentTerms());
     }
 
     public function testCannotSetNotesAfterIssue(): void
@@ -309,14 +309,14 @@ final class InvoiceTest extends TestCase
             new DateTimeImmutable('-30 days'),
         );
 
-        self::assertTrue($invoice->isOverdue());
+        static::assertTrue($invoice->isOverdue());
     }
 
     public function testIsOverdueFalseWhenDueDateInFuture(): void
     {
         $invoice = $this->issuedInvoice(); // due date +30 days
 
-        self::assertFalse($invoice->isOverdue());
+        static::assertFalse($invoice->isOverdue());
     }
 
     public function testIsOverdueFalseWhenStatusPaid(): void
@@ -324,21 +324,21 @@ final class InvoiceTest extends TestCase
         $invoice = $this->issuedInvoice();
         $invoice->markAsPaid(new DateTimeImmutable(), Money::fromAmount(60.0));
 
-        self::assertFalse($invoice->isOverdue());
+        static::assertFalse($invoice->isOverdue());
     }
 
     public function testIsOverdueFalseWhenDraft(): void
     {
         $invoice = $this->newInvoice();
 
-        self::assertFalse($invoice->isOverdue());
+        static::assertFalse($invoice->isOverdue());
     }
 
     public function testGetDaysUntilDueNullWhenNoDate(): void
     {
         $invoice = $this->newInvoice();
 
-        self::assertNull($invoice->getDaysUntilDue());
+        static::assertNull($invoice->getDaysUntilDue());
     }
 
     public function testGetDaysUntilDueNegativeWhenPast(): void
@@ -350,7 +350,7 @@ final class InvoiceTest extends TestCase
             new DateTimeImmutable('-10 days'),
         );
 
-        self::assertLessThan(0, $invoice->getDaysUntilDue());
+        static::assertLessThan(0, $invoice->getDaysUntilDue());
     }
 
     public function testGettersExposeIdentitiesAndOrderProject(): void
@@ -364,12 +364,12 @@ final class InvoiceTest extends TestCase
             ProjectId::fromLegacyInt(11),
         );
 
-        self::assertSame(42, $invoice->getId()->toLegacyInt());
-        self::assertSame('F202601042', $invoice->getNumber()->getValue());
-        self::assertSame(1, $invoice->getCompanyId()->toLegacyInt());
-        self::assertSame(2, $invoice->getClientId()->toLegacyInt());
-        self::assertSame(7, $invoice->getOrderId()?->toLegacyInt());
-        self::assertSame(11, $invoice->getProjectId()?->toLegacyInt());
+        static::assertSame(42, $invoice->getId()->toLegacyInt());
+        static::assertSame('F202601042', $invoice->getNumber()->getValue());
+        static::assertSame(1, $invoice->getCompanyId()->toLegacyInt());
+        static::assertSame(2, $invoice->getClientId()->toLegacyInt());
+        static::assertSame(7, $invoice->getOrderId()?->toLegacyInt());
+        static::assertSame(11, $invoice->getProjectId()?->toLegacyInt());
     }
 
     private function newInvoice(): Invoice

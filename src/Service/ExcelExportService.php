@@ -57,7 +57,7 @@ class ExcelExportService
 
         $filename = sprintf('dashboard_analytics_%s_%s.xlsx', $startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
 
-        $response = new StreamedResponse(function () use ($writer): void {
+        $response = new StreamedResponse(static function () use ($writer): void {
             $writer->save('php://output');
         });
 
@@ -96,11 +96,13 @@ class ExcelExportService
             $sheet->setCellValue('A'.$row, 'Filtres actifs :');
             ++$row;
             foreach ($filters as $key => $value) {
-                if ($value !== null) {
-                    $sheet->setCellValue('A'.$row, '  - '.ucfirst((string) $key));
-                    $sheet->setCellValue('B'.$row, (string) $value);
-                    ++$row;
+                if ($value === null) {
+                    continue;
                 }
+
+                $sheet->setCellValue('A'.$row, '  - '.ucfirst((string) $key));
+                $sheet->setCellValue('B'.$row, (string) $value);
+                ++$row;
             }
         }
 

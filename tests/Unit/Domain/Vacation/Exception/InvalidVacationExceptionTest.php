@@ -14,15 +14,15 @@ final class InvalidVacationExceptionTest extends TestCase
     {
         $exception = InvalidVacationException::endDateBeforeStartDate();
 
-        self::assertInstanceOf(InvalidVacationException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
+        static::assertInstanceOf(InvalidVacationException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
     }
 
     public function testEndDateBeforeStartDateMessageFormat(): void
     {
         $exception = InvalidVacationException::endDateBeforeStartDate();
 
-        self::assertStringContainsString('End date', $exception->getMessage());
-        self::assertStringContainsString('start date', $exception->getMessage());
+        static::assertStringContainsString('End date', $exception->getMessage());
+        static::assertStringContainsString('start date', $exception->getMessage());
     }
 }

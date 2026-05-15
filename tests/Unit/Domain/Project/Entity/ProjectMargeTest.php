@@ -17,39 +17,39 @@ final class ProjectMargeTest extends TestCase
     {
         $project = $this->makeProject();
 
-        self::assertNull($project->getMargeAbsoluteCents());
-        self::assertNull($project->getMargePercent());
-        self::assertNull($project->getCoutTotal());
-        self::assertNull($project->getFactureTotal());
-        self::assertNull($project->getMargeCalculatedAt());
+        static::assertNull($project->getMargeAbsoluteCents());
+        static::assertNull($project->getMargePercent());
+        static::assertNull($project->getCoutTotal());
+        static::assertNull($project->getFactureTotal());
+        static::assertNull($project->getMargeCalculatedAt());
     }
 
     public function testSetMargeSnapshotPositiveMargin(): void
     {
         $project = $this->makeProject();
         $cout = Money::fromAmount(8000.00);
-        $facture = Money::fromAmount(10000.00);
+        $facture = Money::fromAmount(10_000.00);
 
         $project->setMargeSnapshot($cout, $facture);
 
-        self::assertSame(8000.0, $project->getCoutTotal()?->getAmount());
-        self::assertSame(10000.0, $project->getFactureTotal()?->getAmount());
-        self::assertSame(200000, $project->getMargeAbsoluteCents()); // 2000.00 €
-        self::assertSame(20.0, $project->getMargePercent());
-        self::assertNotNull($project->getMargeCalculatedAt());
+        static::assertSame(8000.0, $project->getCoutTotal()?->getAmount());
+        static::assertSame(10_000.0, $project->getFactureTotal()?->getAmount());
+        static::assertSame(200_000, $project->getMargeAbsoluteCents()); // 2000.00 €
+        static::assertSame(20.0, $project->getMargePercent());
+        static::assertNotNull($project->getMargeCalculatedAt());
     }
 
     public function testSetMargeSnapshotNegativeMargin(): void
     {
         $project = $this->makeProject();
-        $cout = Money::fromAmount(12000.00);
-        $facture = Money::fromAmount(10000.00);
+        $cout = Money::fromAmount(12_000.00);
+        $facture = Money::fromAmount(10_000.00);
 
         $project->setMargeSnapshot($cout, $facture);
 
         // marge = 10000 - 12000 = -2000 → cents = -200000 → percent = -20 %
-        self::assertSame(-200000, $project->getMargeAbsoluteCents());
-        self::assertSame(-20.0, $project->getMargePercent());
+        static::assertSame(-200_000, $project->getMargeAbsoluteCents());
+        static::assertSame(-20.0, $project->getMargePercent());
     }
 
     public function testGetMargePercentNullWhenFactureZero(): void
@@ -57,32 +57,32 @@ final class ProjectMargeTest extends TestCase
         $project = $this->makeProject();
         $project->setMargeSnapshot(Money::fromAmount(5000.00), Money::zero());
 
-        self::assertNull($project->getMargePercent());
+        static::assertNull($project->getMargePercent());
     }
 
     public function testHasMargeBelowThresholdTrueWhenBelow(): void
     {
         $project = $this->makeProject();
-        $project->setMargeSnapshot(Money::fromAmount(9300.00), Money::fromAmount(10000.00));
+        $project->setMargeSnapshot(Money::fromAmount(9300.00), Money::fromAmount(10_000.00));
 
         // marge = 700 / 10000 = 7 % < 10 %
-        self::assertTrue($project->hasMargeBelowThreshold(10.0));
+        static::assertTrue($project->hasMargeBelowThreshold(10.0));
     }
 
     public function testHasMargeBelowThresholdFalseWhenAbove(): void
     {
         $project = $this->makeProject();
-        $project->setMargeSnapshot(Money::fromAmount(8000.00), Money::fromAmount(10000.00));
+        $project->setMargeSnapshot(Money::fromAmount(8000.00), Money::fromAmount(10_000.00));
 
         // marge = 2000 / 10000 = 20 % > 10 %
-        self::assertFalse($project->hasMargeBelowThreshold(10.0));
+        static::assertFalse($project->hasMargeBelowThreshold(10.0));
     }
 
     public function testHasMargeBelowThresholdFalseBeforeSnapshot(): void
     {
         $project = $this->makeProject();
 
-        self::assertFalse($project->hasMargeBelowThreshold(10.0));
+        static::assertFalse($project->hasMargeBelowThreshold(10.0));
     }
 
     private function makeProject(): Project

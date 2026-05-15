@@ -53,7 +53,7 @@ final class OrderTaskFactory extends PersistentObjectFactory
     #[Override]
     public function initialize(): static
     {
-        return $this->afterInstantiate(function (OrderTask $task): void {
+        return $this->afterInstantiate(static function (OrderTask $task): void {
             // Re-apply setters to compute totalAmount via entity logic
             $task->setSoldDays($task->getSoldDays());
             $task->setSoldDailyRate($task->getSoldDailyRate());

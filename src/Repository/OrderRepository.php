@@ -482,10 +482,10 @@ class OrderRepository extends CompanyAwareRepository
         ?int $userId = null,
         ?string $userRole = null,
     ): array {
-        $currentStart = new DateTime("$currentYear-01-01");
-        $currentEnd = new DateTime("$currentYear-12-31");
-        $previousStart = new DateTime("$previousYear-01-01");
-        $previousEnd = new DateTime("$previousYear-12-31");
+        $currentStart = new DateTime("{$currentYear}-01-01");
+        $currentEnd = new DateTime("{$currentYear}-12-31");
+        $previousStart = new DateTime("{$previousYear}-01-01");
+        $previousEnd = new DateTime("{$previousYear}-12-31");
 
         return [
             'current' => [

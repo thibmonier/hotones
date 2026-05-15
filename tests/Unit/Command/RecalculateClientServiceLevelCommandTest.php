@@ -48,12 +48,12 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Recalcul des niveaux de service clients', $output);
-        $this->assertStringContainsString("Année de référence : {$currentYear}", $output);
-        $this->assertStringContainsString('15 client(s) en mode auto ont été mis à jour', $output);
+        static::assertStringContainsString('Recalcul des niveaux de service clients', $output);
+        static::assertStringContainsString("Année de référence : {$currentYear}", $output);
+        static::assertStringContainsString('15 client(s) en mode auto ont été mis à jour', $output);
     }
 
     public function testExecuteWithCustomYear(): void
@@ -78,10 +78,10 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             '--year' => (string) $customYear,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString("Année de référence : {$customYear}", $output);
+        static::assertStringContainsString("Année de référence : {$customYear}", $output);
     }
 
     public function testExecuteDisplaysConfiguration(): void
@@ -89,7 +89,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $config = [
             'top_vip_rank' => 3,
             'top_priority_rank' => 15,
-            'low_threshold' => 10000,
+            'low_threshold' => 10_000,
         ];
 
         $this->calculator->expects($this->once())->method('getConfiguration')->willReturn($config);
@@ -99,11 +99,11 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         $this->commandTester->execute([]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Configuration', $output);
-        $this->assertStringContainsString('Top 3 clients → VIP', $output);
-        $this->assertStringContainsString('Top 15 clients → Prioritaire', $output);
-        $this->assertStringContainsString('CA < 10000€ → Basse priorité', $output);
-        $this->assertStringContainsString('Autres → Standard', $output);
+        static::assertStringContainsString('Configuration', $output);
+        static::assertStringContainsString('Top 3 clients → VIP', $output);
+        static::assertStringContainsString('Top 15 clients → Prioritaire', $output);
+        static::assertStringContainsString('CA < 10000€ → Basse priorité', $output);
+        static::assertStringContainsString('Autres → Standard', $output);
     }
 
     public function testExecuteDisplaysCorrectCount(): void
@@ -135,7 +135,7 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
             $tester->execute([]);
             $output = $tester->getDisplay();
 
-            $this->assertStringContainsString("{$count} client(s) en mode auto ont été mis à jour", $output);
+            static::assertStringContainsString("{$count} client(s) en mode auto ont été mis à jour", $output);
         }
     }
 
@@ -153,8 +153,8 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertEquals(0, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertSame(0, $exitCode);
     }
 
     public function testExecuteCallsCalculatorMethods(): void
@@ -177,12 +177,12 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
     {
         $definition = $this->command->getDefinition();
 
-        $this->assertTrue($definition->hasOption('year'));
-        $this->assertTrue($definition->hasShortcut('y'));
+        static::assertTrue($definition->hasOption('year'));
+        static::assertTrue($definition->hasShortcut('y'));
 
         $option = $definition->getOption('year');
-        $this->assertFalse($option->isValueRequired());
-        $this->assertEquals(date('Y'), $option->getDefault());
+        static::assertFalse($option->isValueRequired());
+        static::assertEquals(date('Y'), $option->getDefault());
     }
 
     public function testExecuteWithYearShortOption(): void
@@ -208,6 +208,6 @@ class RecalculateClientServiceLevelCommandTest extends TestCase
         ]);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString("Année de référence : {$customYear}", $output);
+        static::assertStringContainsString("Année de référence : {$customYear}", $output);
     }
 }

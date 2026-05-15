@@ -33,18 +33,18 @@ class ImportTheTribeStaffingCommand extends Command
      * Source: feuille "TJM CF 3 tribus".
      */
     private const array ANNUAL_SALARIES = [
-        1 => 15000,
-        2 => 34000,
-        3 => 36000,
-        4 => 38000,
-        5 => 40000,
-        6 => 42000,
-        7 => 45000,
-        8 => 47500,
-        9 => 50000,
-        10 => 55000,
-        11 => 60000,
-        12 => 65000,
+        1 => 15_000,
+        2 => 34_000,
+        3 => 36_000,
+        4 => 38_000,
+        5 => 40_000,
+        6 => 42_000,
+        7 => 45_000,
+        8 => 47_500,
+        9 => 50_000,
+        10 => 55_000,
+        11 => 60_000,
+        12 => 65_000,
     ];
 
     /**
@@ -645,11 +645,13 @@ class ImportTheTribeStaffingCommand extends Command
         ];
 
         foreach ($variants as $variant) {
-            if (isset($this->technologyCache[$variant])) {
-                $this->technologyCache[$key] = $this->technologyCache[$variant];
-
-                return $this->technologyCache[$variant];
+            if (!(isset($this->technologyCache[$variant]))) {
+                continue;
             }
+
+            $this->technologyCache[$key] = $this->technologyCache[$variant];
+
+            return $this->technologyCache[$variant];
         }
 
         // Créer la technologie si elle n'existe pas

@@ -90,9 +90,11 @@ class NotificationSettingRepository extends CompanyAwareRepository
         ];
 
         foreach ($defaults as $key => $value) {
-            if ($this->findOneBy(['settingKey' => $key]) === null) {
-                $this->setValue($key, $value);
+            if ($this->findOneBy(['settingKey' => $key]) !== null) {
+                continue;
             }
+
+            $this->setValue($key, $value);
         }
     }
 }

@@ -29,7 +29,7 @@ class DependentFieldsController extends AbstractController
     {
         $projects = $projectRepository->findBy(['client' => $id, 'status' => 'active'], ['name' => 'ASC']);
 
-        $data = array_map(fn ($project): array => [
+        $data = array_map(static fn ($project): array => [
             'id' => $project->getId(),
             'name' => $project->getName(),
         ], $projects);
@@ -47,7 +47,7 @@ class DependentFieldsController extends AbstractController
     {
         $tasks = $taskRepository->findBy(['project' => $id, 'active' => true], ['position' => 'ASC']);
 
-        $data = array_map(fn ($task): array => [
+        $data = array_map(static fn ($task): array => [
             'id' => $task->getId(),
             'name' => $task->getName(),
             'description' => $task->getDescription(),
@@ -66,7 +66,7 @@ class DependentFieldsController extends AbstractController
     {
         $subTasks = $subTaskRepository->findBy(['task' => $id], ['position' => 'ASC']);
 
-        $data = array_map(fn ($subTask): array => [
+        $data = array_map(static fn ($subTask): array => [
             'id' => $subTask->getId(),
             'name' => $subTask->getTitle(),
         ], $subTasks);

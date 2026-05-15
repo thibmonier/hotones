@@ -13,9 +13,9 @@ final class ProjectIdLegacyTest extends TestCase
     public function testFromLegacyIntWrapsValue(): void
     {
         $id = ProjectId::fromLegacyInt(42);
-        $this->assertSame('legacy:42', $id->value());
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->value());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testFromLegacyIntRejectsZero(): void
@@ -26,7 +26,7 @@ final class ProjectIdLegacyTest extends TestCase
 
     public function testIsLegacyFalseForUuid(): void
     {
-        $this->assertFalse(ProjectId::generate()->isLegacy());
+        static::assertFalse(ProjectId::generate()->isLegacy());
     }
 
     public function testToLegacyIntRejectsUuid(): void
@@ -38,7 +38,7 @@ final class ProjectIdLegacyTest extends TestCase
     public function testFromStringAcceptsLegacy(): void
     {
         $id = ProjectId::fromString('legacy:99');
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(99, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(99, $id->toLegacyInt());
     }
 }

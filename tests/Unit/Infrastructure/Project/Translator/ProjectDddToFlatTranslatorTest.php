@@ -40,8 +40,8 @@ final class ProjectDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, null);
 
-        $this->assertSame('Acme Project', $flat->name);
-        $this->assertSame('active', $flat->status); // DRAFT collapses to active
+        static::assertSame('Acme Project', $flat->name);
+        static::assertSame('active', $flat->status); // DRAFT collapses to active
     }
 
     public function testStatusMappingCompleted(): void
@@ -52,7 +52,7 @@ final class ProjectDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, null);
 
-        $this->assertSame('completed', $flat->status);
+        static::assertSame('completed', $flat->status);
     }
 
     public function testStatusMappingCancelled(): void
@@ -63,7 +63,7 @@ final class ProjectDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, null);
 
-        $this->assertSame('cancelled', $flat->status);
+        static::assertSame('cancelled', $flat->status);
     }
 
     public function testStatusOnHoldCollapsesToActive(): void
@@ -74,6 +74,6 @@ final class ProjectDddToFlatTranslatorTest extends TestCase
 
         $translator->applyTo($ddd, $flat, null);
 
-        $this->assertSame('active', $flat->status);
+        static::assertSame('active', $flat->status);
     }
 }

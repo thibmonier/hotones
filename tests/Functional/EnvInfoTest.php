@@ -11,6 +11,6 @@ class EnvInfoTest extends KernelTestCase
     public function testEnvNameOnly(): void
     {
         self::bootKernel();
-        $this->assertSame('test', self::$kernel->getEnvironment());
+        static::assertSame('test', self::$kernel->getEnvironment());
     }
 }

@@ -12,6 +12,7 @@ use function count;
 use Exception;
 use OpenAI;
 use RuntimeException;
+use SensitiveParameter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,9 +29,9 @@ class PlanningAIAssistant
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-        ?string $openaiApiKey = null,
-        ?string $anthropicApiKey = null,
-        ?string $geminiApiKey = null,
+        #[SensitiveParameter] ?string $openaiApiKey = null,
+        #[SensitiveParameter] ?string $anthropicApiKey = null,
+        #[SensitiveParameter] ?string $geminiApiKey = null,
     ) {
         // Déterminer quel provider est disponible (ordre de priorité)
         if ($anthropicApiKey !== null && $anthropicApiKey !== '') {
@@ -130,14 +131,16 @@ class PlanningAIAssistant
 
         $prompt .= "\n## Contributeurs en surcharge critique:\n";
         foreach ($analysis['critical'] ?? [] as $item) {
-            if ($item['status'] === 'critical_high') {
-                $prompt .= sprintf(
-                    "- %s (TACE: %.1f%%, Écart: %+.1f points)\n",
-                    $item['contributor']->getFullName(),
-                    $item['tace'],
-                    $item['deviation'],
-                );
+            if ($item['status'] !== 'critical_high') {
+                continue;
             }
+
+            $prompt .= sprintf(
+                "- %s (TACE: %.1f%%, Écart: %+.1f points)\n",
+                $item['contributor']->getFullName(),
+                $item['tace'],
+                $item['deviation'],
+            );
         }
 
         $prompt .= "\n## Contributeurs sous-utilisés:\n";
@@ -246,9 +249,11 @@ class PlanningAIAssistant
         // Extraire le contenu textuel de la réponse
         $content = '';
         foreach ($response->content as $block) {
-            if ($block->type === 'text') {
-                $content .= $block->text;
+            if ($block->type !== 'text') {
+                continue;
             }
+
+            $content .= $block->text;
         }
 
         // Parser la réponse JSON

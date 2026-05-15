@@ -37,8 +37,8 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $ddd = $repo->findById(ClientId::fromLegacyInt(42));
 
-        $this->assertSame(42, $ddd->getId()->toLegacyInt());
-        $this->assertSame('Acme', $ddd->getName()->getValue());
+        static::assertSame(42, $ddd->getId()->toLegacyInt());
+        static::assertSame('Acme', $ddd->getName()->getValue());
     }
 
     public function testFindByIdThrowsWhenNotFound(): void
@@ -58,7 +58,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $result = $repo->findByIdOrNull(ClientId::generate());
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testFindByIdOrNullReturnsNullWhenFlatMissing(): void
@@ -68,14 +68,14 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertNull($repo->findByIdOrNull(ClientId::fromLegacyInt(99)));
+        static::assertNull($repo->findByIdOrNull(ClientId::fromLegacyInt(99)));
     }
 
     public function testFindByEmailAlwaysReturnsNullPhase2(): void
     {
         $repo = $this->makeRepo();
 
-        $this->assertNull($repo->findByEmail(Email::fromString('test@example.com')));
+        static::assertNull($repo->findByEmail(Email::fromString('test@example.com')));
     }
 
     public function testFindAllTranslatesAllFlatClients(): void
@@ -90,9 +90,9 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $clients = $repo->findAll();
 
-        $this->assertCount(2, $clients);
-        $this->assertSame(1, $clients[0]->getId()->toLegacyInt());
-        $this->assertSame(2, $clients[1]->getId()->toLegacyInt());
+        static::assertCount(2, $clients);
+        static::assertSame(1, $clients[0]->getId()->toLegacyInt());
+        static::assertSame(2, $clients[1]->getId()->toLegacyInt());
     }
 
     public function testFindActiveDelegatesToFindAll(): void
@@ -104,7 +104,7 @@ final class DoctrineDddClientRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertCount(1, $repo->findActive());
+        static::assertCount(1, $repo->findActive());
     }
 
     public function testSaveExistingLegacyClient(): void

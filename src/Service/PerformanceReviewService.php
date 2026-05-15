@@ -227,12 +227,10 @@ class PerformanceReviewService
     {
         // This is a simplified version - implement based on your hierarchy
         // For now, return a default admin user or null
-        $user = $contributor->getUser();
-
         // You could implement a hierarchy field on Contributor or User entity
         // For example: $contributor->getManager() or $user->getManager()
 
-        return $user; // Placeholder - adjust based on your actual hierarchy
+        return $contributor->getUser(); // Placeholder - adjust based on your actual hierarchy
     }
 
     /**

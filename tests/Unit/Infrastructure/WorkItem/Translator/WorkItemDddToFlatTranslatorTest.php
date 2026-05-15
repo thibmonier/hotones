@@ -35,8 +35,8 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
 
         new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
-        self::assertSame('8', $flat->hours);
-        self::assertSame('synced notes', $flat->notes);
+        static::assertSame('8', $flat->hours);
+        static::assertSame('synced notes', $flat->notes);
     }
 
     public function testApplyToWithNullNotesClears(): void
@@ -49,7 +49,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
 
         new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
-        self::assertNull($flat->notes);
+        static::assertNull($flat->notes);
     }
 
     public function testApplyToDoesNotTouchStructuralFields(): void
@@ -67,10 +67,10 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
 
         new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
-        self::assertSame($originalId, $flat->getId());
-        self::assertSame($originalContributorId, $flat->contributor->getId());
-        self::assertSame($originalProjectId, $flat->project->getId());
-        self::assertSame($originalDate, $flat->date);
+        static::assertSame($originalId, $flat->getId());
+        static::assertSame($originalContributorId, $flat->contributor->getId());
+        static::assertSame($originalProjectId, $flat->project->getId());
+        static::assertSame($originalDate, $flat->date);
     }
 
     public function testApplyToReviseHoursPropagates(): void
@@ -84,7 +84,7 @@ final class WorkItemDddToFlatTranslatorTest extends TestCase
 
         new WorkItemDddToFlatTranslator()->applyTo($ddd, $flat);
 
-        self::assertSame('8', $flat->hours);
+        static::assertSame('8', $flat->hours);
     }
 
     private function makeWorkItem(float $hours = 7.5): DddWorkItem

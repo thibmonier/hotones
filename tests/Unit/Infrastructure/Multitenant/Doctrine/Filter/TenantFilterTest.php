@@ -53,7 +53,7 @@ final class TenantFilterTest extends TestCase
 
         $constraint = $filter->addFilterConstraint($metadata, 't');
 
-        $this->assertSame('', $constraint);
+        static::assertSame('', $constraint);
     }
 
     public function testConstraintForTenantAwareEntityWithDefaultColumn(): void
@@ -67,7 +67,7 @@ final class TenantFilterTest extends TestCase
 
         $constraint = $filter->addFilterConstraint($metadata, 'p');
 
-        $this->assertSame("p.company_id = '42'", $constraint);
+        static::assertSame("p.company_id = '42'", $constraint);
     }
 
     public function testConstraintUsesCustomAlias(): void
@@ -81,12 +81,12 @@ final class TenantFilterTest extends TestCase
 
         $constraint = $filter->addFilterConstraint($metadata, 'order_alias');
 
-        $this->assertSame("order_alias.company_id = '7'", $constraint);
+        static::assertSame("order_alias.company_id = '7'", $constraint);
     }
 
     public function testConstraintHandlesLargeTenantIds(): void
     {
-        $filter = $this->makeFilter(987654321);
+        $filter = $this->makeFilter(987_654_321);
 
         $tenantAwareEntity = new class implements TenantAwareInterface {};
 
@@ -95,7 +95,7 @@ final class TenantFilterTest extends TestCase
 
         $constraint = $filter->addFilterConstraint($metadata, 't');
 
-        $this->assertSame("t.company_id = '987654321'", $constraint);
+        static::assertSame("t.company_id = '987654321'", $constraint);
     }
 
     public function testLegacyCompanyOwnedInterfaceTriggersFilter(): void
@@ -122,6 +122,6 @@ final class TenantFilterTest extends TestCase
 
         $constraint = $filter->addFilterConstraint($metadata, 'l');
 
-        $this->assertSame("l.company_id = '11'", $constraint);
+        static::assertSame("l.company_id = '11'", $constraint);
     }
 }

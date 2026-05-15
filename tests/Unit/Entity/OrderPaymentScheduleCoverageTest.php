@@ -61,8 +61,8 @@ class OrderPaymentScheduleCoverageTest extends TestCase
         $order->addPaymentSchedule($s2);
 
         [$ok, $scheduled] = $order->validatePaymentScheduleCoverage();
-        $this->assertTrue($ok);
-        $this->assertSame('5000.00', $scheduled);
+        static::assertTrue($ok);
+        static::assertSame('5000.00', $scheduled);
     }
 
     public function testCoverageIsInvalidWhenNot100Percent(): void
@@ -78,8 +78,8 @@ class OrderPaymentScheduleCoverageTest extends TestCase
         $order->addPaymentSchedule($s1);
 
         [$ok, $scheduled] = $order->validatePaymentScheduleCoverage();
-        $this->assertFalse($ok);
-        $this->assertSame('2000.00', $scheduled);
+        static::assertFalse($ok);
+        static::assertSame('2000.00', $scheduled);
     }
 
     public function testCoverageWithFixedAmounts(): void
@@ -101,7 +101,7 @@ class OrderPaymentScheduleCoverageTest extends TestCase
         $order->addPaymentSchedule($s2);
 
         [$ok, $scheduled] = $order->validatePaymentScheduleCoverage();
-        $this->assertTrue($ok);
-        $this->assertSame('3000.00', $scheduled);
+        static::assertTrue($ok);
+        static::assertSame('3000.00', $scheduled);
     }
 }

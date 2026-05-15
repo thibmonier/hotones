@@ -49,13 +49,13 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(2, $result);
-        $this->assertEquals('2023-01-15', $result[0]['date']->format('Y-m-d'));
-        $this->assertEquals('First payment', $result[0]['label']);
-        $this->assertEquals('forfait', $result[0]['type']);
-        $this->assertEquals('2023-02-15', $result[1]['date']->format('Y-m-d'));
-        $this->assertEquals('Second payment', $result[1]['label']);
-        $this->assertEquals('forfait', $result[1]['type']);
+        static::assertCount(2, $result);
+        static::assertSame('2023-01-15', $result[0]['date']->format('Y-m-d'));
+        static::assertSame('First payment', $result[0]['label']);
+        static::assertSame('forfait', $result[0]['type']);
+        static::assertSame('2023-02-15', $result[1]['date']->format('Y-m-d'));
+        static::assertSame('Second payment', $result[1]['label']);
+        static::assertSame('forfait', $result[1]['type']);
     }
 
     public function testBuildProjectBillingRecapWithRegieOrder(): void
@@ -77,15 +77,15 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(2, $result);
-        $this->assertEquals('2023-01-01', $result[0]['date']->format('Y-m-d'));
-        $this->assertEquals('Régie 01/2023', $result[0]['label']);
-        $this->assertEquals(5000.00, $result[0]['amount']);
-        $this->assertEquals('regie', $result[0]['type']);
-        $this->assertEquals('2023-02-01', $result[1]['date']->format('Y-m-d'));
-        $this->assertEquals('Régie 02/2023', $result[1]['label']);
-        $this->assertEquals(7500.00, $result[1]['amount']);
-        $this->assertEquals('regie', $result[1]['type']);
+        static::assertCount(2, $result);
+        static::assertSame('2023-01-01', $result[0]['date']->format('Y-m-d'));
+        static::assertSame('Régie 01/2023', $result[0]['label']);
+        static::assertSame(5000.00, $result[0]['amount']);
+        static::assertSame('regie', $result[0]['type']);
+        static::assertSame('2023-02-01', $result[1]['date']->format('Y-m-d'));
+        static::assertSame('Régie 02/2023', $result[1]['label']);
+        static::assertSame(7500.00, $result[1]['amount']);
+        static::assertSame('regie', $result[1]['type']);
     }
 
     public function testBuildProjectBillingRecapWithMixedOrders(): void
@@ -120,11 +120,11 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(2, $result);
-        $this->assertEquals('2023-01-15', $result[0]['date']->format('Y-m-d'));
-        $this->assertEquals('forfait', $result[0]['type']);
-        $this->assertEquals('2023-02-01', $result[1]['date']->format('Y-m-d'));
-        $this->assertEquals('regie', $result[1]['type']);
+        static::assertCount(2, $result);
+        static::assertSame('2023-01-15', $result[0]['date']->format('Y-m-d'));
+        static::assertSame('forfait', $result[0]['type']);
+        static::assertSame('2023-02-01', $result[1]['date']->format('Y-m-d'));
+        static::assertSame('regie', $result[1]['type']);
     }
 
     public function testBuildProjectBillingRecapEmptyProject(): void
@@ -133,7 +133,7 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertEmpty($result);
+        static::assertEmpty($result);
     }
 
     public function testBuildProjectBillingRecapSortingByDate(): void
@@ -164,10 +164,10 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(3, $result);
-        $this->assertEquals('2023-01-15', $result[0]['date']->format('Y-m-d'));
-        $this->assertEquals('2023-02-15', $result[1]['date']->format('Y-m-d'));
-        $this->assertEquals('2023-03-15', $result[2]['date']->format('Y-m-d'));
+        static::assertCount(3, $result);
+        static::assertSame('2023-01-15', $result[0]['date']->format('Y-m-d'));
+        static::assertSame('2023-02-15', $result[1]['date']->format('Y-m-d'));
+        static::assertSame('2023-03-15', $result[2]['date']->format('Y-m-d'));
     }
 
     public function testBuildProjectBillingRecapWithEmptyScheduleLabel(): void
@@ -187,8 +187,8 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(1, $result);
-        $this->assertEquals('Échéance', $result[0]['label']); // Should default to 'Échéance'
+        static::assertCount(1, $result);
+        static::assertSame('Échéance', $result[0]['label']); // Should default to 'Échéance'
     }
 
     public function testBuildProjectBillingRecapWithNullRevenue(): void
@@ -209,8 +209,8 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(1, $result);
-        $this->assertEquals(0.0, $result[0]['amount']); // Null revenue becomes 0.0
+        static::assertCount(1, $result);
+        static::assertSame(0.0, $result[0]['amount']); // Null revenue becomes 0.0
     }
 
     public function testBuildProjectBillingRecapWithEmptyTimesheetData(): void
@@ -227,7 +227,7 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertEmpty($result);
+        static::assertEmpty($result);
     }
 
     public function testBuildProjectBillingRecapArrayStructure(): void
@@ -247,21 +247,21 @@ class BillingServiceTest extends TestCase
 
         $result = $this->billingService->buildProjectBillingRecap($project);
 
-        $this->assertCount(1, $result);
+        static::assertCount(1, $result);
 
         // Verify exact array structure
         $entry = $result[0];
-        $this->assertArrayHasKey('date', $entry);
-        $this->assertArrayHasKey('label', $entry);
-        $this->assertArrayHasKey('amount', $entry);
-        $this->assertArrayHasKey('type', $entry);
-        $this->assertArrayHasKey('order', $entry);
+        static::assertArrayHasKey('date', $entry);
+        static::assertArrayHasKey('label', $entry);
+        static::assertArrayHasKey('amount', $entry);
+        static::assertArrayHasKey('type', $entry);
+        static::assertArrayHasKey('order', $entry);
 
         // Verify types
-        $this->assertInstanceOf(DateTimeInterface::class, $entry['date']);
-        $this->assertIsString($entry['label']);
-        $this->assertIsFloat($entry['amount']);
-        $this->assertEquals('forfait', $entry['type']);
-        $this->assertSame($order, $entry['order']);
+        static::assertInstanceOf(DateTimeInterface::class, $entry['date']);
+        static::assertIsString($entry['label']);
+        static::assertIsFloat($entry['amount']);
+        static::assertSame('forfait', $entry['type']);
+        static::assertSame($order, $entry['order']);
     }
 }

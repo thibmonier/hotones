@@ -276,7 +276,7 @@ class ProjectRiskAnalyzer
         $now = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
-        $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
+        $recentTimesheets = $timesheets->filter(static fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
 
         if ($recentTimesheets->count() === 0) {
             return [
@@ -366,7 +366,7 @@ class ProjectRiskAnalyzer
         }
 
         // Trier par score de santé croissant (les plus à risque en premier)
-        usort($atRiskProjects, fn ($a, $b): int => $a['analysis']['healthScore'] <=> $b['analysis']['healthScore']);
+        usort($atRiskProjects, static fn ($a, $b): int => $a['analysis']['healthScore'] <=> $b['analysis']['healthScore']);
 
         return $atRiskProjects;
     }
@@ -528,7 +528,7 @@ class ProjectRiskAnalyzer
         $now = new DateTime();
         $twoWeeksAgo = (clone $now)->modify('-14 days');
 
-        $recentTimesheets = $timesheets->filter(fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
+        $recentTimesheets = $timesheets->filter(static fn ($timesheet): bool => $timesheet->getDate() >= $twoWeeksAgo);
 
         if ($project->getStatus() === 'in_progress' && $recentTimesheets->count() === 0) {
             return 50; // No recent activity

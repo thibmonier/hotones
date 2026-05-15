@@ -147,7 +147,7 @@ class GenerateForecastTestDataCommand extends Command
                 $project->setProjectType($projectType);
 
                 // Montant CA (variation réaliste entre 10k et 150k)
-                $baseAmount = random_int(10000, 150000);
+                $baseAmount = random_int(10_000, 150_000);
                 // Arrondir aux 5000€
                 $soldAmount = round($baseAmount / 5000) * 5000;
 

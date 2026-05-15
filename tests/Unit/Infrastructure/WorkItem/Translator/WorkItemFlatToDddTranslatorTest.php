@@ -28,15 +28,15 @@ final class WorkItemFlatToDddTranslatorTest extends TestCase
 
         $workItem = $translator->translate($flat);
 
-        self::assertSame('legacy:42', $workItem->getId()->getValue());
-        self::assertSame(11, $workItem->getProjectId()->toLegacyInt());
-        self::assertSame(7, $workItem->getContributorId()->toLegacyInt());
-        self::assertNull($workItem->getTaskId(), 'task=NULL → DDD taskId null (ADR-0015 Q1)');
-        self::assertSame(7.5, $workItem->getHours()->getValue());
+        static::assertSame('legacy:42', $workItem->getId()->getValue());
+        static::assertSame(11, $workItem->getProjectId()->toLegacyInt());
+        static::assertSame(7, $workItem->getContributorId()->toLegacyInt());
+        static::assertNull($workItem->getTaskId(), 'task=NULL → DDD taskId null (ADR-0015 Q1)');
+        static::assertSame(7.5, $workItem->getHours()->getValue());
         // costRate 400/8 = 50, 7.5h × 50 = 375 EUR = 37500 cents
-        self::assertSame(37500, $workItem->cost()->getAmountCents());
+        static::assertSame(37_500, $workItem->cost()->getAmountCents());
         // billedRate 800/8 = 100, 7.5h × 100 = 750 EUR
-        self::assertSame(75000, $workItem->revenue()->getAmountCents());
+        static::assertSame(75_000, $workItem->revenue()->getAmountCents());
     }
 
     public function testTranslateWithTask(): void
@@ -46,8 +46,8 @@ final class WorkItemFlatToDddTranslatorTest extends TestCase
 
         $workItem = $translator->translate($flat);
 
-        self::assertNotNull($workItem->getTaskId());
-        self::assertSame(33, $workItem->getTaskId()->toLegacyInt());
+        static::assertNotNull($workItem->getTaskId());
+        static::assertSame(33, $workItem->getTaskId()->toLegacyInt());
     }
 
     public function testTranslatePreservesNotes(): void
@@ -57,7 +57,7 @@ final class WorkItemFlatToDddTranslatorTest extends TestCase
 
         $workItem = $translator->translate($flat);
 
-        self::assertSame('client X meeting', $workItem->getNotes());
+        static::assertSame('client X meeting', $workItem->getNotes());
     }
 
     public function testTranslateUnsavedTimesheetThrows(): void

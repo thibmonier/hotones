@@ -34,8 +34,8 @@ final class UpdateProjectUseCaseTest extends TestCase
         $repo
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(
-                fn (Project $p): bool => $p->getName() === 'New Name' && $p->getDescription() === 'New description',
+            ->with(static::callback(
+                static fn (Project $p): bool => $p->getName() === 'New Name' && $p->getDescription() === 'New description',
             ));
 
         $useCase = new UpdateProjectUseCase($repo);
@@ -52,7 +52,7 @@ final class UpdateProjectUseCaseTest extends TestCase
         $useCase = new UpdateProjectUseCase($repo);
         $useCase->execute(new UpdateProjectCommand(projectId: 1, name: 'X', status: 'active'));
 
-        $this->assertSame(ProjectStatus::ACTIVE, $existing->getStatus());
+        static::assertSame(ProjectStatus::ACTIVE, $existing->getStatus());
     }
 
     public function testInvalidStatusRejected(): void
