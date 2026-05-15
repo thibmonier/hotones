@@ -110,6 +110,11 @@ final class ComputeBillingLeadTimeKpiHandlerTest extends TestCase
             {
                 return $this->records;
             }
+
+            public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+            {
+                return [];
+            }
         };
     }
 

@@ -53,6 +53,11 @@
                     Formule : Σ(date_paiement − date_émission) × montant_payé / Σ(montant_payé).
                     Factures impayées exclues. Cache 1 h (invalidé sur paiement).
                 </p>
+
+                <a href="{{ path('admin_business_dashboard_drill_down', {kpi: 'dso', window: 30}) }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    📊 Drill-down par client →
+                </a>
             </div>
         </div>
     </div>

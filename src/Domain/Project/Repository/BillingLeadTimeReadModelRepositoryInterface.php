@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Project\Repository;
 
+use App\Domain\Project\Service\ClientBillingLeadTimeAggregate;
 use App\Domain\Project\Service\QuoteInvoiceRecord;
 use DateTimeImmutable;
 
@@ -31,4 +32,15 @@ interface BillingLeadTimeReadModelRepositoryInterface
      * @return list<QuoteInvoiceRecord>
      */
     public function findEmittedInRollingWindow(int $windowDays, DateTimeImmutable $now): array;
+
+    /**
+     * Find billing lead time aggregated by client within the rolling window
+     * (US-116 drill-down).
+     *
+     * Retourne pour chaque client le lead time moyen + le nombre de devis
+     * convertis facturés sur la fenêtre. Tri valeur décroissante.
+     *
+     * @return list<ClientBillingLeadTimeAggregate>
+     */
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array;
 }

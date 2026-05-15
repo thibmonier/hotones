@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Project\Persistence\Doctrine;
 
 use App\Domain\Project\Repository\BillingLeadTimeReadModelRepositoryInterface;
+use App\Domain\Project\Service\ClientBillingLeadTimeAggregate;
 use App\Domain\Project\Service\QuoteInvoiceRecord;
 use App\Entity\Invoice;
 use App\Security\CompanyContext;
@@ -76,6 +77,41 @@ final readonly class DoctrineBillingLeadTimeReadModelRepository implements Billi
         }
 
         return $records;
+    }
+
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+    {
+        // Réutilise la query records + agrège côté PHP (lead time moyen par client).
+        $records = $this->findEmittedInRollingWindow($windowDays, $now);
+
+        $perClient = [];
+        foreach ($records as $record) {
+            $leadTimeDays = ($record->emittedAt->getTimestamp() - $record->signedAt->getTimestamp()) / 86400;
+            $name = $record->clientName;
+
+            if (!isset($perClient[$name])) {
+                $perClient[$name] = ['leadTimeSum' => 0.0, 'count' => 0];
+            }
+
+            $perClient[$name]['leadTimeSum'] += $leadTimeDays;
+            ++$perClient[$name]['count'];
+        }
+
+        $aggregates = [];
+        foreach ($perClient as $name => $stats) {
+            // count est >= 1 par construction (incrémenté avant chaque assignation perClient).
+            $average = $stats['leadTimeSum'] / $stats['count'];
+            $aggregates[] = new ClientBillingLeadTimeAggregate(
+                clientName: (string) $name,
+                leadTimeAverageDays: round($average, 1),
+                sampleCount: $stats['count'],
+            );
+        }
+
+        // Tri valeur décroissante (clients lents en tête)
+        usort($aggregates, static fn (ClientBillingLeadTimeAggregate $a, ClientBillingLeadTimeAggregate $b): int => $b->leadTimeAverageDays <=> $a->leadTimeAverageDays);
+
+        return $aggregates;
     }
 
     private static function toImmutable(DateTimeInterface $date): DateTimeImmutable
