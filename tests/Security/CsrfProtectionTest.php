@@ -22,7 +22,7 @@ class CsrfProtectionTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Test user not found. Run fixtures first.');
+            static::markTestSkipped('Test user not found. Run fixtures first.');
 
             return;
         }
@@ -38,7 +38,7 @@ class CsrfProtectionTest extends WebTestCase
         ]);
 
         // Devrait être rejeté (403 ou redirection avec erreur)
-        $this->assertNotSame(
+        static::assertNotSame(
             Response::HTTP_OK,
             $client->getResponse()->getStatusCode(),
             'Form submission without CSRF token should be denied',
@@ -54,7 +54,7 @@ class CsrfProtectionTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'admin@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Admin user not found. Run fixtures first.');
+            static::markTestSkipped('Admin user not found. Run fixtures first.');
 
             return;
         }
@@ -68,7 +68,7 @@ class CsrfProtectionTest extends WebTestCase
 
         // Devrait être rejeté
         $response = $client->getResponse();
-        $this->assertTrue(
+        static::assertTrue(
             $response->isRedirection() || $response->getStatusCode() === Response::HTTP_FORBIDDEN,
             'Delete action with invalid CSRF token should be denied',
         );
@@ -83,7 +83,7 @@ class CsrfProtectionTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Test user not found. Run fixtures first.');
+            static::markTestSkipped('Test user not found. Run fixtures first.');
 
             return;
         }
@@ -94,7 +94,7 @@ class CsrfProtectionTest extends WebTestCase
         $crawler = $client->request('GET', '/projects/new');
 
         if (!$client->getResponse()->isSuccessful()) {
-            $this->markTestSkipped('Cannot access project creation form');
+            static::markTestSkipped('Cannot access project creation form');
 
             return;
         }
@@ -102,6 +102,6 @@ class CsrfProtectionTest extends WebTestCase
         // Vérifier que le token CSRF est présent
         $csrfToken = $crawler->filter('input[name="_token"], input[name*="[_token]"]');
 
-        $this->assertGreaterThan(0, $csrfToken->count(), 'CSRF token should be present in forms');
+        static::assertGreaterThan(0, $csrfToken->count(), 'CSRF token should be present in forms');
     }
 }

@@ -15,9 +15,9 @@ final class InvalidInvoiceExceptionTest extends TestCase
     {
         $exception = InvalidInvoiceException::emptyLines();
 
-        self::assertInstanceOf(InvalidInvoiceException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
-        self::assertStringContainsString('line item', $exception->getMessage());
+        static::assertInstanceOf(InvalidInvoiceException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
+        static::assertStringContainsString('line item', $exception->getMessage());
     }
 
     public function testInvalidStatusTransitionFactory(): void
@@ -27,46 +27,46 @@ final class InvalidInvoiceExceptionTest extends TestCase
             InvoiceStatus::DRAFT,
         );
 
-        self::assertInstanceOf(InvalidInvoiceException::class, $exception);
-        self::assertStringContainsString('Cannot transition', $exception->getMessage());
+        static::assertInstanceOf(InvalidInvoiceException::class, $exception);
+        static::assertStringContainsString('Cannot transition', $exception->getMessage());
     }
 
     public function testCannotModifyFinalizedInvoiceFactory(): void
     {
         $exception = InvalidInvoiceException::cannotModifyFinalizedInvoice();
 
-        self::assertStringContainsString('Cannot modify', $exception->getMessage());
-        self::assertStringContainsString('issued', $exception->getMessage());
+        static::assertStringContainsString('Cannot modify', $exception->getMessage());
+        static::assertStringContainsString('issued', $exception->getMessage());
     }
 
     public function testDueDateBeforeIssueDateFactory(): void
     {
         $exception = InvalidInvoiceException::dueDateBeforeIssueDate();
 
-        self::assertStringContainsString('Due date', $exception->getMessage());
-        self::assertStringContainsString('issue date', $exception->getMessage());
+        static::assertStringContainsString('Due date', $exception->getMessage());
+        static::assertStringContainsString('issue date', $exception->getMessage());
     }
 
     public function testInvalidPaymentAmountFactory(): void
     {
         $exception = InvalidInvoiceException::invalidPaymentAmount();
 
-        self::assertStringContainsString('Payment amount', $exception->getMessage());
-        self::assertStringContainsString('positive', $exception->getMessage());
+        static::assertStringContainsString('Payment amount', $exception->getMessage());
+        static::assertStringContainsString('positive', $exception->getMessage());
     }
 
     public function testAlreadyPaidFactory(): void
     {
         $exception = InvalidInvoiceException::alreadyPaid();
 
-        self::assertStringContainsString('already been paid', $exception->getMessage());
+        static::assertStringContainsString('already been paid', $exception->getMessage());
     }
 
     public function testCannotCancelPaidInvoiceFactory(): void
     {
         $exception = InvalidInvoiceException::cannotCancelPaidInvoice();
 
-        self::assertStringContainsString('Cannot cancel', $exception->getMessage());
-        self::assertStringContainsString('paid', $exception->getMessage());
+        static::assertStringContainsString('Cannot cancel', $exception->getMessage());
+        static::assertStringContainsString('paid', $exception->getMessage());
     }
 }

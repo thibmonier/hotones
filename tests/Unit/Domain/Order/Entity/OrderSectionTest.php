@@ -25,11 +25,11 @@ final class OrderSectionTest extends TestCase
             position: 1,
         );
 
-        self::assertSame('Phase 1 — Design', $section->getTitle());
-        self::assertSame(1, $section->getPosition());
-        self::assertSame([], $section->getLines());
-        self::assertSame(0, $section->getLineCount());
-        self::assertNull($section->getUpdatedAt());
+        static::assertSame('Phase 1 — Design', $section->getTitle());
+        static::assertSame(1, $section->getPosition());
+        static::assertSame([], $section->getLines());
+        static::assertSame(0, $section->getLineCount());
+        static::assertNull($section->getUpdatedAt());
     }
 
     public function testCreateEmptyTitleThrows(): void
@@ -51,9 +51,9 @@ final class OrderSectionTest extends TestCase
             taxRate: 0.20,
         );
 
-        self::assertSame(1, $section->getLineCount());
-        self::assertCount(1, $section->getLines());
-        self::assertNotNull($section->getUpdatedAt());
+        static::assertSame(1, $section->getLineCount());
+        static::assertCount(1, $section->getLines());
+        static::assertNotNull($section->getUpdatedAt());
     }
 
     public function testAddMultipleLinesHaveIncrementalPositions(): void
@@ -64,9 +64,9 @@ final class OrderSectionTest extends TestCase
         $section->addLine(OrderLineId::generate(), 'C', OrderLineType::SERVICE, 1.0, Money::fromAmount(30.0), 0.20);
 
         $lines = $section->getLines();
-        self::assertSame(1, $lines[0]->getPosition());
-        self::assertSame(2, $lines[1]->getPosition());
-        self::assertSame(3, $lines[2]->getPosition());
+        static::assertSame(1, $lines[0]->getPosition());
+        static::assertSame(2, $lines[1]->getPosition());
+        static::assertSame(3, $lines[2]->getPosition());
     }
 
     public function testUpdateLineMutatesLine(): void
@@ -78,9 +78,9 @@ final class OrderSectionTest extends TestCase
         $section->updateLine($lineId, 'Updated', OrderLineType::PURCHASE, 5.0, Money::fromAmount(50.0), 0.10);
 
         $line = $section->getLines()[0];
-        self::assertSame('Updated', $line->getDescription());
-        self::assertSame(OrderLineType::PURCHASE, $line->getType());
-        self::assertSame(5.0, $line->getQuantity());
+        static::assertSame('Updated', $line->getDescription());
+        static::assertSame(OrderLineType::PURCHASE, $line->getType());
+        static::assertSame(5.0, $line->getQuantity());
     }
 
     public function testUpdateLineUnknownIdThrows(): void
@@ -105,12 +105,12 @@ final class OrderSectionTest extends TestCase
 
         $section->removeLine($remove);
 
-        self::assertSame(2, $section->getLineCount());
+        static::assertSame(2, $section->getLineCount());
         $lines = $section->getLines();
-        self::assertSame('A', $lines[0]->getDescription());
-        self::assertSame(1, $lines[0]->getPosition());
-        self::assertSame('C', $lines[1]->getDescription());
-        self::assertSame(2, $lines[1]->getPosition()); // reordered
+        static::assertSame('A', $lines[0]->getDescription());
+        static::assertSame(1, $lines[0]->getPosition());
+        static::assertSame('C', $lines[1]->getDescription());
+        static::assertSame(2, $lines[1]->getPosition()); // reordered
     }
 
     public function testRemoveLineUnknownIdThrows(): void
@@ -124,8 +124,8 @@ final class OrderSectionTest extends TestCase
     {
         $section = OrderSection::create(OrderSectionId::generate(), 'Old title', 1);
         $section->update('New title');
-        self::assertSame('New title', $section->getTitle());
-        self::assertNotNull($section->getUpdatedAt());
+        static::assertSame('New title', $section->getTitle());
+        static::assertNotNull($section->getUpdatedAt());
     }
 
     public function testUpdateTitleEmptyThrows(): void
@@ -139,7 +139,7 @@ final class OrderSectionTest extends TestCase
     {
         $section = OrderSection::create(OrderSectionId::generate(), 'Section', 1);
         $section->updatePosition(5);
-        self::assertSame(5, $section->getPosition());
+        static::assertSame(5, $section->getPosition());
     }
 
     public function testGetTotalHtSumsLines(): void
@@ -149,7 +149,7 @@ final class OrderSectionTest extends TestCase
         $section->addLine(OrderLineId::generate(), 'B', OrderLineType::SERVICE, 2.0, Money::fromAmount(50.0), 0.20);
 
         // 100 + (2 × 50) = 200 EUR
-        self::assertSame(20000, $section->getTotalHt()->getAmountCents());
+        static::assertSame(20_000, $section->getTotalHt()->getAmountCents());
     }
 
     public function testGetTaxAmountSumsLines(): void
@@ -159,7 +159,7 @@ final class OrderSectionTest extends TestCase
         $section->addLine(OrderLineId::generate(), 'B', OrderLineType::SERVICE, 1.0, Money::fromAmount(50.0), 0.10);
 
         // (100 × 0.20) + (50 × 0.10) = 25 EUR
-        self::assertSame(2500, $section->getTaxAmount()->getAmountCents());
+        static::assertSame(2500, $section->getTaxAmount()->getAmountCents());
     }
 
     public function testGetTotalTtc(): void
@@ -168,14 +168,14 @@ final class OrderSectionTest extends TestCase
         $section->addLine(OrderLineId::generate(), 'A', OrderLineType::SERVICE, 1.0, Money::fromAmount(100.0), 0.20);
 
         // HT 100 + TVA 20 = TTC 120
-        self::assertSame(12000, $section->getTotalTtc()->getAmountCents());
+        static::assertSame(12_000, $section->getTotalTtc()->getAmountCents());
     }
 
     public function testEmptySectionTotalsAreZero(): void
     {
         $section = OrderSection::create(OrderSectionId::generate(), 'Empty', 1);
-        self::assertSame(0, $section->getTotalHt()->getAmountCents());
-        self::assertSame(0, $section->getTaxAmount()->getAmountCents());
-        self::assertSame(0, $section->getTotalTtc()->getAmountCents());
+        static::assertSame(0, $section->getTotalHt()->getAmountCents());
+        static::assertSame(0, $section->getTaxAmount()->getAmountCents());
+        static::assertSame(0, $section->getTotalTtc()->getAmountCents());
     }
 }

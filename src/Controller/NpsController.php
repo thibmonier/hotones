@@ -54,7 +54,7 @@ class NpsController extends AbstractController
 
         // Statistiques globales
         $totalSurveys = count($surveys);
-        $completedSurveys = array_filter($surveys, fn ($s): bool => $s->getStatus() === NpsSurvey::STATUS_COMPLETED);
+        $completedSurveys = array_filter($surveys, static fn ($s): bool => $s->getStatus() === NpsSurvey::STATUS_COMPLETED);
         $completedCount = count($completedSurveys);
         $responseRate = $totalSurveys > 0 ? round(($completedCount / $totalSurveys) * 100, 1) : 0;
 

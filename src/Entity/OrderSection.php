@@ -148,9 +148,11 @@ class OrderSection implements CompanyOwnedInterface
     {
         $total = '0';
         foreach ($this->lines as $line) {
-            if ($line->getProfile()) { // Seulement les lignes avec profil
-                $total = bcadd($total, (string) $line->getDays(), 2);
+            if (!$line->getProfile()) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $line->getDays(), 2);
         }
 
         return $total;

@@ -15,21 +15,21 @@ final class HourlyRateTest extends TestCase
     public function testFromAmount(): void
     {
         $rate = HourlyRate::fromAmount(50.0);
-        self::assertTrue($rate->getAmount()->equals(Money::fromAmount(50.0)));
+        static::assertTrue($rate->getAmount()->equals(Money::fromAmount(50.0)));
     }
 
     public function testFromMoney(): void
     {
         $money = Money::fromAmount(75.0);
         $rate = HourlyRate::fromMoney($money);
-        self::assertTrue($rate->getAmount()->equals($money));
+        static::assertTrue($rate->getAmount()->equals($money));
     }
 
     public function testFromDailyRateDividesBy8(): void
     {
         $rate = HourlyRate::fromDailyRate(400.0);
         // 400 / 8 = 50 EUR/h
-        self::assertTrue($rate->getAmount()->equals(Money::fromAmount(50.0)));
+        static::assertTrue($rate->getAmount()->equals(Money::fromAmount(50.0)));
     }
 
     public function testFromDailyRateNullThrows(): void
@@ -55,7 +55,7 @@ final class HourlyRateTest extends TestCase
     {
         $rate = HourlyRate::fromDailyRateDecimalString('480.00');
         // 480 / 8 = 60 EUR/h
-        self::assertTrue($rate->getAmount()->equals(Money::fromAmount(60.0)));
+        static::assertTrue($rate->getAmount()->equals(Money::fromAmount(60.0)));
     }
 
     public function testFromDailyRateDecimalStringNullThrows(): void
@@ -83,7 +83,7 @@ final class HourlyRateTest extends TestCase
         $total = $rate->multiply($hours);
 
         // 50 × 8 = 400 EUR
-        self::assertSame(40000, $total->getAmountCents());
+        static::assertSame(40_000, $total->getAmountCents());
     }
 
     public function testEquals(): void
@@ -92,7 +92,7 @@ final class HourlyRateTest extends TestCase
         $b = HourlyRate::fromAmount(50.0);
         $c = HourlyRate::fromAmount(60.0);
 
-        self::assertTrue($a->equals($b));
-        self::assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 }

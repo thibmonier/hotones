@@ -37,12 +37,12 @@ final class ContextProcessorTest extends TestCase
 
         $record = $processor($this->makeRecord());
 
-        self::assertSame('POST', $record->extra['request_method']);
-        self::assertSame('/api/clients', $record->extra['request_uri']);
-        self::assertSame('10.0.0.42', $record->extra['client_ip']);
-        self::assertSame('prod', $record->extra['environment']);
-        self::assertArrayHasKey('request_id', $record->extra);
-        self::assertArrayNotHasKey('user_email', $record->extra);
+        static::assertSame('POST', $record->extra['request_method']);
+        static::assertSame('/api/clients', $record->extra['request_uri']);
+        static::assertSame('10.0.0.42', $record->extra['client_ip']);
+        static::assertSame('prod', $record->extra['environment']);
+        static::assertArrayHasKey('request_id', $record->extra);
+        static::assertArrayNotHasKey('user_email', $record->extra);
     }
 
     public function testHttpContextEnrichmentWithAuthenticatedUser(): void
@@ -79,8 +79,8 @@ final class ContextProcessorTest extends TestCase
 
         $record = $processor($this->makeRecord());
 
-        self::assertSame('alice@example.org', $record->extra['user_email']);
-        self::assertSame(42, $record->extra['user_id']);
+        static::assertSame('alice@example.org', $record->extra['user_email']);
+        static::assertSame(42, $record->extra['user_id']);
     }
 
     public function testRequestIdIsStableAcrossInvocationsForSameRequest(): void
@@ -97,7 +97,7 @@ final class ContextProcessorTest extends TestCase
         $first = $processor($this->makeRecord());
         $second = $processor($this->makeRecord());
 
-        self::assertSame(
+        static::assertSame(
             $first->extra['request_id'],
             $second->extra['request_id'],
             'request_id doit être stable au sein du même cycle de requête (correlation ID)',
@@ -115,10 +115,10 @@ final class ContextProcessorTest extends TestCase
 
         $record = $processor($this->makeRecord());
 
-        self::assertSame('cli', $record->extra['context']);
-        self::assertSame('prod', $record->extra['environment']);
-        self::assertArrayNotHasKey('request_id', $record->extra);
-        self::assertArrayNotHasKey('request_method', $record->extra);
+        static::assertSame('cli', $record->extra['context']);
+        static::assertSame('prod', $record->extra['environment']);
+        static::assertArrayNotHasKey('request_id', $record->extra);
+        static::assertArrayNotHasKey('request_method', $record->extra);
     }
 
     public function testExistingExtraDataIsPreserved(): void
@@ -143,8 +143,8 @@ final class ContextProcessorTest extends TestCase
 
         $record = $processor($original);
 
-        self::assertSame('custom_value', $record->extra['custom_key']);
-        self::assertArrayHasKey('request_id', $record->extra);
+        static::assertSame('custom_value', $record->extra['custom_key']);
+        static::assertArrayHasKey('request_id', $record->extra);
     }
 
     public function testReusesRequestIdFromSubscriberWhenAvailable(): void
@@ -165,7 +165,7 @@ final class ContextProcessorTest extends TestCase
 
         $record = $processor($this->makeRecord());
 
-        self::assertSame('cf-edge-correlation-42', $record->extra['request_id']);
+        static::assertSame('cf-edge-correlation-42', $record->extra['request_id']);
     }
 
     private function makeRecord(): LogRecord

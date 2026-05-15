@@ -62,11 +62,11 @@ class ForecastingServiceTest extends TestCase
                 $service->forecastRevenue($horizon);
             } catch (RuntimeException $e) {
                 // Expected when no data - horizon validation passed
-                $this->assertStringContainsString('Insufficient historical data', $e->getMessage());
+                static::assertStringContainsString('Insufficient historical data', $e->getMessage());
             }
         }
 
-        $this->assertTrue(true); // If we get here, validation works
+        static::assertTrue(true); // If we get here, validation works
     }
 
     public function testForecastRevenueThrowsExceptionForInsufficientData(): void
@@ -102,15 +102,15 @@ class ForecastingServiceTest extends TestCase
         $projects = [];
         for ($i = 0; $i < 12; ++$i) {
             $project = new Project();
-            $project->setName("Project $i");
+            $project->setName("Project {$i}");
             $project->setStatus('completed');
-            $date = new DateTime()->modify("-$i months");
+            $date = new DateTime()->modify("-{$i} months");
             $project->setStartDate($date);
 
             // Use reflection to set totalSoldAmount (it's calculated from tasks/orders)
             $reflection = new ReflectionClass($project);
             if ($reflection->hasMethod('setTotalSoldAmount')) {
-                $project->setTotalSoldAmount((string) (10000 + ($i * 1000)));
+                $project->setTotalSoldAmount((string) (10_000 + ($i * 1000)));
             }
 
             $projects[] = $project;
@@ -132,32 +132,32 @@ class ForecastingServiceTest extends TestCase
         $result = $service->forecastRevenue(6);
 
         // Verify structure
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('predictions', $result);
-        $this->assertArrayHasKey('trend', $result);
-        $this->assertArrayHasKey('confidence', $result);
-        $this->assertArrayHasKey('historical', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('predictions', $result);
+        static::assertArrayHasKey('trend', $result);
+        static::assertArrayHasKey('confidence', $result);
+        static::assertArrayHasKey('historical', $result);
 
         // Verify predictions count
-        $this->assertCount(6, $result['predictions']);
+        static::assertCount(6, $result['predictions']);
 
         // Verify each prediction has required fields
         foreach ($result['predictions'] as $prediction) {
-            $this->assertArrayHasKey('month', $prediction);
-            $this->assertArrayHasKey('predicted', $prediction);
-            $this->assertArrayHasKey('min', $prediction);
-            $this->assertArrayHasKey('max', $prediction);
-            $this->assertGreaterThanOrEqual(0, $prediction['predicted']);
-            $this->assertLessThanOrEqual($prediction['predicted'], $prediction['min']);
-            $this->assertGreaterThanOrEqual($prediction['predicted'], $prediction['max']);
+            static::assertArrayHasKey('month', $prediction);
+            static::assertArrayHasKey('predicted', $prediction);
+            static::assertArrayHasKey('min', $prediction);
+            static::assertArrayHasKey('max', $prediction);
+            static::assertGreaterThanOrEqual(0, $prediction['predicted']);
+            static::assertLessThanOrEqual($prediction['predicted'], $prediction['min']);
+            static::assertGreaterThanOrEqual($prediction['predicted'], $prediction['max']);
         }
 
         // Verify trend is one of expected values
-        $this->assertContains($result['trend'], ['growth', 'stable', 'decline', 'insufficient_data']);
+        static::assertContains($result['trend'], ['growth', 'stable', 'decline', 'insufficient_data']);
 
         // Verify confidence is a percentage
-        $this->assertGreaterThanOrEqual(0, $result['confidence']);
-        $this->assertLessThanOrEqual(100, $result['confidence']);
+        static::assertGreaterThanOrEqual(0, $result['confidence']);
+        static::assertLessThanOrEqual(100, $result['confidence']);
     }
 
     public function testCalculateWeightedMovingAverage(): void
@@ -169,14 +169,14 @@ class ForecastingServiceTest extends TestCase
 
         // Test with simple data
         $historical = [
-            ['month' => '2024-01', 'actual' => 10000.0],
-            ['month' => '2024-02', 'actual' => 15000.0],
-            ['month' => '2024-03', 'actual' => 20000.0],
+            ['month' => '2024-01', 'actual' => 10_000.0],
+            ['month' => '2024-02', 'actual' => 15_000.0],
+            ['month' => '2024-03', 'actual' => 20_000.0],
         ];
 
         // Weighted average: (10000*1 + 15000*2 + 20000*3) / (1+2+3) = 100000/6 = 16666.67
         $result = $method->invoke($service, $historical, 3);
-        $this->assertEquals(16666.67, round($result, 2));
+        static::assertSame(16_666.67, round($result, 2));
     }
 
     public function testCalculateSeasonalityFactors(): void
@@ -188,10 +188,10 @@ class ForecastingServiceTest extends TestCase
 
         // Create historical data spanning multiple years with clear seasonality
         $historical = [
-            ['month' => '2023-01', 'actual' => 10000.0],
+            ['month' => '2023-01', 'actual' => 10_000.0],
             ['month' => '2023-08', 'actual' => 5000.0], // August low
             ['month' => '2023-12', 'actual' => 6000.0], // December low
-            ['month' => '2024-01', 'actual' => 12000.0],
+            ['month' => '2024-01', 'actual' => 12_000.0],
             ['month' => '2024-08', 'actual' => 4000.0], // August low
             ['month' => '2024-12', 'actual' => 5000.0], // December low
         ];
@@ -199,19 +199,19 @@ class ForecastingServiceTest extends TestCase
         $result = $method->invoke($service, $historical);
 
         // Should return array with 12 months
-        $this->assertCount(12, $result);
+        static::assertCount(12, $result);
 
         // January should be above 1.0 (above average)
-        $this->assertGreaterThan(1.0, $result[1]);
+        static::assertGreaterThan(1.0, $result[1]);
 
         // August and December should be below 1.0 (below average)
-        $this->assertLessThan(1.0, $result[8]);
-        $this->assertLessThan(1.0, $result[12]);
+        static::assertLessThan(1.0, $result[8]);
+        static::assertLessThan(1.0, $result[12]);
 
         // All months should have a factor
         for ($month = 1; $month <= 12; ++$month) {
-            $this->assertArrayHasKey($month, $result);
-            $this->assertGreaterThan(0, $result[$month]);
+            static::assertArrayHasKey($month, $result);
+            static::assertGreaterThan(0, $result[$month]);
         }
     }
 
@@ -224,13 +224,13 @@ class ForecastingServiceTest extends TestCase
 
         // Less than 6 months = 40% confidence
         $historical = [
-            ['month' => '2024-01', 'actual' => 10000.0],
-            ['month' => '2024-02', 'actual' => 11000.0],
-            ['month' => '2024-03', 'actual' => 12000.0],
+            ['month' => '2024-01', 'actual' => 10_000.0],
+            ['month' => '2024-02', 'actual' => 11_000.0],
+            ['month' => '2024-03', 'actual' => 12_000.0],
         ];
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals(40, $result);
+        static::assertSame(40.0, $result);
     }
 
     public function testCalculateConfidenceWithModerateData(): void
@@ -243,11 +243,11 @@ class ForecastingServiceTest extends TestCase
         // 6-11 months = 60% confidence
         $historical = [];
         for ($i = 0; $i < 10; ++$i) {
-            $historical[] = ['month' => "2024-0$i", 'actual' => 10000.0 + ($i * 1000)];
+            $historical[] = ['month' => "2024-0{$i}", 'actual' => 10_000.0 + ($i * 1000)];
         }
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals(60, $result);
+        static::assertSame(60.0, $result);
     }
 
     public function testCalculateConfidenceWithExtensiveData(): void
@@ -260,12 +260,12 @@ class ForecastingServiceTest extends TestCase
         // 24+ months with low volatility = high confidence
         $historical = [];
         for ($i = 1; $i <= 24; ++$i) {
-            $historical[] = ['month' => sprintf('2024-%02d', $i % 12 ?: 12), 'actual' => 10000.0];
+            $historical[] = ['month' => sprintf('2024-%02d', $i % 12 ?: 12), 'actual' => 10_000.0];
         }
 
         $result = $method->invoke($service, $historical);
-        $this->assertGreaterThanOrEqual(85, $result);
-        $this->assertLessThanOrEqual(95, $result);
+        static::assertGreaterThanOrEqual(85, $result);
+        static::assertLessThanOrEqual(95, $result);
     }
 
     public function testDetermineTrendDirectionGrowth(): void
@@ -277,16 +277,16 @@ class ForecastingServiceTest extends TestCase
 
         // Clear growth: recent months 20% higher
         $historical = [
-            ['month' => '2024-01', 'actual' => 10000.0],
-            ['month' => '2024-02', 'actual' => 11000.0],
-            ['month' => '2024-03', 'actual' => 12000.0],
-            ['month' => '2024-04', 'actual' => 14000.0],
-            ['month' => '2024-05', 'actual' => 15000.0],
-            ['month' => '2024-06', 'actual' => 16000.0],
+            ['month' => '2024-01', 'actual' => 10_000.0],
+            ['month' => '2024-02', 'actual' => 11_000.0],
+            ['month' => '2024-03', 'actual' => 12_000.0],
+            ['month' => '2024-04', 'actual' => 14_000.0],
+            ['month' => '2024-05', 'actual' => 15_000.0],
+            ['month' => '2024-06', 'actual' => 16_000.0],
         ];
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals('growth', $result);
+        static::assertSame('growth', $result);
     }
 
     public function testDetermineTrendDirectionStable(): void
@@ -298,16 +298,16 @@ class ForecastingServiceTest extends TestCase
 
         // Stable: recent months within 10% of previous
         $historical = [
-            ['month' => '2024-01', 'actual' => 10000.0],
-            ['month' => '2024-02', 'actual' => 10500.0],
-            ['month' => '2024-03', 'actual' => 10200.0],
-            ['month' => '2024-04', 'actual' => 10300.0],
-            ['month' => '2024-05', 'actual' => 10400.0],
-            ['month' => '2024-06', 'actual' => 10100.0],
+            ['month' => '2024-01', 'actual' => 10_000.0],
+            ['month' => '2024-02', 'actual' => 10_500.0],
+            ['month' => '2024-03', 'actual' => 10_200.0],
+            ['month' => '2024-04', 'actual' => 10_300.0],
+            ['month' => '2024-05', 'actual' => 10_400.0],
+            ['month' => '2024-06', 'actual' => 10_100.0],
         ];
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals('stable', $result);
+        static::assertSame('stable', $result);
     }
 
     public function testDetermineTrendDirectionDecline(): void
@@ -319,16 +319,16 @@ class ForecastingServiceTest extends TestCase
 
         // Decline: recent months 20% lower
         $historical = [
-            ['month' => '2024-01', 'actual' => 16000.0],
-            ['month' => '2024-02', 'actual' => 15000.0],
-            ['month' => '2024-03', 'actual' => 14000.0],
-            ['month' => '2024-04', 'actual' => 12000.0],
-            ['month' => '2024-05', 'actual' => 11000.0],
-            ['month' => '2024-06', 'actual' => 10000.0],
+            ['month' => '2024-01', 'actual' => 16_000.0],
+            ['month' => '2024-02', 'actual' => 15_000.0],
+            ['month' => '2024-03', 'actual' => 14_000.0],
+            ['month' => '2024-04', 'actual' => 12_000.0],
+            ['month' => '2024-05', 'actual' => 11_000.0],
+            ['month' => '2024-06', 'actual' => 10_000.0],
         ];
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals('decline', $result);
+        static::assertSame('decline', $result);
     }
 
     public function testDetermineTrendDirectionInsufficientData(): void
@@ -340,12 +340,12 @@ class ForecastingServiceTest extends TestCase
 
         // Less than 3 months
         $historical = [
-            ['month' => '2024-01', 'actual' => 10000.0],
-            ['month' => '2024-02', 'actual' => 11000.0],
+            ['month' => '2024-01', 'actual' => 10_000.0],
+            ['month' => '2024-02', 'actual' => 11_000.0],
         ];
 
         $result = $method->invoke($service, $historical);
-        $this->assertEquals('insufficient_data', $result);
+        static::assertSame('insufficient_data', $result);
     }
 
     // -----------------------------------------------------------------
@@ -360,8 +360,8 @@ class ForecastingServiceTest extends TestCase
 
         $result = $method->invoke($service, [['x' => 1.0, 'y' => 100.0]]);
 
-        $this->assertSame(0.0, $result['slope']);
-        $this->assertSame(0.0, $result['intercept']);
+        static::assertSame(0.0, $result['slope']);
+        static::assertSame(0.0, $result['intercept']);
     }
 
     public function testLinearRegressionSimpleHandlesEmptyArray(): void
@@ -372,8 +372,8 @@ class ForecastingServiceTest extends TestCase
 
         $result = $method->invoke($service, []);
 
-        $this->assertSame(0.0, $result['slope']);
-        $this->assertSame(0.0, $result['intercept']);
+        static::assertSame(0.0, $result['slope']);
+        static::assertSame(0.0, $result['intercept']);
     }
 
     public function testLinearRegressionSimplePerfectLinearFit(): void
@@ -393,8 +393,8 @@ class ForecastingServiceTest extends TestCase
 
         $result = $method->invoke($service, $points);
 
-        $this->assertEqualsWithDelta(2.0, $result['slope'], 0.001);
-        $this->assertEqualsWithDelta(1.0, $result['intercept'], 0.001);
+        static::assertEqualsWithDelta(2.0, $result['slope'], 0.001);
+        static::assertEqualsWithDelta(1.0, $result['intercept'], 0.001);
     }
 
     public function testGetMonthsDifferenceReturnsZeroForSameMonth(): void
@@ -406,7 +406,7 @@ class ForecastingServiceTest extends TestCase
         $from = new DateTimeImmutable('2026-05-01');
         $to = new DateTimeImmutable('2026-05-31');
 
-        $this->assertSame(0, $method->invoke($service, $from, $to));
+        static::assertSame(0, $method->invoke($service, $from, $to));
     }
 
     public function testGetMonthsDifferenceReturnsExpectedMonthsAcrossYears(): void
@@ -419,6 +419,6 @@ class ForecastingServiceTest extends TestCase
         $to = new DateTimeImmutable('2026-04-15');
 
         // 1 year × 12 + 3 months = 15.
-        $this->assertSame(15, $method->invoke($service, $from, $to));
+        static::assertSame(15, $method->invoke($service, $from, $to));
     }
 }

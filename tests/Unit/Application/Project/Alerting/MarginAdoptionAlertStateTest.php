@@ -14,9 +14,9 @@ final class MarginAdoptionAlertStateTest extends TestCase
     {
         $state = MarginAdoptionAlertState::initial();
 
-        self::assertSame(0, $state->consecutiveRedDays);
-        self::assertNull($state->lastRedDate);
-        self::assertNull($state->lastAlertSentAt);
+        static::assertSame(0, $state->consecutiveRedDays);
+        static::assertNull($state->lastRedDate);
+        static::assertNull($state->lastAlertSentAt);
     }
 
     public function testWithRedTodayStartsStreakFromInitial(): void
@@ -26,8 +26,8 @@ final class MarginAdoptionAlertStateTest extends TestCase
 
         $next = $state->withRedToday($today);
 
-        self::assertSame(1, $next->consecutiveRedDays);
-        self::assertEquals($today, $next->lastRedDate);
+        static::assertSame(1, $next->consecutiveRedDays);
+        static::assertEquals($today, $next->lastRedDate);
     }
 
     public function testWithRedTodayIncrementsConsecutiveStreak(): void
@@ -41,7 +41,7 @@ final class MarginAdoptionAlertStateTest extends TestCase
             ->withRedToday($day2)
             ->withRedToday($day3);
 
-        self::assertSame(3, $state->consecutiveRedDays);
+        static::assertSame(3, $state->consecutiveRedDays);
     }
 
     public function testWithRedTodaySameDayDoesNotIncrement(): void
@@ -53,7 +53,7 @@ final class MarginAdoptionAlertStateTest extends TestCase
             ->withRedToday($today)
             ->withRedToday($sameDayLater);
 
-        self::assertSame(1, $state->consecutiveRedDays);
+        static::assertSame(1, $state->consecutiveRedDays);
     }
 
     public function testGapBreaksStreakAndRestartsAt1(): void
@@ -65,7 +65,7 @@ final class MarginAdoptionAlertStateTest extends TestCase
             ->withRedToday($day1)
             ->withRedToday($day3);
 
-        self::assertSame(1, $state->consecutiveRedDays);
+        static::assertSame(1, $state->consecutiveRedDays);
     }
 
     public function testWithGreenTodayResetsStreak(): void
@@ -74,12 +74,12 @@ final class MarginAdoptionAlertStateTest extends TestCase
             ->withRedToday(new DateTimeImmutable('2026-05-10'))
             ->withRedToday(new DateTimeImmutable('2026-05-11'));
 
-        self::assertSame(2, $state->consecutiveRedDays);
+        static::assertSame(2, $state->consecutiveRedDays);
 
         $reset = $state->withGreenToday();
 
-        self::assertSame(0, $reset->consecutiveRedDays);
-        self::assertNull($reset->lastRedDate);
+        static::assertSame(0, $reset->consecutiveRedDays);
+        static::assertNull($reset->lastRedDate);
     }
 
     public function testShouldFireAlertWhenStreakReachesThreshold(): void
@@ -91,8 +91,8 @@ final class MarginAdoptionAlertStateTest extends TestCase
             $state = $state->withRedToday($now->modify(sprintf('-%d days', 7 - $i)));
         }
 
-        self::assertSame(7, $state->consecutiveRedDays);
-        self::assertTrue($state->shouldFireAlert(threshold: 7, now: $now));
+        static::assertSame(7, $state->consecutiveRedDays);
+        static::assertTrue($state->shouldFireAlert(threshold: 7, now: $now));
     }
 
     public function testShouldNotFireAlertBelowThreshold(): void
@@ -102,7 +102,7 @@ final class MarginAdoptionAlertStateTest extends TestCase
             ->withRedToday(new DateTimeImmutable('2026-05-11'))
             ->withRedToday(new DateTimeImmutable('2026-05-12'));
 
-        self::assertFalse($state->shouldFireAlert(threshold: 7, now: new DateTimeImmutable('2026-05-12')));
+        static::assertFalse($state->shouldFireAlert(threshold: 7, now: new DateTimeImmutable('2026-05-12')));
     }
 
     public function testShouldNotFireDuplicateAlertWithin24Hours(): void
@@ -117,7 +117,7 @@ final class MarginAdoptionAlertStateTest extends TestCase
         $afterAlert = $base->withAlertSentAt($now);
         $oneHourLater = $now->modify('+1 hour');
 
-        self::assertFalse($afterAlert->shouldFireAlert(threshold: 7, now: $oneHourLater));
+        static::assertFalse($afterAlert->shouldFireAlert(threshold: 7, now: $oneHourLater));
     }
 
     public function testShouldFireAlertAfter24HoursElapsed(): void
@@ -132,6 +132,6 @@ final class MarginAdoptionAlertStateTest extends TestCase
         $afterAlert = $base->withAlertSentAt($now);
         $nextDay = $now->modify('+25 hours');
 
-        self::assertTrue($afterAlert->shouldFireAlert(threshold: 7, now: $nextDay));
+        static::assertTrue($afterAlert->shouldFireAlert(threshold: 7, now: $nextDay));
     }
 }

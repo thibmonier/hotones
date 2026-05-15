@@ -182,14 +182,14 @@ class NotificationController extends AbstractController
 
             return "Il y a {$minutes} minute".($minutes > 1 ? 's' : '');
         }
-        if ($diff < 86400) {
+        if ($diff < 86_400) {
             $hours = (int) floor($diff / 3600);
 
             return "Il y a {$hours} heure".($hours > 1 ? 's' : '');
         }
 
-        if ($diff < 604800) {
-            $days = (int) floor($diff / 86400);
+        if ($diff < 604_800) {
+            $days = (int) floor($diff / 86_400);
 
             return "Il y a {$days} jour".($days > 1 ? 's' : '');
         }

@@ -25,7 +25,7 @@ final class WorkItemTransitionsTest extends TestCase
     {
         $workItem = $this->makeDraft();
 
-        self::assertSame(WorkItemStatus::DRAFT, $workItem->getStatus());
+        static::assertSame(WorkItemStatus::DRAFT, $workItem->getStatus());
     }
 
     public function testMarkAsValidatedFromDraft(): void
@@ -35,11 +35,11 @@ final class WorkItemTransitionsTest extends TestCase
 
         $workItem->markAsValidated();
 
-        self::assertSame(WorkItemStatus::VALIDATED, $workItem->getStatus());
+        static::assertSame(WorkItemStatus::VALIDATED, $workItem->getStatus());
 
         $events = $workItem->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(WorkItemValidatedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(WorkItemValidatedEvent::class, $events[0]);
     }
 
     public function testMarkAsValidatedIdempotent(): void
@@ -50,8 +50,8 @@ final class WorkItemTransitionsTest extends TestCase
 
         $workItem->markAsValidated();
 
-        self::assertSame(WorkItemStatus::VALIDATED, $workItem->getStatus());
-        self::assertSame([], $workItem->pullDomainEvents());
+        static::assertSame(WorkItemStatus::VALIDATED, $workItem->getStatus());
+        static::assertSame([], $workItem->pullDomainEvents());
     }
 
     public function testMarkAsBilledFromValidated(): void
@@ -63,11 +63,11 @@ final class WorkItemTransitionsTest extends TestCase
         $invoiceId = InvoiceId::fromLegacyInt(7);
         $workItem->markAsBilled($invoiceId);
 
-        self::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
 
         $events = $workItem->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(WorkItemBilledEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(WorkItemBilledEvent::class, $events[0]);
     }
 
     public function testMarkAsBilledFromDraftThrows(): void
@@ -87,8 +87,8 @@ final class WorkItemTransitionsTest extends TestCase
 
         $workItem->markAsBilled(InvoiceId::fromLegacyInt(7));
 
-        self::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
-        self::assertSame([], $workItem->pullDomainEvents());
+        static::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
+        static::assertSame([], $workItem->pullDomainEvents());
     }
 
     public function testMarkAsPaidFromBilled(): void
@@ -100,11 +100,11 @@ final class WorkItemTransitionsTest extends TestCase
 
         $workItem->markAsPaid(InvoiceId::fromLegacyInt(7));
 
-        self::assertSame(WorkItemStatus::PAID, $workItem->getStatus());
+        static::assertSame(WorkItemStatus::PAID, $workItem->getStatus());
 
         $events = $workItem->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(WorkItemPaidEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(WorkItemPaidEvent::class, $events[0]);
     }
 
     public function testMarkAsPaidFromDraftThrows(): void
@@ -131,7 +131,7 @@ final class WorkItemTransitionsTest extends TestCase
 
         // Pas de méthode markAsDraft (intentionnel — pas de retour arrière).
         // Vérifier que canTransitionTo refuse.
-        self::assertFalse($workItem->getStatus()->canTransitionTo(WorkItemStatus::DRAFT));
+        static::assertFalse($workItem->getStatus()->canTransitionTo(WorkItemStatus::DRAFT));
     }
 
     private function makeDraft(): WorkItem

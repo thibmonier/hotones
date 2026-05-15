@@ -84,7 +84,7 @@ class GenerateTestInvoicesCommand extends Command
             $invoice->setInvoiceNumber($invoiceNumber);
 
             // Montant aléatoire entre 2000€ et 25000€
-            $amountHt = random_int(2000, 25000);
+            $amountHt = random_int(2000, 25_000);
             $tvaRate = 20.00;
             $amountTva = ($amountHt * $tvaRate) / 100;
             $amountTtc = $amountHt + $amountTva;

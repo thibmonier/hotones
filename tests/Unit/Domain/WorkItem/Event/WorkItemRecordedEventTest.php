@@ -22,11 +22,11 @@ final class WorkItemRecordedEventTest extends TestCase
 
         $event = WorkItemRecordedEvent::create($workItemId, $projectId, $contributorId, $workedOn);
 
-        self::assertTrue($event->workItemId->equals($workItemId));
-        self::assertTrue($event->projectId->equals($projectId));
-        self::assertTrue($event->contributorId->equals($contributorId));
-        self::assertEquals($workedOn, $event->workedOn);
-        self::assertSame('legacy:7', $event->getAggregateId());
+        static::assertTrue($event->workItemId->equals($workItemId));
+        static::assertTrue($event->projectId->equals($projectId));
+        static::assertTrue($event->contributorId->equals($contributorId));
+        static::assertEquals($workedOn, $event->workedOn);
+        static::assertSame('legacy:7', $event->getAggregateId());
     }
 
     public function testOccurredOnRecorded(): void
@@ -38,6 +38,6 @@ final class WorkItemRecordedEventTest extends TestCase
             new DateTimeImmutable(),
         );
 
-        self::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
+        static::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
     }
 }

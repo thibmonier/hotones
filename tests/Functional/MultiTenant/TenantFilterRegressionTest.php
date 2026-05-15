@@ -60,14 +60,14 @@ final class TenantFilterRegressionTest extends KernelTestCase
         // Activate filter as if listener fired for tenantA.
         $this->activateFilterFor($tenantA);
         $clientsForA = $this->em->getRepository(Client::class)->findAll();
-        $this->assertCount(1, $clientsForA, 'Tenant A should see only Acme clients');
-        $this->assertSame('Acme Client', $clientsForA[0]->getName());
+        static::assertCount(1, $clientsForA, 'Tenant A should see only Acme clients');
+        static::assertSame('Acme Client', $clientsForA[0]->getName());
 
         // Re-activate filter for tenantB.
         $this->activateFilterFor($tenantB);
         $clientsForB = $this->em->getRepository(Client::class)->findAll();
-        $this->assertCount(1, $clientsForB, 'Tenant B should see only Concurrent clients');
-        $this->assertSame('Concurrent Client', $clientsForB[0]->getName());
+        static::assertCount(1, $clientsForB, 'Tenant B should see only Concurrent clients');
+        static::assertSame('Concurrent Client', $clientsForB[0]->getName());
     }
 
     public function testFilterDeniesCrossTenantAccessByPrimaryKey(): void
@@ -75,7 +75,7 @@ final class TenantFilterRegressionTest extends KernelTestCase
         [$tenantA, $tenantB] = $this->seedTwoTenantsWithClients();
 
         $clientB = $this->em->getRepository(Client::class)->findOneBy(['name' => 'Concurrent Client']);
-        $this->assertNotNull($clientB);
+        static::assertNotNull($clientB);
 
         // Activate filter for tenantA, then try to load client from tenantB by id.
         $this->em->clear();
@@ -83,7 +83,7 @@ final class TenantFilterRegressionTest extends KernelTestCase
 
         $loaded = $this->em->getRepository(Client::class)->find($clientB->getId());
 
-        $this->assertNull(
+        static::assertNull(
             $loaded,
             'Tenant A must not be able to load tenant B client by primary key (anti-enumeration)',
         );
@@ -101,7 +101,7 @@ final class TenantFilterRegressionTest extends KernelTestCase
         $this->em->clear();
 
         $allClients = $this->em->getRepository(Client::class)->findAll();
-        $this->assertCount(2, $allClients, 'Disabled filter must expose all tenants (superadmin cross-tenant reports)');
+        static::assertCount(2, $allClients, 'Disabled filter must expose all tenants (superadmin cross-tenant reports)');
 
         // Re-enable for cleanup discipline.
         $this->em->getFilters()->enable('tenant_filter');
@@ -123,8 +123,8 @@ final class TenantFilterRegressionTest extends KernelTestCase
         $this->em->clear();
         $clients = $this->em->getRepository(Client::class)->findAll();
 
-        $this->assertCount(1, $clients);
-        $this->assertSame('Acme Client', $clients[0]->getName());
+        static::assertCount(1, $clients);
+        static::assertSame('Acme Client', $clients[0]->getName());
     }
 
     /**

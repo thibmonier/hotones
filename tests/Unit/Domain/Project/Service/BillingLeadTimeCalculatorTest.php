@@ -25,10 +25,10 @@ final class BillingLeadTimeCalculatorTest extends TestCase
     {
         $stats = $this->calculator->calculateRolling([], 30, $this->now);
 
-        self::assertSame(0, $stats->count);
-        self::assertSame(0.0, $stats->p50->getDays());
-        self::assertSame(0.0, $stats->p75->getDays());
-        self::assertSame(0.0, $stats->p95->getDays());
+        static::assertSame(0, $stats->count);
+        static::assertSame(0.0, $stats->p50->getDays());
+        static::assertSame(0.0, $stats->p75->getDays());
+        static::assertSame(0.0, $stats->p95->getDays());
     }
 
     public function testComputesMedianForSingleRecord(): void
@@ -37,9 +37,9 @@ final class BillingLeadTimeCalculatorTest extends TestCase
 
         $stats = $this->calculator->calculateRolling($records, 30, $this->now);
 
-        self::assertSame(1, $stats->count);
-        self::assertEqualsWithDelta(10.0, $stats->p50->getDays(), 0.1);
-        self::assertEqualsWithDelta(10.0, $stats->p95->getDays(), 0.1);
+        static::assertSame(1, $stats->count);
+        static::assertEqualsWithDelta(10.0, $stats->p50->getDays(), 0.1);
+        static::assertEqualsWithDelta(10.0, $stats->p95->getDays(), 0.1);
     }
 
     public function testComputesMedianForOddCount(): void
@@ -52,8 +52,8 @@ final class BillingLeadTimeCalculatorTest extends TestCase
 
         $stats = $this->calculator->calculateRolling($records, 30, $this->now);
 
-        self::assertSame(3, $stats->count);
-        self::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.1);
+        static::assertSame(3, $stats->count);
+        static::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.1);
     }
 
     public function testComputesP75AndP95WithInterpolation(): void
@@ -66,10 +66,10 @@ final class BillingLeadTimeCalculatorTest extends TestCase
 
         $stats = $this->calculator->calculateRolling($records, 30, $this->now);
 
-        self::assertSame(100, $stats->count);
-        self::assertEqualsWithDelta(50.5, $stats->p50->getDays(), 0.5);
-        self::assertEqualsWithDelta(75.25, $stats->p75->getDays(), 0.5);
-        self::assertEqualsWithDelta(95.05, $stats->p95->getDays(), 0.5);
+        static::assertSame(100, $stats->count);
+        static::assertEqualsWithDelta(50.5, $stats->p50->getDays(), 0.5);
+        static::assertEqualsWithDelta(75.25, $stats->p75->getDays(), 0.5);
+        static::assertEqualsWithDelta(95.05, $stats->p95->getDays(), 0.5);
     }
 
     public function testExcludesRecordsOutsideWindow(): void
@@ -81,8 +81,8 @@ final class BillingLeadTimeCalculatorTest extends TestCase
 
         $stats = $this->calculator->calculateRolling($records, 30, $this->now);
 
-        self::assertSame(1, $stats->count);
-        self::assertEqualsWithDelta(5.0, $stats->p50->getDays(), 0.1);
+        static::assertSame(1, $stats->count);
+        static::assertEqualsWithDelta(5.0, $stats->p50->getDays(), 0.1);
     }
 
     public function testRejectsNegativeLeadTimeRecord(): void
@@ -104,9 +104,9 @@ final class BillingLeadTimeCalculatorTest extends TestCase
 
         $stats = $this->calculator->calculateRolling($records, 365, $this->now);
 
-        self::assertSame(2, $stats->count);
+        static::assertSame(2, $stats->count);
         // Interpolation p50 for [15, 25] at index 0.5 → 20
-        self::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.1);
+        static::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.1);
     }
 
     private function makeRecord(int $daysAgoEmitted, int $leadTimeDays): QuoteInvoiceRecord

@@ -68,10 +68,10 @@ class AnalyzeProjectRisksCommand extends Command
 
         // Filtrer selon les options
         if ($criticalOnly) {
-            $atRiskProjects = array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'critical');
+            $atRiskProjects = array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['riskLevel'] === 'critical');
             $io->writeln('Filtrage: projets critiques uniquement');
         } elseif ($minScore < 80) {
-            $atRiskProjects = array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['healthScore'] < $minScore);
+            $atRiskProjects = array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['healthScore'] < $minScore);
             $io->writeln(sprintf('Filtrage: score < %d', $minScore));
         }
 
@@ -81,10 +81,10 @@ class AnalyzeProjectRisksCommand extends Command
             'atRisk' => count($atRiskProjects),
             'critical' => count(array_filter(
                 $atRiskProjects,
-                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
+                static fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
             )),
-            'high' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
-            'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
+            'high' => count(array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium' => count(array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         $io->section('Résumé');

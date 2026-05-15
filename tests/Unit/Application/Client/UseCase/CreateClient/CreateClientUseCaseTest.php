@@ -29,14 +29,14 @@ final class CreateClientUseCaseTest extends TestCase
 
         $id = $useCase->execute(new CreateClientCommand(name: 'Acme Corp', serviceLevel: 'standard'));
 
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testNameValueObjectAppliedToFlat(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatClient $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -44,13 +44,13 @@ final class CreateClientUseCaseTest extends TestCase
 
         $useCase->execute(new CreateClientCommand(name: 'Acme Corp', serviceLevel: 'standard'));
 
-        $this->assertSame('Acme Corp', $persistedFlat->name);
+        static::assertSame('Acme Corp', $persistedFlat->name);
     }
 
     public function testServiceLevelMappingEnterprise(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatClient $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -58,13 +58,13 @@ final class CreateClientUseCaseTest extends TestCase
 
         $useCase->execute(new CreateClientCommand(name: 'Acme', serviceLevel: 'vip'));
 
-        $this->assertSame('vip', $persistedFlat->serviceLevel);
+        static::assertSame('vip', $persistedFlat->serviceLevel);
     }
 
     public function testServiceLevelMappingPremium(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatClient $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -72,7 +72,7 @@ final class CreateClientUseCaseTest extends TestCase
 
         $useCase->execute(new CreateClientCommand(name: 'Acme', serviceLevel: 'premium'));
 
-        $this->assertSame('standard', $persistedFlat->serviceLevel);
+        static::assertSame('standard', $persistedFlat->serviceLevel);
     }
 
     public function testInvalidServiceLevelRejected(): void
@@ -86,7 +86,7 @@ final class CreateClientUseCaseTest extends TestCase
     public function testNotesPropagatedToAggregate(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatClient $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -94,13 +94,13 @@ final class CreateClientUseCaseTest extends TestCase
 
         $useCase->execute(new CreateClientCommand(name: 'Acme', serviceLevel: 'standard', notes: 'Important'));
 
-        $this->assertSame('Important', $persistedFlat->description);
+        static::assertSame('Important', $persistedFlat->description);
     }
 
     public function testNullNotesPersistedAsNull(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatClient $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatClient $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -108,7 +108,7 @@ final class CreateClientUseCaseTest extends TestCase
 
         $useCase->execute(new CreateClientCommand(name: 'Acme', serviceLevel: 'standard', notes: null));
 
-        $this->assertNull($persistedFlat->description);
+        static::assertNull($persistedFlat->description);
     }
 
     public function testNoHandlerForEventIsTolerated(): void
@@ -120,7 +120,7 @@ final class CreateClientUseCaseTest extends TestCase
 
         // Doit pas propager l'exception
         $id = $useCase->execute(new CreateClientCommand(name: 'Acme', serviceLevel: 'standard'));
-        $this->assertSame(7, $id->toLegacyInt());
+        static::assertSame(7, $id->toLegacyInt());
     }
 
     /**
@@ -132,7 +132,7 @@ final class CreateClientUseCaseTest extends TestCase
         ?MessageBusInterface $messageBus = null,
     ): CreateClientUseCase {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatClient $flat) use (
+        $em->method('persist')->willReturnCallback(static function (FlatClient $flat) use (
             $persistedId,
             $persistCapture,
         ): void {

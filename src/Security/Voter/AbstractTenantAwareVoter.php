@@ -8,6 +8,7 @@ use App\Entity\Interface\CompanyOwnedInterface;
 use App\Entity\User;
 use App\Security\CompanyContext;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -38,7 +39,7 @@ abstract class AbstractTenantAwareVoter extends Voter
     protected function voteOnAttribute(
         string $attribute,
         mixed $subject,
-        TokenInterface $token,
+        #[SensitiveParameter] TokenInterface $token,
         ?Vote $vote = null,
     ): bool {
         $user = $token->getUser();
@@ -101,6 +102,6 @@ abstract class AbstractTenantAwareVoter extends Voter
     {
         $userRoles = $user->getRoles();
 
-        return array_any($roles, fn ($role): bool => in_array($role, $userRoles, true));
+        return array_any($roles, static fn ($role): bool => in_array($role, $userRoles, true));
     }
 }

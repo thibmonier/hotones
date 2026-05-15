@@ -195,16 +195,18 @@ class AlertDetectionService
             foreach ($order->getPaymentSchedules() as $schedule) {
                 // Check if due within 7 days
                 // Note: Actual billing status tracking may be elsewhere in the system
-                if ($schedule->getBillingDate() <= $sevenDaysFromNow) {
-                    $recipients = $this->getPaymentAlertRecipients($order);
-                    $daysUntilDue = new DateTime()->diff($schedule->getBillingDate())->days;
-
-                    $this->eventDispatcher->dispatch(
-                        new PaymentDueAlertEvent($order, $schedule->getBillingDate(), $daysUntilDue, $recipients),
-                    );
-
-                    ++$alertCount;
+                if ($schedule->getBillingDate() > $sevenDaysFromNow) {
+                    continue;
                 }
+
+                $recipients = $this->getPaymentAlertRecipients($order);
+                $daysUntilDue = new DateTime()->diff($schedule->getBillingDate())->days;
+
+                $this->eventDispatcher->dispatch(
+                    new PaymentDueAlertEvent($order, $schedule->getBillingDate(), $daysUntilDue, $recipients),
+                );
+
+                ++$alertCount;
             }
         }
 
@@ -325,10 +327,12 @@ class AlertDetectionService
         $result = [];
 
         foreach ($users as $user) {
-            if (!in_array($user->getId(), $uniqueIds, true)) {
-                $uniqueIds[] = $user->getId();
-                $result[] = $user;
+            if (in_array($user->getId(), $uniqueIds, true)) {
+                continue;
             }
+
+            $uniqueIds[] = $user->getId();
+            $result[] = $user;
         }
 
         return $result;

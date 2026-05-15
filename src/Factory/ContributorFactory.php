@@ -56,7 +56,7 @@ final class ContributorFactory extends PersistentObjectFactory
     #[Override]
     protected function initialize(): static
     {
-        return $this->afterInstantiate(function (Contributor $contributor): void {
+        return $this->afterInstantiate(static function (Contributor $contributor): void {
             // Multi-tenant alignment : si user fourni, hériter de sa company
             // (priorité sur le default qui peut créer une nouvelle company isolée).
             $user = $contributor->getUser();

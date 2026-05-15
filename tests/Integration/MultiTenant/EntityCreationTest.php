@@ -106,8 +106,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($project);
         $this->entityManager->flush();
 
-        $this->assertNotNull($project->getCompany());
-        $this->assertEquals($this->company->getId(), $project->getCompany()->getId());
+        static::assertNotNull($project->getCompany());
+        static::assertEquals($this->company->getId(), $project->getCompany()->getId());
     }
 
     /**
@@ -122,8 +122,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($client);
         $this->entityManager->flush();
 
-        $this->assertNotNull($client->getCompany());
-        $this->assertEquals($this->company->getId(), $client->getCompany()->getId());
+        static::assertNotNull($client->getCompany());
+        static::assertEquals($this->company->getId(), $client->getCompany()->getId());
     }
 
     /**
@@ -139,8 +139,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($contributor);
         $this->entityManager->flush();
 
-        $this->assertNotNull($contributor->getCompany());
-        $this->assertEquals($this->company->getId(), $contributor->getCompany()->getId());
+        static::assertNotNull($contributor->getCompany());
+        static::assertEquals($this->company->getId(), $contributor->getCompany()->getId());
     }
 
     /**
@@ -160,9 +160,9 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($order);
         $this->entityManager->flush();
 
-        $this->assertNotNull($order->getCompany());
-        $this->assertEquals($this->company->getId(), $order->getCompany()->getId());
-        $this->assertEquals($project->getCompany()->getId(), $order->getCompany()->getId());
+        static::assertNotNull($order->getCompany());
+        static::assertEquals($this->company->getId(), $order->getCompany()->getId());
+        static::assertEquals($project->getCompany()->getId(), $order->getCompany()->getId());
     }
 
     /**
@@ -181,8 +181,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $this->assertNotNull($task->getCompany());
-        $this->assertEquals($project->getCompany()->getId(), $task->getCompany()->getId());
+        static::assertNotNull($task->getCompany());
+        static::assertEquals($project->getCompany()->getId(), $task->getCompany()->getId());
     }
 
     /**
@@ -203,8 +203,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($timesheet);
         $this->entityManager->flush();
 
-        $this->assertNotNull($timesheet->getCompany());
-        $this->assertEquals($project->getCompany()->getId(), $timesheet->getCompany()->getId());
+        static::assertNotNull($timesheet->getCompany());
+        static::assertEquals($project->getCompany()->getId(), $timesheet->getCompany()->getId());
     }
 
     /**
@@ -227,8 +227,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($planning);
         $this->entityManager->flush();
 
-        $this->assertNotNull($planning->getCompany());
-        $this->assertEquals($project->getCompany()->getId(), $planning->getCompany()->getId());
+        static::assertNotNull($planning->getCompany());
+        static::assertEquals($project->getCompany()->getId(), $planning->getCompany()->getId());
     }
 
     /**
@@ -256,8 +256,8 @@ class EntityCreationTest extends KernelTestCase
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        $this->assertNotNull($invoice->getCompany());
-        $this->assertEquals($this->company->getId(), $invoice->getCompany()->getId());
+        static::assertNotNull($invoice->getCompany());
+        static::assertEquals($this->company->getId(), $invoice->getCompany()->getId());
     }
 
     /**
@@ -268,8 +268,8 @@ class EntityCreationTest extends KernelTestCase
         $project = ProjectFactory::createOne();
         $contributor = ContributorFactory::createOne();
 
-        $this->assertNotNull($project->getCompany());
-        $this->assertNotNull($contributor->getCompany());
+        static::assertNotNull($project->getCompany());
+        static::assertNotNull($contributor->getCompany());
     }
 
     /**

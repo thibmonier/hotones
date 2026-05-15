@@ -46,12 +46,13 @@ class LoginRedirectSubscriber implements EventSubscriberInterface
 
             // Vérifier si l'URL cible contient un pattern bloqué
             foreach ($blockedPatterns as $pattern) {
-                if (str_contains($targetUrl, $pattern)) {
-                    // Rediriger vers la page d'accueil au lieu de l'URL bloquée
-                    $event->setResponse(new RedirectResponse($this->urlGenerator->generate('home')));
-
-                    return;
+                if (!str_contains($targetUrl, $pattern)) {
+                    continue;
                 }
+
+                $event->setResponse(new RedirectResponse($this->urlGenerator->generate('home')));
+
+                return;
             }
         }
 

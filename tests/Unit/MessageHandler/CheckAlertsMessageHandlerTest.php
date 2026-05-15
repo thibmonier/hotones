@@ -55,16 +55,16 @@ final class CheckAlertsMessageHandlerTest extends TestCase
 
         ($this->handler)(new CheckAlertsMessage());
 
-        self::assertCount(2, $logCalls);
-        self::assertSame('Starting alert check...', $logCalls[0]['message']);
-        self::assertSame([], $logCalls[0]['context']);
+        static::assertCount(2, $logCalls);
+        static::assertSame('Starting alert check...', $logCalls[0]['message']);
+        static::assertSame([], $logCalls[0]['context']);
 
-        self::assertSame('Alert check completed', $logCalls[1]['message']);
-        self::assertSame(3, $logCalls[1]['context']['budget_alerts']);
-        self::assertSame(1, $logCalls[1]['context']['margin_alerts']);
-        self::assertSame(5, $logCalls[1]['context']['overload_alerts']);
-        self::assertSame(2, $logCalls[1]['context']['payment_alerts']);
-        self::assertSame(11, $logCalls[1]['context']['total_alerts']);
+        static::assertSame('Alert check completed', $logCalls[1]['message']);
+        static::assertSame(3, $logCalls[1]['context']['budget_alerts']);
+        static::assertSame(1, $logCalls[1]['context']['margin_alerts']);
+        static::assertSame(5, $logCalls[1]['context']['overload_alerts']);
+        static::assertSame(2, $logCalls[1]['context']['payment_alerts']);
+        static::assertSame(11, $logCalls[1]['context']['total_alerts']);
     }
 
     public function testHandlerHandlesZeroAlertsCleanly(): void
@@ -89,7 +89,7 @@ final class CheckAlertsMessageHandlerTest extends TestCase
 
         ($this->handler)(new CheckAlertsMessage());
 
-        self::assertNotNull($captured);
-        self::assertSame(0, $captured['total_alerts']);
+        static::assertNotNull($captured);
+        static::assertSame(0, $captured['total_alerts']);
     }
 }

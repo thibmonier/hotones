@@ -401,7 +401,7 @@ class CrmLeadController extends AbstractController
         }
 
         // Trier par date décroissante
-        usort($timeline, fn ($a, $b): int => $b['date'] <=> $a['date']);
+        usort($timeline, static fn ($a, $b): int => $b['date'] <=> $a['date']);
 
         return $timeline;
     }

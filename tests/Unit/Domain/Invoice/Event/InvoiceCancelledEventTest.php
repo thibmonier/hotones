@@ -19,15 +19,15 @@ final class InvoiceCancelledEventTest extends TestCase
 
         $event = InvoiceCancelledEvent::create($invoiceId, $reason);
 
-        self::assertInstanceOf(DomainEventInterface::class, $event);
-        self::assertSame($invoiceId, $event->getInvoiceId());
-        self::assertSame($reason, $event->getReason());
+        static::assertInstanceOf(DomainEventInterface::class, $event);
+        static::assertSame($invoiceId, $event->getInvoiceId());
+        static::assertSame($reason, $event->getReason());
     }
 
     public function testGetOccurredOnSetAtConstruction(): void
     {
         $event = InvoiceCancelledEvent::create(InvoiceId::generate(), 'reason');
 
-        self::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
+        static::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
     }
 }

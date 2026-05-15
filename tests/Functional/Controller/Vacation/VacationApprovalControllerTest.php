@@ -108,7 +108,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        self::assertSame(VacationStatus::APPROVED, $repo->findById($vacation->getId())->getStatus());
+        static::assertSame(VacationStatus::APPROVED, $repo->findById($vacation->getId())->getStatus());
     }
 
     public function testRejectTransitionsVacationToRejected(): void
@@ -123,7 +123,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        self::assertSame(VacationStatus::REJECTED, $repo->findById($vacation->getId())->getStatus());
+        static::assertSame(VacationStatus::REJECTED, $repo->findById($vacation->getId())->getStatus());
     }
 
     public function testRejectPersistsRejectionReasonWhenSupplied(): void
@@ -140,8 +140,8 @@ final class VacationApprovalControllerTest extends WebTestCase
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
         $rejected = $repo->findById($vacation->getId());
-        self::assertSame(VacationStatus::REJECTED, $rejected->getStatus());
-        self::assertSame('Planning sature sur la periode', $rejected->getRejectionReason());
+        static::assertSame(VacationStatus::REJECTED, $rejected->getStatus());
+        static::assertSame('Planning sature sur la periode', $rejected->getRejectionReason());
     }
 
     public function testRejectKeepsNullReasonWhenFieldOmitted(): void
@@ -154,7 +154,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        self::assertNull($repo->findById($vacation->getId())->getRejectionReason());
+        static::assertNull($repo->findById($vacation->getId())->getRejectionReason());
     }
 
     public function testManagerCancelTransitionsApprovedVacationToCancelled(): void
@@ -176,7 +176,7 @@ final class VacationApprovalControllerTest extends WebTestCase
 
         /** @var VacationRepositoryInterface $repo */
         $repo = static::getContainer()->get(VacationRepositoryInterface::class);
-        self::assertSame(VacationStatus::CANCELLED, $repo->findById($vacation->getId())->getStatus());
+        static::assertSame(VacationStatus::CANCELLED, $repo->findById($vacation->getId())->getStatus());
     }
 
     public function testManagerCancelIsForbiddenForUnmanagedContributor(): void
@@ -210,7 +210,7 @@ final class VacationApprovalControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
         $payload = json_decode($this->client->getResponse()->getContent(), true);
-        self::assertSame(2, $payload['count']);
-        self::assertCount(2, $payload['vacations']);
+        static::assertSame(2, $payload['count']);
+        static::assertCount(2, $payload['vacations']);
     }
 }

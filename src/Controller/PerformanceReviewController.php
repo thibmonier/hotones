@@ -46,11 +46,11 @@ class PerformanceReviewController extends AbstractController
 
         // Apply filters
         if ($year) {
-            $reviews = array_filter($reviews, fn ($review): bool => $review->getYear() === $year);
+            $reviews = array_filter($reviews, static fn ($review): bool => $review->getYear() === $year);
         }
 
         if ($status) {
-            $reviews = array_filter($reviews, fn ($review): bool => $review->getStatus() === $status);
+            $reviews = array_filter($reviews, static fn ($review): bool => $review->getStatus() === $status);
         }
 
         // Get statistics for admin/manager
@@ -192,13 +192,15 @@ class PerformanceReviewController extends AbstractController
             // Parse objectives
             $objectives = [];
             foreach ($objectivesData as $objective) {
-                if (!empty($objective['title'])) {
-                    $objectives[] = [
-                        'title' => $objective['title'],
-                        'description' => $objective['description'] ?? '',
-                        'deadline' => $objective['deadline'] ?? null,
-                    ];
+                if (empty($objective['title'])) {
+                    continue;
                 }
+
+                $objectives[] = [
+                    'title' => $objective['title'],
+                    'description' => $objective['description'] ?? '',
+                    'deadline' => $objective['deadline'] ?? null,
+                ];
             }
 
             $interviewDate = $interviewDateStr ? new DateTimeImmutable($interviewDateStr) : null;

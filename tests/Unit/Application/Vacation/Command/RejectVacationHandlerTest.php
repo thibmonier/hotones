@@ -35,7 +35,7 @@ final class RejectVacationHandlerTest extends TestCase
 
         $captured = null;
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturnCallback(function ($msg) use (&$captured) {
+        $bus->method('dispatch')->willReturnCallback(static function ($msg) use (&$captured) {
             $captured = $msg;
 
             return new Envelope($msg);
@@ -47,8 +47,8 @@ final class RejectVacationHandlerTest extends TestCase
             rejectionReason: 'Equipe saturee',
         ));
 
-        $this->assertInstanceOf(VacationNotificationMessage::class, $captured);
-        $this->assertSame('rejected', $captured->getType());
+        static::assertInstanceOf(VacationNotificationMessage::class, $captured);
+        static::assertSame('rejected', $captured->getType());
     }
 
     public function testRejectWithoutReason(): void
@@ -69,7 +69,7 @@ final class RejectVacationHandlerTest extends TestCase
         ));
 
         // No exception thrown — handler completed, vacation rejected without reason
-        $this->assertNull($vacation->getRejectionReason());
+        static::assertNull($vacation->getRejectionReason());
     }
 
     private function makePendingVacation(): Vacation

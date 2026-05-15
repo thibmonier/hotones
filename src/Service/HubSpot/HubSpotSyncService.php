@@ -213,7 +213,7 @@ class HubSpotSyncService
             }
 
             // Trier par date de creation (plus recents en premier)
-            usort($formattedDeals, fn ($a, $b) => ($b['createDate'] ?? '') <=> ($a['createDate'] ?? ''));
+            usort($formattedDeals, static fn ($a, $b) => ($b['createDate'] ?? '') <=> ($a['createDate'] ?? ''));
 
             return [
                 'success' => true,
@@ -293,7 +293,7 @@ class HubSpotSyncService
             }
 
             // Trier par nom
-            usort($formattedClients, fn ($a, $b) => strcasecmp((string) $a['name'], (string) $b['name']));
+            usort($formattedClients, static fn ($a, $b) => strcasecmp((string) $a['name'], (string) $b['name']));
 
             return [
                 'success' => true,

@@ -69,8 +69,8 @@ final class CheckMarginAdoptionRedThresholdHandlerTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::stringContains('Adoption marge sous seuil rouge depuis 7 jours'),
-                self::stringContains('0.0 %'),
+                static::stringContains('Adoption marge sous seuil rouge depuis 7 jours'),
+                static::stringContains('0.0 %'),
                 AlertSeverity::CRITICAL,
             )
             ->willReturn(true);
@@ -114,7 +114,7 @@ final class CheckMarginAdoptionRedThresholdHandlerTest extends TestCase
         SlackAlertingInterface $slack,
         ?ArrayAdapter $cache = null,
     ): CheckMarginAdoptionRedThresholdHandler {
-        $cache = $cache ?? new ArrayAdapter();
+        $cache ??= new ArrayAdapter();
         $repo = new class($records) implements MarginAdoptionReadModelRepositoryInterface {
             /** @param list<ProjectMarginSnapshotRecord> $records */
             public function __construct(private readonly array $records)
@@ -144,7 +144,7 @@ final class CheckMarginAdoptionRedThresholdHandlerTest extends TestCase
 
         return new ProjectMarginSnapshotRecord(
             projectId: $id,
-            projectName: "Project$id",
+            projectName: "Project{$id}",
             marginCalculatedAt: $now->modify(sprintf('-%d days', $daysAgo)),
         );
     }

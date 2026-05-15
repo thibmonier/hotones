@@ -20,10 +20,10 @@ final class WorkItemRevisedEventTest extends TestCase
 
         $event = WorkItemRevisedEvent::create($workItemId, $oldHours, $newHours);
 
-        self::assertTrue($event->workItemId->equals($workItemId));
-        self::assertTrue($event->oldHours->equals($oldHours));
-        self::assertTrue($event->newHours->equals($newHours));
-        self::assertSame('legacy:7', $event->getAggregateId());
+        static::assertTrue($event->workItemId->equals($workItemId));
+        static::assertTrue($event->oldHours->equals($oldHours));
+        static::assertTrue($event->newHours->equals($newHours));
+        static::assertSame('legacy:7', $event->getAggregateId());
     }
 
     public function testOccurredOnRecorded(): void
@@ -34,6 +34,6 @@ final class WorkItemRevisedEventTest extends TestCase
             WorkedHours::fromFloat(2.0),
         );
 
-        self::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
+        static::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
     }
 }

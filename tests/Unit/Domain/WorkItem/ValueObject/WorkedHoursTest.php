@@ -13,14 +13,14 @@ final class WorkedHoursTest extends TestCase
     public function testFromFloatPositive(): void
     {
         $h = WorkedHours::fromFloat(7.5);
-        self::assertSame(7.5, $h->getValue());
-        self::assertSame('7.50', (string) $h);
+        static::assertSame(7.5, $h->getValue());
+        static::assertSame('7.50', (string) $h);
     }
 
     public function testFromDecimalString(): void
     {
         $h = WorkedHours::fromDecimalString('8.00');
-        self::assertSame(8.0, $h->getValue());
+        static::assertSame(8.0, $h->getValue());
     }
 
     public function testZeroThrows(): void
@@ -46,13 +46,13 @@ final class WorkedHoursTest extends TestCase
     public function testExactly24HoursAccepted(): void
     {
         $h = WorkedHours::fromFloat(24.0);
-        self::assertSame(24.0, $h->getValue());
+        static::assertSame(24.0, $h->getValue());
     }
 
     public function testRoundsTo2DecimalPlaces(): void
     {
-        $h = WorkedHours::fromFloat(7.123456);
-        self::assertSame(7.12, $h->getValue());
+        $h = WorkedHours::fromFloat(7.123_456);
+        static::assertSame(7.12, $h->getValue());
     }
 
     public function testEquals(): void
@@ -61,7 +61,7 @@ final class WorkedHoursTest extends TestCase
         $b = WorkedHours::fromFloat(7.5);
         $c = WorkedHours::fromFloat(8.0);
 
-        self::assertTrue($a->equals($b));
-        self::assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 }

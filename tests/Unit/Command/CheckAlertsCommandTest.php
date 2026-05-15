@@ -41,12 +41,12 @@ class CheckAlertsCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Vérification des alertes', $output);
-        $this->assertStringContainsString('Aucune alerte détectée', $output);
-        $this->assertStringNotContainsString('Les notifications ont été créées', $output);
+        static::assertStringContainsString('Vérification des alertes', $output);
+        static::assertStringContainsString('Aucune alerte détectée', $output);
+        static::assertStringNotContainsString('Les notifications ont été créées', $output);
     }
 
     public function testExecuteWithSingleAlert(): void
@@ -64,8 +64,8 @@ class CheckAlertsCommandTest extends TestCase
 
         $output = $this->commandTester->getDisplay();
         // Singular form
-        $this->assertStringContainsString('1 alerte détectée et dispatchée', $output);
-        $this->assertStringContainsString('Les notifications ont été créées', $output);
+        static::assertStringContainsString('1 alerte détectée et dispatchée', $output);
+        static::assertStringContainsString('Les notifications ont été créées', $output);
     }
 
     public function testExecuteWithMultipleAlerts(): void
@@ -83,8 +83,8 @@ class CheckAlertsCommandTest extends TestCase
 
         $output = $this->commandTester->getDisplay();
         // Plural form - total is 14
-        $this->assertStringContainsString('14 alertes détectées et dispatchées', $output);
-        $this->assertStringContainsString('Les notifications ont été créées', $output);
+        static::assertStringContainsString('14 alertes détectées et dispatchées', $output);
+        static::assertStringContainsString('Les notifications ont été créées', $output);
     }
 
     public function testExecuteDisplaysTableWithAllAlertTypes(): void
@@ -103,19 +103,19 @@ class CheckAlertsCommandTest extends TestCase
         $output = $this->commandTester->getDisplay();
 
         // Verify table headers and values
-        $this->assertStringContainsString("Type d'alerte", $output);
-        $this->assertStringContainsString('Nombre', $output);
-        $this->assertStringContainsString('Budget dépassé', $output);
-        $this->assertStringContainsString('Marge faible', $output);
-        $this->assertStringContainsString('Surcharge contributeur', $output);
-        $this->assertStringContainsString('Paiement proche', $output);
-        $this->assertStringContainsString('TOTAL', $output);
+        static::assertStringContainsString("Type d'alerte", $output);
+        static::assertStringContainsString('Nombre', $output);
+        static::assertStringContainsString('Budget dépassé', $output);
+        static::assertStringContainsString('Marge faible', $output);
+        static::assertStringContainsString('Surcharge contributeur', $output);
+        static::assertStringContainsString('Paiement proche', $output);
+        static::assertStringContainsString('TOTAL', $output);
 
         // Verify counts appear in output
-        $this->assertStringContainsString('2', $output); // budget_alerts
-        $this->assertStringContainsString('1', $output); // margin_alerts
-        $this->assertStringContainsString('3', $output); // overload_alerts
-        $this->assertStringContainsString('6', $output); // total
+        static::assertStringContainsString('2', $output); // budget_alerts
+        static::assertStringContainsString('1', $output); // margin_alerts
+        static::assertStringContainsString('3', $output); // overload_alerts
+        static::assertStringContainsString('6', $output); // total
     }
 
     public function testExecuteCalculatesTotalCorrectly(): void
@@ -150,7 +150,7 @@ class CheckAlertsCommandTest extends TestCase
             $tester->execute([]);
             $output = $tester->getDisplay();
 
-            $this->assertStringContainsString((string) $testCase['total'], $output);
+            static::assertStringContainsString((string) $testCase['total'], $output);
         }
     }
 
@@ -167,8 +167,8 @@ class CheckAlertsCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertEquals(0, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertSame(0, $exitCode);
     }
 
     public function testExecuteCallsAlertDetectionService(): void
@@ -200,7 +200,7 @@ class CheckAlertsCommandTest extends TestCase
         // Should not throw any errors accessing array keys
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
     }
 
     public function testExecuteUsesCorrectPluralFormsForTwoAlerts(): void
@@ -218,6 +218,6 @@ class CheckAlertsCommandTest extends TestCase
 
         $output = $this->commandTester->getDisplay();
         // Plural form for 2 alerts
-        $this->assertStringContainsString('2 alertes détectées et dispatchées', $output);
+        static::assertStringContainsString('2 alertes détectées et dispatchées', $output);
     }
 }

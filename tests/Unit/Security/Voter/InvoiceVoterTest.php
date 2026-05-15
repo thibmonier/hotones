@@ -64,7 +64,7 @@ final class InvoiceVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMPTA']);
         $invoice = $this->makeInvoice($company, Invoice::STATUS_SENT);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $invoice, InvoiceVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $invoice, InvoiceVoter::EDIT));
     }
 
     public function testEditGrantedOnDraftForCompta(): void
@@ -73,7 +73,7 @@ final class InvoiceVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMPTA']);
         $invoice = $this->makeInvoice($company, Invoice::STATUS_DRAFT);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $invoice, InvoiceVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $invoice, InvoiceVoter::EDIT));
     }
 
     public function testCancelGrantedOnSentForCompta(): void
@@ -82,7 +82,7 @@ final class InvoiceVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMPTA']);
         $invoice = $this->makeInvoice($company, Invoice::STATUS_SENT);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $invoice, InvoiceVoter::CANCEL));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $invoice, InvoiceVoter::CANCEL));
     }
 
     public function testCancelDeniedOnDraft(): void
@@ -91,7 +91,7 @@ final class InvoiceVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMPTA']);
         $invoice = $this->makeInvoice($company, Invoice::STATUS_DRAFT);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $invoice, InvoiceVoter::CANCEL));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $invoice, InvoiceVoter::CANCEL));
     }
 
     public function testDeleteOnlyOnDraftForAdmin(): void
@@ -100,9 +100,9 @@ final class InvoiceVoterTest extends TestCase
         $admin = $this->makeUser($company, ['ROLE_ADMIN']);
 
         $draft = $this->makeInvoice($company, Invoice::STATUS_DRAFT);
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $draft, InvoiceVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $draft, InvoiceVoter::DELETE));
 
         $sent = $this->makeInvoice($company, Invoice::STATUS_SENT);
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($admin, $sent, InvoiceVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($admin, $sent, InvoiceVoter::DELETE));
     }
 }

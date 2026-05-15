@@ -30,7 +30,7 @@ final readonly class ComputeMarginAdoptionKpiHandler
 
     public function __invoke(?DateTimeImmutable $now = null): MarginAdoptionKpiDto
     {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $records = $this->repository->findActiveWithMarginSnapshot();
         $stats = $this->calculator->classify($records, $now);

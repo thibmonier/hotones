@@ -67,7 +67,7 @@ class MetricsCalculationServiceTest extends TestCase
         $this->entityManager
             ->expects($this->exactly(2))
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }
@@ -112,7 +112,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }
@@ -153,7 +153,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }
@@ -192,7 +192,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }
@@ -204,7 +204,7 @@ class MetricsCalculationServiceTest extends TestCase
             });
 
         // Expect persist to be called for new DimTime
-        $this->entityManager->expects($this->once())->method('persist')->with($this->isInstanceOf(DimTime::class));
+        $this->entityManager->expects($this->once())->method('persist')->with(static::isInstanceOf(DimTime::class));
 
         // Expect flush to be called twice: once for DimTime, once at the end
         $this->entityManager->expects($this->exactly(2))->method('flush');
@@ -233,7 +233,7 @@ class MetricsCalculationServiceTest extends TestCase
             ->method('error')
             ->with(
                 'Erreur lors du calcul des métriques',
-                $this->callback(fn ($context): bool => isset($context['error']) && $context['error'] === $errorMessage),
+                static::callback(static fn ($context): bool => isset($context['error']) && $context['error'] === $errorMessage),
             );
 
         $this->expectException(Exception::class);
@@ -253,7 +253,7 @@ class MetricsCalculationServiceTest extends TestCase
         $this->entityManager
             ->expects($this->once())
             ->method('createQuery')
-            ->with($this->stringContains('DELETE FROM App\Entity\Analytics\FactProjectMetrics'))
+            ->with(static::stringContains('DELETE FROM App\Entity\Analytics\FactProjectMetrics'))
             ->willReturn($deleteQuery);
 
         // Mock repositories for metric calculations
@@ -272,7 +272,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }
@@ -315,7 +315,7 @@ class MetricsCalculationServiceTest extends TestCase
 
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($dimTimeRepo, $projectRepo) {
+            ->willReturnCallback(static function ($entityClass) use ($dimTimeRepo, $projectRepo) {
                 if ($entityClass === DimTime::class) {
                     return $dimTimeRepo;
                 }

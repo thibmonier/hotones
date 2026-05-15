@@ -11,29 +11,29 @@ final class ContractTypeTest extends TestCase
 {
     public function testFixedPriceLabel(): void
     {
-        $this->assertSame('Forfait', ContractType::FIXED_PRICE->getLabel());
+        static::assertSame('Forfait', ContractType::FIXED_PRICE->getLabel());
     }
 
     public function testTimeAndMaterialLabel(): void
     {
-        $this->assertSame('Régie', ContractType::TIME_AND_MATERIAL->getLabel());
+        static::assertSame('Régie', ContractType::TIME_AND_MATERIAL->getLabel());
     }
 
     public function testIsFixedPrice(): void
     {
-        $this->assertTrue(ContractType::FIXED_PRICE->isFixedPrice());
-        $this->assertFalse(ContractType::TIME_AND_MATERIAL->isFixedPrice());
+        static::assertTrue(ContractType::FIXED_PRICE->isFixedPrice());
+        static::assertFalse(ContractType::TIME_AND_MATERIAL->isFixedPrice());
     }
 
     public function testIsTimeAndMaterial(): void
     {
-        $this->assertTrue(ContractType::TIME_AND_MATERIAL->isTimeAndMaterial());
-        $this->assertFalse(ContractType::FIXED_PRICE->isTimeAndMaterial());
+        static::assertTrue(ContractType::TIME_AND_MATERIAL->isTimeAndMaterial());
+        static::assertFalse(ContractType::FIXED_PRICE->isTimeAndMaterial());
     }
 
     public function testFromValueRoundtrip(): void
     {
-        $this->assertSame(ContractType::FIXED_PRICE, ContractType::from('forfait'));
-        $this->assertSame(ContractType::TIME_AND_MATERIAL, ContractType::from('regie'));
+        static::assertSame(ContractType::FIXED_PRICE, ContractType::from('forfait'));
+        static::assertSame(ContractType::TIME_AND_MATERIAL, ContractType::from('regie'));
     }
 }

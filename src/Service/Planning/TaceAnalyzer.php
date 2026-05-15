@@ -68,9 +68,9 @@ class TaceAnalyzer
         }
 
         // Trier par gravité (TACE le plus éloigné de l'idéal)
-        usort($results['critical'], fn ($a, $b): int => abs($b['tace'] - 80) <=> abs($a['tace'] - 80));
-        usort($results['overloaded'], fn ($a, $b): int => $b['tace'] <=> $a['tace']);
-        usort($results['underutilized'], fn ($a, $b): int => $a['tace'] <=> $b['tace']);
+        usort($results['critical'], static fn ($a, $b): int => abs($b['tace'] - 80) <=> abs($a['tace'] - 80));
+        usort($results['overloaded'], static fn ($a, $b): int => $b['tace'] <=> $a['tace']);
+        usort($results['underutilized'], static fn ($a, $b): int => $a['tace'] <=> $b['tace']);
 
         return $results;
     }

@@ -19,9 +19,9 @@ final class ProjectCreatedEventTest extends TestCase
             'My Project',
         );
 
-        $this->assertSame(7, $event->getProjectId()->toLegacyInt());
-        $this->assertSame(42, $event->getClientId()->toLegacyInt());
-        $this->assertSame('My Project', $event->getName());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertSame(7, $event->getProjectId()->toLegacyInt());
+        static::assertSame(42, $event->getClientId()->toLegacyInt());
+        static::assertSame('My Project', $event->getName());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

@@ -23,12 +23,12 @@ final class ComputeDsoKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertSame(0.0, $dto->dso30Days);
-        self::assertSame(0.0, $dto->dso90Days);
-        self::assertSame(0.0, $dto->dso365Days);
-        self::assertSame(DsoTrend::Stable, $dto->trend30);
-        self::assertFalse($dto->warningTriggered);
-        self::assertSame(45.0, $dto->warningThresholdDays);
+        static::assertSame(0.0, $dto->dso30Days);
+        static::assertSame(0.0, $dto->dso90Days);
+        static::assertSame(0.0, $dto->dso365Days);
+        static::assertSame(DsoTrend::Stable, $dto->trend30);
+        static::assertFalse($dto->warningTriggered);
+        static::assertSame(45.0, $dto->warningThresholdDays);
     }
 
     public function testFlagsWarningWhen30DayDsoExceedsDefaultThreshold(): void
@@ -44,8 +44,8 @@ final class ComputeDsoKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertTrue($dto->warningTriggered);
-        self::assertEqualsWithDelta(50.0, $dto->dso30Days, 0.1);
+        static::assertTrue($dto->warningTriggered);
+        static::assertEqualsWithDelta(50.0, $dto->dso30Days, 0.1);
     }
 
     public function testTrendUpWhenCurrentDsoHigherThanPrevious(): void
@@ -77,7 +77,7 @@ final class ComputeDsoKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertSame(DsoTrend::Up, $dto->trend30);
+        static::assertSame(DsoTrend::Up, $dto->trend30);
     }
 
     public function testTrendStableWhenDeltaWithinOneDay(): void
@@ -93,7 +93,7 @@ final class ComputeDsoKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertSame(DsoTrend::Stable, $dto->trend30);
+        static::assertSame(DsoTrend::Stable, $dto->trend30);
     }
 
     /**

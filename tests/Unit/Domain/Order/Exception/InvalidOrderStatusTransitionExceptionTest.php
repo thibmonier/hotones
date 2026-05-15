@@ -18,8 +18,8 @@ final class InvalidOrderStatusTransitionExceptionTest extends TestCase
             OrderStatus::SIGNED,
         );
 
-        self::assertInstanceOf(InvalidOrderStatusTransitionException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
+        static::assertInstanceOf(InvalidOrderStatusTransitionException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
     }
 
     public function testCreateMessageContainsBothStatuses(): void
@@ -29,8 +29,8 @@ final class InvalidOrderStatusTransitionExceptionTest extends TestCase
             OrderStatus::SIGNED,
         );
 
-        self::assertStringContainsString(OrderStatus::ABANDONED->value, $exception->getMessage());
-        self::assertStringContainsString(OrderStatus::SIGNED->value, $exception->getMessage());
-        self::assertStringContainsString('Cannot transition', $exception->getMessage());
+        static::assertStringContainsString(OrderStatus::ABANDONED->value, $exception->getMessage());
+        static::assertStringContainsString(OrderStatus::SIGNED->value, $exception->getMessage());
+        static::assertStringContainsString('Cannot transition', $exception->getMessage());
     }
 }

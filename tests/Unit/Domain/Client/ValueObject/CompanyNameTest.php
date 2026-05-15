@@ -13,13 +13,13 @@ final class CompanyNameTest extends TestCase
     public function testFromStringValid(): void
     {
         $name = CompanyName::fromString('Acme Corp');
-        $this->assertSame('Acme Corp', $name->getValue());
+        static::assertSame('Acme Corp', $name->getValue());
     }
 
     public function testFromStringTrimsWhitespace(): void
     {
         $name = CompanyName::fromString('  Acme  ');
-        $this->assertSame('Acme', $name->getValue());
+        static::assertSame('Acme', $name->getValue());
     }
 
     public function testTooShortRejected(): void
@@ -42,12 +42,12 @@ final class CompanyNameTest extends TestCase
         $b = CompanyName::fromString('Foo');
         $c = CompanyName::fromString('Bar');
 
-        $this->assertTrue($a->equals($b));
-        $this->assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testToString(): void
     {
-        $this->assertSame('Acme', (string) CompanyName::fromString('Acme'));
+        static::assertSame('Acme', (string) CompanyName::fromString('Acme'));
     }
 }

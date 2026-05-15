@@ -62,9 +62,9 @@ class ProjectRepositoryFilterTest extends KernelTestCase
 
         $results = $this->repository->findBetweenDatesFiltered(new DateTime('2026-01-01'), new DateTime('2026-12-31'));
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertContains('In Range', $names);
-        $this->assertNotContains('Out of Range', $names);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertContains('In Range', $names);
+        static::assertNotContains('Out of Range', $names);
     }
 
     public function testFilterByStatus(): void
@@ -78,9 +78,9 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'active',
         );
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertContains('Active One', $names);
-        $this->assertNotContains('Completed One', $names);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertContains('Active One', $names);
+        static::assertNotContains('Completed One', $names);
     }
 
     public function testFilterByProjectType(): void
@@ -95,9 +95,9 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'forfait',
         );
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertContains('Forfait', $names);
-        $this->assertNotContains('Regie', $names);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertContains('Forfait', $names);
+        static::assertNotContains('Regie', $names);
     }
 
     public function testFilterBySearch(): void
@@ -122,9 +122,9 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'Alpha',
         );
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertContains('Alpha Project', $names);
-        $this->assertNotContains('Beta Project', $names);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertContains('Alpha Project', $names);
+        static::assertNotContains('Beta Project', $names);
     }
 
     public function testCountBetweenDatesFiltered(): void
@@ -139,7 +139,7 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'active',
         );
 
-        $this->assertSame(2, $count);
+        static::assertSame(2, $count);
     }
 
     public function testSortByNameAsc(): void
@@ -157,8 +157,8 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'ASC',
         );
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertSame('Alpha', $names[0]);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertSame('Alpha', $names[0]);
     }
 
     public function testPaginationWithLimitOffset(): void
@@ -179,7 +179,7 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             0,
         );
 
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testCombinedFilters(): void
@@ -195,8 +195,8 @@ class ProjectRepositoryFilterTest extends KernelTestCase
             'forfait',
         );
 
-        $this->assertCount(1, $results);
-        $this->assertSame('Active Forfait', $results[0]->getName());
+        static::assertCount(1, $results);
+        static::assertSame('Active Forfait', $results[0]->getName());
     }
 
     public function testMultiTenantIsolation(): void
@@ -218,8 +218,8 @@ class ProjectRepositoryFilterTest extends KernelTestCase
 
         $results = $this->repository->findBetweenDatesFiltered(new DateTime('2026-01-01'), new DateTime('2026-12-31'));
 
-        $names = array_map(fn (Project $p): string => $p->getName(), $results);
-        $this->assertContains('My Company Project', $names);
-        $this->assertNotContains('Other Company Project', $names);
+        $names = array_map(static fn (Project $p): string => $p->getName(), $results);
+        static::assertContains('My Company Project', $names);
+        static::assertNotContains('Other Company Project', $names);
     }
 }

@@ -56,7 +56,7 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
 
     public function testReturnsEmptyArrayWhenNoInvoices(): void
     {
-        self::assertSame([], $this->repository->findEmittedInRollingWindow(30, $this->now));
+        static::assertSame([], $this->repository->findEmittedInRollingWindow(30, $this->now));
     }
 
     public function testIncludesOnlySignedQuoteInvoicedInsideWindow(): void
@@ -80,13 +80,13 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
         $w90 = $this->repository->findEmittedInRollingWindow(90, $this->now);
         $w365 = $this->repository->findEmittedInRollingWindow(365, $this->now);
 
-        self::assertCount(1, $w30);
-        self::assertCount(2, $w90);
-        self::assertCount(3, $w365);
+        static::assertCount(1, $w30);
+        static::assertCount(2, $w90);
+        static::assertCount(3, $w365);
 
         foreach ($w30 as $record) {
-            self::assertInstanceOf(QuoteInvoiceRecord::class, $record);
-            self::assertSame('Acme', $record->clientName);
+            static::assertInstanceOf(QuoteInvoiceRecord::class, $record);
+            static::assertSame('Acme', $record->clientName);
         }
     }
 
@@ -107,8 +107,8 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
 
         $records = $this->repository->findEmittedInRollingWindow(30, $this->now);
 
-        self::assertCount(1, $records);
-        self::assertSame('Own', $records[0]->clientName);
+        static::assertCount(1, $records);
+        static::assertSame('Own', $records[0]->clientName);
     }
 
     public function testRecordsAreConsumableByCalculator(): void
@@ -125,8 +125,8 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
             now: $this->now,
         );
 
-        self::assertSame(3, $stats->count);
-        self::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.5);
+        static::assertSame(3, $stats->count);
+        static::assertEqualsWithDelta(20.0, $stats->p50->getDays(), 0.5);
     }
 
     private function createQuoteInvoice(object $client, int $daysAgoEmitted, int $leadTimeDays): void
@@ -248,7 +248,7 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
         $order = new Order();
         $order->setCompany($company);
         $order->name = 'Other Quote';
-        $order->orderNumber = sprintf('OTHER-%d', random_int(1, 99999));
+        $order->orderNumber = sprintf('OTHER-%d', random_int(1, 99_999));
         $order->totalAmount = '1000.00';
         $order->status = 'gagne';
         $order->validatedAt = InvoiceFactory::toMutable($signedAt);
@@ -258,7 +258,7 @@ final class DoctrineBillingLeadTimeReadModelRepositoryTest extends KernelTestCas
         $invoice->setCompany($company);
         $invoice->setClient($client);
         $invoice->setOrder($order);
-        $invoice->invoiceNumber = sprintf('OTHER-INV-%d', random_int(1, 99999));
+        $invoice->invoiceNumber = sprintf('OTHER-INV-%d', random_int(1, 99_999));
         $invoice->status = Invoice::STATUS_SENT;
         $invoice->issuedAt = InvoiceFactory::toMutable($emittedAt);
         $invoice->dueDate = InvoiceFactory::toMutable($emittedAt->modify('+30 days'));

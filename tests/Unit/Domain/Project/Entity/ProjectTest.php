@@ -28,13 +28,13 @@ final class ProjectTest extends TestCase
     {
         $project = $this->makeProject();
 
-        $this->assertSame('Test Project', $project->getName());
-        $this->assertSame(ProjectStatus::DRAFT, $project->getStatus());
-        $this->assertSame(ProjectType::FORFAIT, $project->getProjectType());
-        $this->assertFalse($project->isInternal());
-        $this->assertNull($project->getDescription());
-        $this->assertNull($project->getBudget());
-        $this->assertNotNull($project->getCreatedAt());
+        static::assertSame('Test Project', $project->getName());
+        static::assertSame(ProjectStatus::DRAFT, $project->getStatus());
+        static::assertSame(ProjectType::FORFAIT, $project->getProjectType());
+        static::assertFalse($project->isInternal());
+        static::assertNull($project->getDescription());
+        static::assertNull($project->getBudget());
+        static::assertNotNull($project->getCreatedAt());
     }
 
     public function testCreateRecordsProjectCreatedEvent(): void
@@ -42,8 +42,8 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $events = $project->pullDomainEvents();
 
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ProjectCreatedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ProjectCreatedEvent::class, $events[0]);
     }
 
     public function testInternalProject(): void
@@ -56,8 +56,8 @@ final class ProjectTest extends TestCase
             isInternal: true,
         );
 
-        $this->assertTrue($project->isInternal());
-        $this->assertTrue($project->isTimeAndMaterials());
+        static::assertTrue($project->isInternal());
+        static::assertTrue($project->isTimeAndMaterials());
     }
 
     public function testActivateFromDraft(): void
@@ -66,12 +66,12 @@ final class ProjectTest extends TestCase
         $project->pullDomainEvents();
 
         $project->activate();
-        $this->assertSame(ProjectStatus::ACTIVE, $project->getStatus());
-        $this->assertTrue($project->isActive());
+        static::assertSame(ProjectStatus::ACTIVE, $project->getStatus());
+        static::assertTrue($project->isActive());
 
         $events = $project->pullDomainEvents();
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
     }
 
     public function testCannotCompleteFromDraft(): void
@@ -88,9 +88,9 @@ final class ProjectTest extends TestCase
         $project->activate();
         $project->complete();
 
-        $this->assertTrue($project->isClosed());
-        $this->assertSame(ProjectStatus::COMPLETED, $project->getStatus());
-        $this->assertNotNull($project->getCompletedAt());
+        static::assertTrue($project->isClosed());
+        static::assertSame(ProjectStatus::COMPLETED, $project->getStatus());
+        static::assertNotNull($project->getCompletedAt());
 
         $this->expectException(InvalidProjectStatusTransitionException::class);
         $project->activate();
@@ -102,7 +102,7 @@ final class ProjectTest extends TestCase
         $project->activate();
         $project->putOnHold();
 
-        $this->assertSame(ProjectStatus::ON_HOLD, $project->getStatus());
+        static::assertSame(ProjectStatus::ON_HOLD, $project->getStatus());
     }
 
     public function testCancelFromActive(): void
@@ -111,8 +111,8 @@ final class ProjectTest extends TestCase
         $project->activate();
         $project->cancel();
 
-        $this->assertTrue($project->isClosed());
-        $this->assertSame(ProjectStatus::CANCELLED, $project->getStatus());
+        static::assertTrue($project->isClosed());
+        static::assertSame(ProjectStatus::CANCELLED, $project->getStatus());
     }
 
     public function testChangeStatusNoOpIfSame(): void
@@ -122,7 +122,7 @@ final class ProjectTest extends TestCase
 
         $project->changeStatus(ProjectStatus::DRAFT);
 
-        $this->assertSame([], $project->pullDomainEvents());
+        static::assertSame([], $project->pullDomainEvents());
     }
 
     public function testUpdateDetails(): void
@@ -130,10 +130,10 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->updateDetails('New Name', 'New description', 'PROJ-123');
 
-        $this->assertSame('New Name', $project->getName());
-        $this->assertSame('New description', $project->getDescription());
-        $this->assertSame('PROJ-123', $project->getReference());
-        $this->assertNotNull($project->getUpdatedAt());
+        static::assertSame('New Name', $project->getName());
+        static::assertSame('New description', $project->getDescription());
+        static::assertSame('PROJ-123', $project->getReference());
+        static::assertNotNull($project->getUpdatedAt());
     }
 
     public function testSetDatesValid(): void
@@ -144,8 +144,8 @@ final class ProjectTest extends TestCase
 
         $project->setDates($start, $end);
 
-        $this->assertSame($start, $project->getStartDate());
-        $this->assertSame($end, $project->getEndDate());
+        static::assertSame($start, $project->getStartDate());
+        static::assertSame($end, $project->getEndDate());
     }
 
     public function testSetDatesStartAfterEndRejected(): void
@@ -159,11 +159,11 @@ final class ProjectTest extends TestCase
     public function testSetBudgetAndSoldAmount(): void
     {
         $project = $this->makeProject();
-        $project->setBudget(Money::fromAmount(50000));
-        $project->setSoldAmount(Money::fromAmount(45000));
+        $project->setBudget(Money::fromAmount(50_000));
+        $project->setSoldAmount(Money::fromAmount(45_000));
 
-        $this->assertSame(50000.0, $project->getBudget()->getAmount());
-        $this->assertSame(45000.0, $project->getSoldAmount()->getAmount());
+        static::assertSame(50_000.0, $project->getBudget()->getAmount());
+        static::assertSame(45_000.0, $project->getSoldAmount()->getAmount());
     }
 
     // TEST-COVERAGE-009 (sprint-019) — coverage extensions
@@ -171,20 +171,20 @@ final class ProjectTest extends TestCase
     public function testSetBudgetToNullClears(): void
     {
         $project = $this->makeProject();
-        $project->setBudget(Money::fromAmount(10000));
+        $project->setBudget(Money::fromAmount(10_000));
         $project->setBudget(null);
 
-        $this->assertNull($project->getBudget());
-        $this->assertNotNull($project->getUpdatedAt());
+        static::assertNull($project->getBudget());
+        static::assertNotNull($project->getUpdatedAt());
     }
 
     public function testSetSoldAmountToNullClears(): void
     {
         $project = $this->makeProject();
-        $project->setSoldAmount(Money::fromAmount(10000));
+        $project->setSoldAmount(Money::fromAmount(10_000));
         $project->setSoldAmount(null);
 
-        $this->assertNull($project->getSoldAmount());
+        static::assertNull($project->getSoldAmount());
     }
 
     public function testSetTechnicalInfo(): void
@@ -192,9 +192,9 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->setTechnicalInfo('https://github.com/org/repo', 'https://docs.example.org');
 
-        $this->assertSame('https://github.com/org/repo', $project->getRepositoryUrl());
-        $this->assertSame('https://docs.example.org', $project->getDocumentationUrl());
-        $this->assertNotNull($project->getUpdatedAt());
+        static::assertSame('https://github.com/org/repo', $project->getRepositoryUrl());
+        static::assertSame('https://docs.example.org', $project->getDocumentationUrl());
+        static::assertNotNull($project->getUpdatedAt());
     }
 
     public function testSetTechnicalInfoNullsClears(): void
@@ -203,8 +203,8 @@ final class ProjectTest extends TestCase
         $project->setTechnicalInfo('https://github.com/org/repo', 'https://docs.example.org');
         $project->setTechnicalInfo(null, null);
 
-        $this->assertNull($project->getRepositoryUrl());
-        $this->assertNull($project->getDocumentationUrl());
+        static::assertNull($project->getRepositoryUrl());
+        static::assertNull($project->getDocumentationUrl());
     }
 
     public function testAddNotes(): void
@@ -212,8 +212,8 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->addNotes('Important client feedback');
 
-        $this->assertSame('Important client feedback', $project->getNotes());
-        $this->assertNotNull($project->getUpdatedAt());
+        static::assertSame('Important client feedback', $project->getNotes());
+        static::assertNotNull($project->getUpdatedAt());
     }
 
     public function testIsFixedPriceForForfait(): void
@@ -225,8 +225,8 @@ final class ProjectTest extends TestCase
             ProjectType::FORFAIT,
         );
 
-        $this->assertTrue($forfait->isFixedPrice());
-        $this->assertFalse($forfait->isTimeAndMaterials());
+        static::assertTrue($forfait->isFixedPrice());
+        static::assertFalse($forfait->isTimeAndMaterials());
     }
 
     public function testIsTimeAndMaterialsForRegie(): void
@@ -238,8 +238,8 @@ final class ProjectTest extends TestCase
             ProjectType::REGIE,
         );
 
-        $this->assertTrue($regie->isTimeAndMaterials());
-        $this->assertFalse($regie->isFixedPrice());
+        static::assertTrue($regie->isTimeAndMaterials());
+        static::assertFalse($regie->isFixedPrice());
     }
 
     public function testGetDurationDaysNullWhenNoStartDate(): void
@@ -247,7 +247,7 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->setDates(null, new DateTimeImmutable('2026-12-31'));
 
-        $this->assertNull($project->getDurationDays());
+        static::assertNull($project->getDurationDays());
     }
 
     public function testGetDurationDaysNullWhenNoEndDate(): void
@@ -255,7 +255,7 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->setDates(new DateTimeImmutable('2026-01-01'), null);
 
-        $this->assertNull($project->getDurationDays());
+        static::assertNull($project->getDurationDays());
     }
 
     public function testGetDurationDaysCalculatesFromRange(): void
@@ -266,7 +266,7 @@ final class ProjectTest extends TestCase
             new DateTimeImmutable('2026-01-31'),
         );
 
-        $this->assertSame(30, $project->getDurationDays());
+        static::assertSame(30, $project->getDurationDays());
     }
 
     public function testCancelFromDraftDirectly(): void
@@ -274,8 +274,8 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->cancel();
 
-        $this->assertSame(ProjectStatus::CANCELLED, $project->getStatus());
-        $this->assertTrue($project->isClosed());
+        static::assertSame(ProjectStatus::CANCELLED, $project->getStatus());
+        static::assertTrue($project->isClosed());
     }
 
     public function testIsClosedForCancelled(): void
@@ -283,8 +283,8 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->cancel();
 
-        $this->assertTrue($project->isClosed());
-        $this->assertFalse($project->isActive());
+        static::assertTrue($project->isClosed());
+        static::assertFalse($project->isActive());
     }
 
     public function testCompletedSetsCompletedAtTimestamp(): void
@@ -293,8 +293,8 @@ final class ProjectTest extends TestCase
         $project->activate();
         $project->complete();
 
-        $this->assertNotNull($project->getCompletedAt());
-        $this->assertInstanceOf(DateTimeImmutable::class, $project->getCompletedAt());
+        static::assertNotNull($project->getCompletedAt());
+        static::assertInstanceOf(DateTimeImmutable::class, $project->getCompletedAt());
     }
 
     public function testCancelledDoesNotSetCompletedAt(): void
@@ -302,7 +302,7 @@ final class ProjectTest extends TestCase
         $project = $this->makeProject();
         $project->cancel();
 
-        $this->assertNull($project->getCompletedAt());
+        static::assertNull($project->getCompletedAt());
     }
 
     public function testActivateRecordsStatusChangedEvent(): void
@@ -312,8 +312,8 @@ final class ProjectTest extends TestCase
         $project->activate();
 
         $events = $project->pullDomainEvents();
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
     }
 
     public function testCompleteRecordsStatusChangedEvent(): void
@@ -325,8 +325,8 @@ final class ProjectTest extends TestCase
         $project->complete();
 
         $events = $project->pullDomainEvents();
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ProjectStatusChangedEvent::class, $events[0]);
     }
 
     public function testInvalidTransitionDraftToOnHold(): void
@@ -349,16 +349,16 @@ final class ProjectTest extends TestCase
                 'status' => ProjectStatus::ACTIVE,
                 'description' => 'desc',
                 'reference' => 'PROJ-2026-001',
-                'budget' => Money::fromAmount(10000),
+                'budget' => Money::fromAmount(10_000),
                 'soldAmount' => Money::fromAmount(9000),
             ],
         );
 
-        $this->assertSame([], $project->pullDomainEvents());
-        $this->assertSame(ProjectStatus::ACTIVE, $project->getStatus());
-        $this->assertSame('desc', $project->getDescription());
-        $this->assertSame('PROJ-2026-001', $project->getReference());
-        $this->assertSame(10000.0, $project->getBudget()->getAmount());
+        static::assertSame([], $project->pullDomainEvents());
+        static::assertSame(ProjectStatus::ACTIVE, $project->getStatus());
+        static::assertSame('desc', $project->getDescription());
+        static::assertSame('PROJ-2026-001', $project->getReference());
+        static::assertSame(10_000.0, $project->getBudget()->getAmount());
     }
 
     public function testReconstituteFallbacksToDefaults(): void
@@ -371,11 +371,11 @@ final class ProjectTest extends TestCase
             isInternal: true,
         );
 
-        $this->assertSame(ProjectStatus::DRAFT, $project->getStatus());
-        $this->assertNull($project->getDescription());
-        $this->assertNull($project->getBudget());
-        $this->assertNull($project->getReference());
-        $this->assertSame([], $project->pullDomainEvents());
+        static::assertSame(ProjectStatus::DRAFT, $project->getStatus());
+        static::assertNull($project->getDescription());
+        static::assertNull($project->getBudget());
+        static::assertNull($project->getReference());
+        static::assertSame([], $project->pullDomainEvents());
     }
 
     public function testUpdateDetailsClearsOptionalFields(): void
@@ -384,14 +384,14 @@ final class ProjectTest extends TestCase
         $project->updateDetails('New name', 'desc', 'REF-1');
         $project->updateDetails('Cleaned', null, null);
 
-        $this->assertSame('Cleaned', $project->getName());
-        $this->assertNull($project->getDescription());
-        $this->assertNull($project->getReference());
+        static::assertSame('Cleaned', $project->getName());
+        static::assertNull($project->getDescription());
+        static::assertNull($project->getReference());
     }
 
     public function testInternalFlagDefaultFalse(): void
     {
         $project = $this->makeProject();
-        $this->assertFalse($project->isInternal());
+        static::assertFalse($project->isInternal());
     }
 }

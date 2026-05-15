@@ -786,10 +786,12 @@ class OrderController extends AbstractController
 
         $hasLines = false;
         foreach ($order->getSections() as $section) {
-            if (!$section->getLines()->isEmpty()) {
-                $hasLines = true;
-                break;
+            if ($section->getLines()->isEmpty()) {
+                continue;
             }
+
+            $hasLines = true;
+            break;
         }
         if (!$hasLines) {
             return new Response(

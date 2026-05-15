@@ -41,7 +41,7 @@ final class CalculateProjectMarginUseCaseTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::once())
             ->method('warning')
-            ->with(self::stringContains('not found'));
+            ->with(static::stringContains('not found'));
 
         $eventBus = $this->createMock(MessageBusInterface::class);
         $eventBus->expects(self::never())->method('dispatch');
@@ -71,7 +71,7 @@ final class CalculateProjectMarginUseCaseTest extends TestCase
         $eventBus = $this->createMock(MessageBusInterface::class);
         $eventBus->expects(self::once())
             ->method('dispatch')
-            ->with(self::isInstanceOf(MarginThresholdExceededEvent::class))
+            ->with(static::isInstanceOf(MarginThresholdExceededEvent::class))
             ->willReturnCallback(static fn (object $e): Envelope => new Envelope($e));
 
         $useCase = new CalculateProjectMarginUseCase($projectRepo, $workItemRepo, $em, $eventBus, $logger);

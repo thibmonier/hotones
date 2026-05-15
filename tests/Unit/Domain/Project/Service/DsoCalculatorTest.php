@@ -25,7 +25,7 @@ final class DsoCalculatorTest extends TestCase
 
         $result = $this->calculator->calculateRolling([], 30, $now);
 
-        self::assertSame(0.0, $result->getDays());
+        static::assertSame(0.0, $result->getDays());
     }
 
     public function testSingleInvoicePaidIn10Days(): void
@@ -35,13 +35,13 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-05-01'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
         ];
 
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
-        self::assertSame(10.0, $result->getDays());
+        static::assertSame(10.0, $result->getDays());
     }
 
     public function testMultipleInvoicesWeightedByAmount(): void
@@ -52,20 +52,20 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-05-01'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
             // 20 days × 200€ (double weight)
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-04-21'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 20000,
+                amountPaidCents: 20_000,
             ),
         ];
 
         // Weighted: (10*10000 + 20*20000) / (10000+20000) = 500000/30000 = 16.666...
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
-        self::assertSame(16.7, $result->getDays());
+        static::assertSame(16.7, $result->getDays());
     }
 
     public function testUnpaidInvoicesExcluded(): void
@@ -75,20 +75,20 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-05-01'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
             // Unpaid (paidAt null) — must be excluded
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-04-01'),
                 paidAt: null,
-                amountPaidCents: 50000,
+                amountPaidCents: 50_000,
             ),
         ];
 
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
         // Only first invoice counts: 10 days
-        self::assertSame(10.0, $result->getDays());
+        static::assertSame(10.0, $result->getDays());
     }
 
     public function testInvoicesOutsideWindowExcluded(): void
@@ -99,20 +99,20 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-04-26'),
                 paidAt: new DateTimeImmutable('2026-05-06'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
             // Outside 30-day window (paid 40 days ago)
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-03-22'),
                 paidAt: new DateTimeImmutable('2026-04-01'),
-                amountPaidCents: 50000,
+                amountPaidCents: 50_000,
             ),
         ];
 
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
         // Only first invoice (10 days)
-        self::assertSame(10.0, $result->getDays());
+        static::assertSame(10.0, $result->getDays());
     }
 
     public function testZeroAmountInvoicesExcluded(): void
@@ -122,7 +122,7 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-05-01'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
             // Zero amount — must be excluded (no contribution to weighted average)
             new InvoicePaymentRecord(
@@ -134,7 +134,7 @@ final class DsoCalculatorTest extends TestCase
 
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
-        self::assertSame(10.0, $result->getDays());
+        static::assertSame(10.0, $result->getDays());
     }
 
     public function testReturnsDsoDaysValueObject(): void
@@ -144,12 +144,12 @@ final class DsoCalculatorTest extends TestCase
             new InvoicePaymentRecord(
                 issuedAt: new DateTimeImmutable('2026-05-01'),
                 paidAt: new DateTimeImmutable('2026-05-11'),
-                amountPaidCents: 10000,
+                amountPaidCents: 10_000,
             ),
         ];
 
         $result = $this->calculator->calculateRolling($invoices, 30, $now);
 
-        self::assertInstanceOf(DsoDays::class, $result);
+        static::assertInstanceOf(DsoDays::class, $result);
     }
 }

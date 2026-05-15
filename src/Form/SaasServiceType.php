@@ -49,7 +49,7 @@ class SaasServiceType extends AbstractType
                 'required' => false,
                 'choice_label' => 'name',
                 'placeholder' => '-- Souscription directe (sans fournisseur) --',
-                'query_builder' => fn ($repository) => $repository
+                'query_builder' => static fn ($repository) => $repository
                     ->createQueryBuilder('p')
                     ->where('p.active = :active')
                     ->setParameter('active', true)

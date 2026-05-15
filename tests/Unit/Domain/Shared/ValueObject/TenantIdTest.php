@@ -15,14 +15,14 @@ final class TenantIdTest extends TestCase
     {
         $tenantId = TenantId::fromInt(42);
 
-        $this->assertSame(42, $tenantId->value);
+        static::assertSame(42, $tenantId->value);
     }
 
     public function testFromStringParsesNumericString(): void
     {
         $tenantId = TenantId::fromString('17');
 
-        $this->assertSame(17, $tenantId->value);
+        static::assertSame(17, $tenantId->value);
     }
 
     public function testFromIntRejectsZero(): void
@@ -67,7 +67,7 @@ final class TenantIdTest extends TestCase
         $a = TenantId::fromInt(7);
         $b = TenantId::fromInt(7);
 
-        $this->assertTrue($a->equals($b));
+        static::assertTrue($a->equals($b));
     }
 
     public function testEqualsReturnsFalseForDifferentValues(): void
@@ -75,14 +75,14 @@ final class TenantIdTest extends TestCase
         $a = TenantId::fromInt(1);
         $b = TenantId::fromInt(2);
 
-        $this->assertFalse($a->equals($b));
+        static::assertFalse($a->equals($b));
     }
 
     public function testToStringReturnsValueAsString(): void
     {
         $tenantId = TenantId::fromInt(123);
 
-        $this->assertSame('123', (string) $tenantId);
+        static::assertSame('123', (string) $tenantId);
     }
 
     public function testValueIsReadonly(): void
@@ -90,7 +90,7 @@ final class TenantIdTest extends TestCase
         $tenantId = TenantId::fromInt(1);
 
         // Domain rules require final readonly. Reading public prop OK.
-        $this->assertSame(1, $tenantId->value);
+        static::assertSame(1, $tenantId->value);
 
         // Writing should fail at PHP level (readonly).
         $this->expectException(Error::class);

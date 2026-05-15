@@ -234,7 +234,7 @@ final class BackupRestoreCommand extends Command
         $process = new Process($cmd, env: $env);
         $process->setTimeout(600);
         $process->setInput(
-            (function () use ($handle, $isGz) {
+            (static function () use ($handle, $isGz) {
                 while (!($isGz ? gzeof($handle) : feof($handle))) {
                     $chunk = $isGz ? gzread($handle, 8192) : fread($handle, 8192);
                     if ($chunk === false || $chunk === '') {

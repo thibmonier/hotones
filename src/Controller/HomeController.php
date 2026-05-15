@@ -308,7 +308,7 @@ class HomeController extends AbstractController
         $weeklyTimesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startOfWeek, $endOfWeek);
 
         // Total heures cette semaine
-        $weeklyHours = array_reduce($weeklyTimesheets, fn ($sum, $t): float|int|array => $sum + $t->getHours(), 0);
+        $weeklyHours = array_reduce($weeklyTimesheets, static fn ($sum, $t): float|int|array => $sum + $t->getHours(), 0);
 
         // Mes temps récents
         $recentTimesheets = $timesheetRepo->findRecentByContributor($contributor, 5);

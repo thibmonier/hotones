@@ -14,14 +14,14 @@ final class InvoiceLineIdTest extends TestCase
     public function testGenerateProducesValidUuid(): void
     {
         $id = InvoiceLineId::generate();
-        $this->assertTrue(Uuid::isValid($id->getValue()));
+        static::assertTrue(Uuid::isValid($id->getValue()));
     }
 
     public function testFromStringAcceptsValidUuid(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
         $id = InvoiceLineId::fromString($uuid);
-        $this->assertSame($uuid, $id->getValue());
+        static::assertSame($uuid, $id->getValue());
     }
 
     public function testFromStringRejectsInvalidUuid(): void
@@ -33,17 +33,17 @@ final class InvoiceLineIdTest extends TestCase
     public function testEqualsTrueForSameValue(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertTrue(InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid)));
+        static::assertTrue(InvoiceLineId::fromString($uuid)->equals(InvoiceLineId::fromString($uuid)));
     }
 
     public function testEqualsFalseForDifferentValues(): void
     {
-        $this->assertFalse(InvoiceLineId::generate()->equals(InvoiceLineId::generate()));
+        static::assertFalse(InvoiceLineId::generate()->equals(InvoiceLineId::generate()));
     }
 
     public function testToStringReturnsValue(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertSame($uuid, (string) InvoiceLineId::fromString($uuid));
+        static::assertSame($uuid, (string) InvoiceLineId::fromString($uuid));
     }
 }

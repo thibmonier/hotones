@@ -19,17 +19,17 @@ final class MarginThresholdExceededEventTest extends TestCase
         $event = MarginThresholdExceededEvent::create(
             projectId: $projectId,
             projectName: 'Refonte Site E-Commerce',
-            costTotal: Money::fromAmount(15000.00),
-            invoicedPaidTotal: Money::fromAmount(16000.00),
+            costTotal: Money::fromAmount(15_000.00),
+            invoicedPaidTotal: Money::fromAmount(16_000.00),
             marginPercent: 6.25,
             thresholdPercent: 10.0,
         );
 
-        self::assertSame($projectId, $event->projectId);
-        self::assertSame('Refonte Site E-Commerce', $event->projectName);
-        self::assertSame(6.25, $event->marginPercent);
-        self::assertSame(10.0, $event->thresholdPercent);
-        self::assertSame((string) $projectId, $event->getAggregateId());
+        static::assertSame($projectId, $event->projectId);
+        static::assertSame('Refonte Site E-Commerce', $event->projectName);
+        static::assertSame(6.25, $event->marginPercent);
+        static::assertSame(10.0, $event->thresholdPercent);
+        static::assertSame((string) $projectId, $event->getAggregateId());
     }
 
     public function testIsCriticalTrueWhenMarginBelowHalfThreshold(): void
@@ -38,13 +38,13 @@ final class MarginThresholdExceededEventTest extends TestCase
         $event = MarginThresholdExceededEvent::create(
             projectId: ProjectId::generate(),
             projectName: 'Project A',
-            costTotal: Money::fromAmount(10000.00),
-            invoicedPaidTotal: Money::fromAmount(10400.00),
+            costTotal: Money::fromAmount(10_000.00),
+            invoicedPaidTotal: Money::fromAmount(10_400.00),
             marginPercent: 4.0,
             thresholdPercent: 10.0,
         );
 
-        self::assertTrue($event->isCritical());
+        static::assertTrue($event->isCritical());
     }
 
     public function testIsCriticalFalseWhenMarginAboveHalfThreshold(): void
@@ -53,13 +53,13 @@ final class MarginThresholdExceededEventTest extends TestCase
         $event = MarginThresholdExceededEvent::create(
             projectId: ProjectId::generate(),
             projectName: 'Project B',
-            costTotal: Money::fromAmount(10000.00),
-            invoicedPaidTotal: Money::fromAmount(10750.00),
+            costTotal: Money::fromAmount(10_000.00),
+            invoicedPaidTotal: Money::fromAmount(10_750.00),
             marginPercent: 7.0,
             thresholdPercent: 10.0,
         );
 
-        self::assertFalse($event->isCritical());
+        static::assertFalse($event->isCritical());
     }
 
     public function testOccurredOnSetAtConstruction(): void
@@ -77,7 +77,7 @@ final class MarginThresholdExceededEventTest extends TestCase
 
         $after = new DateTimeImmutable();
 
-        self::assertGreaterThanOrEqual($before, $event->getOccurredOn());
-        self::assertLessThanOrEqual($after, $event->getOccurredOn());
+        static::assertGreaterThanOrEqual($before, $event->getOccurredOn());
+        static::assertLessThanOrEqual($after, $event->getOccurredOn());
     }
 }

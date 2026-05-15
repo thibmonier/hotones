@@ -210,9 +210,11 @@ class ProjectSubTask implements CompanyOwnedInterface
         $total = '0.00';
         // Parcourir les timesheets du projet pour éviter une relation bidirectionnelle lourde
         foreach ($this->project->getTimesheets() as $timesheet) {
-            if ($timesheet->getSubTask() && $timesheet->getSubTask()->getId() === $this->getId()) {
-                $total = bcadd($total, (string) $timesheet->getHours(), 2);
+            if (!($timesheet->getSubTask() && $timesheet->getSubTask()->getId() === $this->getId())) {
+                continue;
             }
+
+            $total = bcadd($total, (string) $timesheet->getHours(), 2);
         }
 
         return $total;

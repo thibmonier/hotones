@@ -58,7 +58,7 @@ final class BoondManagerContractTest extends TestCase
     {
         $client = new BoondManagerClient(HttpClient::create(), new NullLogger());
 
-        self::assertTrue(
+        static::assertTrue(
             $client->testConnection($this->settings),
             'BoondManager sandbox /api/application/dictionary did not return 200.',
         );
@@ -70,9 +70,9 @@ final class BoondManagerContractTest extends TestCase
 
         $dictionary = $client->getDictionary($this->settings);
 
-        self::assertNotNull($dictionary, 'Dictionary call returned null.');
-        self::assertIsArray($dictionary);
-        self::assertNotEmpty($dictionary, 'Dictionary array is empty — Boond may have changed the response shape.');
+        static::assertNotNull($dictionary, 'Dictionary call returned null.');
+        static::assertIsArray($dictionary);
+        static::assertNotEmpty($dictionary, 'Dictionary array is empty — Boond may have changed the response shape.');
     }
 
     public function testGetTimesAcceptsDateRangeWithoutCrashing(): void
@@ -84,6 +84,6 @@ final class BoondManagerContractTest extends TestCase
 
         $times = $client->getTimes($this->settings, $startDate, $endDate);
 
-        self::assertIsArray($times, 'getTimes() must return an array (even when empty).');
+        static::assertIsArray($times, 'getTimes() must return an array (even when empty).');
     }
 }

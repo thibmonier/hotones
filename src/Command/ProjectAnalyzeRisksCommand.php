@@ -88,16 +88,18 @@ class ProjectAnalyzeRisksCommand extends Command
                 $criticalData = [];
 
                 foreach ($healthScores as $healthScore) {
-                    if ($healthScore->getHealthLevel() === 'critical') {
-                        $project = $healthScore->getProject();
-                        $criticalData[] = [
-                            $project->getName(),
-                            $healthScore->getScore().'/100',
-                            'Budget: '.$healthScore->getBudgetScore(),
-                            'Planning: '.$healthScore->getTimelineScore(),
-                            count($healthScore->getRecommendations() ?: []).' recommandations',
-                        ];
+                    if ($healthScore->getHealthLevel() !== 'critical') {
+                        continue;
                     }
+
+                    $project = $healthScore->getProject();
+                    $criticalData[] = [
+                        $project->getName(),
+                        $healthScore->getScore().'/100',
+                        'Budget: '.$healthScore->getBudgetScore(),
+                        'Planning: '.$healthScore->getTimelineScore(),
+                        count($healthScore->getRecommendations() ?: []).' recommandations',
+                    ];
                 }
 
                 $io->table(['Projet', 'Score', 'Budget', 'Planning', 'Recommandations'], $criticalData);
@@ -114,13 +116,15 @@ class ProjectAnalyzeRisksCommand extends Command
                 $warningData = [];
 
                 foreach ($healthScores as $healthScore) {
-                    if ($healthScore->getHealthLevel() === 'warning') {
-                        $project = $healthScore->getProject();
-                        $warningData[] = [
-                            $project->getName(),
-                            $healthScore->getScore().'/100',
-                        ];
+                    if ($healthScore->getHealthLevel() !== 'warning') {
+                        continue;
                     }
+
+                    $project = $healthScore->getProject();
+                    $warningData[] = [
+                        $project->getName(),
+                        $healthScore->getScore().'/100',
+                    ];
                 }
 
                 $io->table(['Projet', 'Score'], $warningData);

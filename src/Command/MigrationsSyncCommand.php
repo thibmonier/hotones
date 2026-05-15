@@ -74,12 +74,12 @@ class MigrationsSyncCommand extends Command
 
         // Calculate pending migrations
         $executedVersionStrings = array_map(
-            fn ($executionResult): string => (string) $executionResult->getVersion(),
+            static fn ($executionResult): string => (string) $executionResult->getVersion(),
             $executedVersions->getItems(),
         );
 
         $availableVersionStrings = array_map(
-            fn ($version): string => (string) $version->getVersion(),
+            static fn ($version): string => (string) $version->getVersion(),
             $availableMigrations->getItems(),
         );
 
@@ -276,9 +276,11 @@ class MigrationsSyncCommand extends Command
 
             if (preg_match_all('/DROP\s+(\w+)(?:\s|,|;)/i', $upMethod, $colMatches)) {
                 foreach (array_unique($colMatches[1]) as $col) {
-                    if (!in_array(strtoupper($col), ['TABLE', 'INDEX', 'CONSTRAINT'], true)) {
-                        $operations[] = "  • Drop column: <error>{$col}</error>";
+                    if (in_array(strtoupper($col), ['TABLE', 'INDEX', 'CONSTRAINT'], true)) {
+                        continue;
                     }
+
+                    $operations[] = "  • Drop column: <error>{$col}</error>";
                 }
             }
 

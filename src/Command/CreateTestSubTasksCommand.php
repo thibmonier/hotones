@@ -114,7 +114,7 @@ class CreateTestSubTasksCommand extends Command
         }
 
         $this->em->flush();
-        $io->success("$created sous-tâches créées");
+        $io->success("{$created} sous-tâches créées");
 
         if ($attachTs) {
             $this->attachSomeTimesheets($io);
@@ -171,7 +171,7 @@ class CreateTestSubTasksCommand extends Command
             // Si possible, choisir une sous-tâche assignée au même contributeur
             $matching = array_values(array_filter(
                 $subTasks,
-                fn (ProjectSubTask $st): bool => $st->getAssignee()
+                static fn (ProjectSubTask $st): bool => $st->getAssignee()
                     && $st->getAssignee()->getId() === $ts->getContributor()->getId(),
             ));
             $chosen = $matching ? $matching[array_rand($matching)] : $subTasks[array_rand($subTasks)];
@@ -179,6 +179,6 @@ class CreateTestSubTasksCommand extends Command
             ++$count;
         }
         $this->em->flush();
-        $io->writeln("✓ $count timesheets rattachées à des sous-tâches");
+        $io->writeln("✓ {$count} timesheets rattachées à des sous-tâches");
     }
 }

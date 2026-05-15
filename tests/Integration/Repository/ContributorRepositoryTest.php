@@ -41,10 +41,10 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $contributors = $this->repository->findActiveContributors();
 
-        $this->assertCount(2, $contributors);
+        static::assertCount(2, $contributors);
         // Should be ordered by lastName ASC
-        $this->assertEquals('Alpha', $contributors[0]->getLastName());
-        $this->assertEquals('Zulu', $contributors[1]->getLastName());
+        static::assertSame('Alpha', $contributors[0]->getLastName());
+        static::assertSame('Zulu', $contributors[1]->getLastName());
     }
 
     public function testFindActiveContributorsByProfile(): void
@@ -68,7 +68,7 @@ class ContributorRepositoryTest extends KernelTestCase
         $contributors = $this->repository->findActiveContributorsByProfile($profile1);
 
         // Should return only active contributors with profile1
-        $this->assertCount(2, $contributors);
+        static::assertCount(2, $contributors);
     }
 
     public function testCountActiveContributors(): void
@@ -78,7 +78,7 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $count = $this->repository->countActiveContributors();
 
-        $this->assertEquals(5, $count);
+        static::assertSame(5, $count);
     }
 
     public function testFindByUser(): void
@@ -92,8 +92,8 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findByUser($user1);
 
-        $this->assertNotNull($result);
-        $this->assertEquals($contributor1->getId(), $result->getId());
+        static::assertNotNull($result);
+        static::assertEquals($contributor1->getId(), $result->getId());
     }
 
     public function testFindByUserReturnsNullWhenNotFound(): void
@@ -102,7 +102,7 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findByUser($user);
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testFindWithProfiles(): void
@@ -119,9 +119,9 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $contributors = $this->repository->findWithProfiles();
 
-        $this->assertCount(2, $contributors);
+        static::assertCount(2, $contributors);
         // Profiles should be eagerly loaded (no N+1 query)
-        $this->assertNotNull($contributors[0]->getProfiles());
+        static::assertNotNull($contributors[0]->getProfiles());
     }
 
     public function testSearchByName(): void
@@ -134,7 +134,7 @@ class ContributorRepositoryTest extends KernelTestCase
         $results = $this->repository->searchByName('John');
 
         // Should find "John Doe" and "Bob Johnson" (both active)
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testSearchByNameIsCaseInsensitive(): void
@@ -143,7 +143,7 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $results = $this->repository->searchByName('john');
 
-        $this->assertCount(1, $results);
+        static::assertCount(1, $results);
     }
 
     public function testFindWithHoursForPeriod(): void
@@ -189,10 +189,10 @@ class ContributorRepositoryTest extends KernelTestCase
 
         // Should return only active contributors
         // Note: Results are mixed array with [0] = Contributor entity, ['totalHours'] = aggregate
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
         // Verify structure: each result contains Contributor entity at index 0
-        $this->assertIsObject($results[0][0]);
-        $this->assertInstanceOf(\App\Entity\Contributor::class, $results[0][0]);
+        static::assertIsObject($results[0][0]);
+        static::assertInstanceOf(\App\Entity\Contributor::class, $results[0][0]);
     }
 
     public function testFindProjectsWithAssignedTasks(): void
@@ -236,7 +236,7 @@ class ContributorRepositoryTest extends KernelTestCase
         $projects = $this->repository->findProjectsWithAssignedTasks($contributor);
 
         // Should return only active projects with active tasks
-        $this->assertCount(2, $projects);
+        static::assertCount(2, $projects);
     }
 
     public function testFindProjectsWithTasksForContributor(): void
@@ -273,13 +273,13 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findProjectsWithTasksForContributor($contributor);
 
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
         // Verify structure
-        $this->assertArrayHasKey('project', $results[0]);
-        $this->assertArrayHasKey('tasks', $results[0]);
+        static::assertArrayHasKey('project', $results[0]);
+        static::assertArrayHasKey('tasks', $results[0]);
         // Results are sorted by project name ASC, so A-Project (2 tasks) should be first
-        $this->assertCount(2, $results[0]['tasks']);
-        $this->assertCount(1, $results[1]['tasks']);
+        static::assertCount(2, $results[0]['tasks']);
+        static::assertCount(1, $results[1]['tasks']);
     }
 
     public function testSearch(): void
@@ -301,11 +301,11 @@ class ContributorRepositoryTest extends KernelTestCase
 
         // Search by first name
         $results = $this->repository->search('John', 10);
-        $this->assertCount(2, $results); // John Doe + Bob Johnson
+        static::assertCount(2, $results); // John Doe + Bob Johnson
 
         // Search by email
         $results = $this->repository->search('john@example', 10);
-        $this->assertCount(1, $results); // John Doe via email
+        static::assertCount(1, $results); // John Doe via email
     }
 
     public function testSearchRespectsLimit(): void
@@ -314,6 +314,6 @@ class ContributorRepositoryTest extends KernelTestCase
 
         $results = $this->repository->search('Test', 3);
 
-        $this->assertCount(3, $results);
+        static::assertCount(3, $results);
     }
 }

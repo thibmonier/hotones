@@ -18,10 +18,10 @@ final class InvalidStatusTransitionExceptionTest extends TestCase
             VacationStatus::PENDING,
         );
 
-        self::assertInstanceOf(InvalidStatusTransitionException::class, $exception);
-        self::assertInstanceOf(DomainException::class, $exception);
-        self::assertStringContainsString(VacationStatus::APPROVED->value, $exception->getMessage());
-        self::assertStringContainsString(VacationStatus::PENDING->value, $exception->getMessage());
+        static::assertInstanceOf(InvalidStatusTransitionException::class, $exception);
+        static::assertInstanceOf(DomainException::class, $exception);
+        static::assertStringContainsString(VacationStatus::APPROVED->value, $exception->getMessage());
+        static::assertStringContainsString(VacationStatus::PENDING->value, $exception->getMessage());
     }
 
     public function testCreateMessageFormat(): void
@@ -31,6 +31,6 @@ final class InvalidStatusTransitionExceptionTest extends TestCase
             VacationStatus::APPROVED,
         );
 
-        self::assertStringContainsString('Cannot transition vacation', $exception->getMessage());
+        static::assertStringContainsString('Cannot transition vacation', $exception->getMessage());
     }
 }

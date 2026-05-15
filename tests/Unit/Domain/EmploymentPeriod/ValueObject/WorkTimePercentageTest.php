@@ -13,30 +13,30 @@ final class WorkTimePercentageTest extends TestCase
     public function testFromFloatFullTime(): void
     {
         $p = WorkTimePercentage::fromFloat(100.0);
-        self::assertSame(100.0, $p->getValue());
-        self::assertTrue($p->isFullTime());
-        self::assertSame(1.0, $p->asRatio());
+        static::assertSame(100.0, $p->getValue());
+        static::assertTrue($p->isFullTime());
+        static::assertSame(1.0, $p->asRatio());
     }
 
     public function testFromFloatPartTime(): void
     {
         $p = WorkTimePercentage::fromFloat(80.0);
-        self::assertSame(80.0, $p->getValue());
-        self::assertFalse($p->isFullTime());
-        self::assertEqualsWithDelta(0.8, $p->asRatio(), 0.001);
+        static::assertSame(80.0, $p->getValue());
+        static::assertFalse($p->isFullTime());
+        static::assertEqualsWithDelta(0.8, $p->asRatio(), 0.001);
     }
 
     public function testFullTimeFactory(): void
     {
         $p = WorkTimePercentage::fullTime();
-        self::assertSame(100.0, $p->getValue());
-        self::assertTrue($p->isFullTime());
+        static::assertSame(100.0, $p->getValue());
+        static::assertTrue($p->isFullTime());
     }
 
     public function testFromDecimalString(): void
     {
         $p = WorkTimePercentage::fromDecimalString('80.00');
-        self::assertSame(80.0, $p->getValue());
+        static::assertSame(80.0, $p->getValue());
     }
 
     public function testZeroThrows(): void
@@ -57,6 +57,6 @@ final class WorkTimePercentageTest extends TestCase
     {
         $a = WorkTimePercentage::fromFloat(80.0);
         $b = WorkTimePercentage::fromFloat(80.0);
-        self::assertTrue($a->equals($b));
+        static::assertTrue($a->equals($b));
     }
 }

@@ -74,7 +74,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
             $this->token($user),
             $client,
             [ClientVoter::VIEW],
@@ -90,7 +90,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
             $this->token($user),
             $client,
             [ClientVoter::EDIT],
@@ -106,7 +106,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ClientVoter($this->ctx($user), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
             $this->token($user),
             $client,
             [ClientVoter::EDIT],
@@ -121,7 +121,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $manager = $this->makeUser($company, ['ROLE_MANAGER']);
         $voterManager = new ClientVoter($this->ctx($manager), new NullLogger());
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voterManager->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voterManager->vote(
             $this->token($manager),
             $client,
             [ClientVoter::DELETE],
@@ -129,7 +129,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $admin = $this->makeUser($company, ['ROLE_ADMIN']);
         $voterAdmin = new ClientVoter($this->ctx($admin), new NullLogger());
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voterAdmin->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voterAdmin->vote(
             $this->token($admin),
             $client,
             [ClientVoter::DELETE],
@@ -152,7 +152,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
             $this->token($self),
             $contributor,
             [ContributorVoter::VIEW],
@@ -171,7 +171,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
             $this->token($self),
             $contributor,
             [ContributorVoter::DEACTIVATE],
@@ -191,7 +191,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ContributorVoter($this->ctx($self), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
             $this->token($self),
             $contributor,
             [ContributorVoter::EDIT],
@@ -231,7 +231,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
             $this->token($owner),
             $report,
             [ExpenseReportVoter::EDIT],
@@ -246,7 +246,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
             $this->token($owner),
             $report,
             [ExpenseReportVoter::EDIT],
@@ -261,7 +261,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($owner), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_DENIED, $voter->vote(
             $this->token($owner),
             $report,
             [ExpenseReportVoter::APPROVE],
@@ -277,7 +277,7 @@ final class ClientContributorExpenseVoterTest extends TestCase
 
         $voter = new ExpenseReportVoter($this->ctx($compta), new NullLogger());
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote(
             $this->token($compta),
             $report,
             [ExpenseReportVoter::APPROVE],

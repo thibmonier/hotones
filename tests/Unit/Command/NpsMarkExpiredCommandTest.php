@@ -39,12 +39,12 @@ class NpsMarkExpiredCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Marquage des enquêtes NPS expirées', $output);
-        $this->assertStringContainsString('5 enquête(s) marquée(s) comme expirée(s)', $output);
-        $this->assertStringContainsString('[OK]', $output); // SymfonyStyle success message
+        static::assertStringContainsString('Marquage des enquêtes NPS expirées', $output);
+        static::assertStringContainsString('5 enquête(s) marquée(s) comme expirée(s)', $output);
+        static::assertStringContainsString('[OK]', $output); // SymfonyStyle success message
     }
 
     public function testExecuteWithNoExpiredSurveys(): void
@@ -53,12 +53,12 @@ class NpsMarkExpiredCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Marquage des enquêtes NPS expirées', $output);
-        $this->assertStringContainsString('Aucune enquête expirée à marquer', $output);
-        $this->assertStringContainsString('[INFO]', $output); // SymfonyStyle info message
+        static::assertStringContainsString('Marquage des enquêtes NPS expirées', $output);
+        static::assertStringContainsString('Aucune enquête expirée à marquer', $output);
+        static::assertStringContainsString('[INFO]', $output); // SymfonyStyle info message
     }
 
     public function testExecuteReturnsSuccess(): void
@@ -67,8 +67,8 @@ class NpsMarkExpiredCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertEquals(0, $exitCode); // SUCCESS is 0
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertSame(0, $exitCode); // SUCCESS is 0
     }
 
     public function testExecuteCallsRepositoryMethod(): void
@@ -92,8 +92,8 @@ class NpsMarkExpiredCommandTest extends TestCase
             $tester->execute([]);
             $output = $tester->getDisplay();
 
-            $this->assertStringContainsString((string) $count, $output);
-            $this->assertStringContainsString('enquête(s) marquée(s)', $output);
+            static::assertStringContainsString((string) $count, $output);
+            static::assertStringContainsString('enquête(s) marquée(s)', $output);
         }
     }
 }

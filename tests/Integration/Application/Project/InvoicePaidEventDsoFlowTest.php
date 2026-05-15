@@ -65,14 +65,14 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
         // Warm cache (first read populates cache.kpi).
         $repository = static::getContainer()->get(DsoReadModelRepositoryInterface::class);
         $beforeDispatch = $repository->findPaidInRollingWindow(30, $this->now);
-        self::assertCount(1, $beforeDispatch);
+        static::assertCount(1, $beforeDispatch);
 
         $cacheKey = sprintf(
             'dso.paid_records.company_%d.window_30.day_%s',
             $this->getTestCompany()->getId(),
             $this->now->format('Y-m-d'),
         );
-        self::assertTrue($this->kpiCache->hasItem($cacheKey), 'cache item should be populated after first read');
+        static::assertTrue($this->kpiCache->hasItem($cacheKey), 'cache item should be populated after first read');
 
         // Invoke the cache-invalidation handler directly (handler under test).
         // The MessageBus path is covered indirectly by Symfony Messenger framework
@@ -84,7 +84,7 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
             paidAt: $this->now,
         ));
 
-        self::assertFalse(
+        static::assertFalse(
             $this->kpiCache->hasItem($cacheKey),
             'cache.kpi pool should be cleared by InvalidateDsoCacheOnInvoicePaid',
         );
@@ -109,7 +109,7 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
             paidAt: $this->now,
         ));
 
-        self::assertSame(1, $slackSpy->callCount, 'Slack alert should be sent when DSO 30j > 60j');
+        static::assertSame(1, $slackSpy->callCount, 'Slack alert should be sent when DSO 30j > 60j');
     }
 
     public function testNoSlackAlertWhenDsoBelowThreshold(): void
@@ -131,7 +131,7 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
             paidAt: $this->now,
         ));
 
-        self::assertSame(0, $slackSpy->callCount, 'No alert expected when DSO 30j <= 60j');
+        static::assertSame(0, $slackSpy->callCount, 'No alert expected when DSO 30j <= 60j');
     }
 
     public function testDsoRefreshesAfterEventDispatchWithNewInvoiceData(): void
@@ -141,7 +141,7 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
         // Initial state : DSO 10 days
         $this->createPaidInvoice($client, daysAgoPaid: 10, amountTtc: '1000.00', delayDays: 10);
         $first = ($this->computeDsoKpi)($this->now);
-        self::assertEqualsWithDelta(10.0, $first->dso30Days, 0.5);
+        static::assertEqualsWithDelta(10.0, $first->dso30Days, 0.5);
 
         // Add a slow-paid invoice that should change the weighted DSO
         $this->createPaidInvoice($client, daysAgoPaid: 5, amountTtc: '1000.00', delayDays: 50);
@@ -155,7 +155,7 @@ final class InvoicePaidEventDsoFlowTest extends KernelTestCase
         ));
 
         $afterInvalidation = ($this->computeDsoKpi)($this->now);
-        self::assertGreaterThan(
+        static::assertGreaterThan(
             $first->dso30Days,
             $afterInvalidation->dso30Days,
             'DSO should increase after a slower-paid invoice once cache is cleared',

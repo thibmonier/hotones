@@ -125,7 +125,7 @@ class PlanningOptimizationController extends AbstractController
 
         return $this->json([
             'success' => true,
-            'recommendations' => array_map(fn ($rec): array => [
+            'recommendations' => array_map(static fn ($rec): array => [
                 'type' => $rec['type'],
                 'title' => $rec['title'],
                 'description' => $rec['description'],

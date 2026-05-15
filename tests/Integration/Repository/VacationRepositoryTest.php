@@ -44,8 +44,8 @@ class VacationRepositoryTest extends KernelTestCase
 
         $found = $this->repository->findById($vacation->getId());
 
-        $this->assertSame($vacation->getId()->getValue(), $found->getId()->getValue());
-        $this->assertSame(VacationStatus::PENDING, $found->getStatus());
+        static::assertSame($vacation->getId()->getValue(), $found->getId()->getValue());
+        static::assertSame(VacationStatus::PENDING, $found->getStatus());
     }
 
     public function testFindByContributor(): void
@@ -56,7 +56,7 @@ class VacationRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findByContributor($contributor);
 
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testCountApprovedDaysBetween(): void
@@ -75,14 +75,14 @@ class VacationRepositoryTest extends KernelTestCase
         $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         // 5 days (Jan 10-14) + 4 days (Jan 28-31) = 9 days
-        $this->assertEquals(9.0, $count);
+        static::assertSame(9.0, $count);
     }
 
     public function testCountApprovedDaysBetweenWithNoVacations(): void
     {
         $count = $this->repository->countApprovedDaysBetween(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
-        $this->assertEquals(0.0, $count);
+        static::assertSame(0.0, $count);
     }
 
     public function testFindPendingForContributors(): void
@@ -105,16 +105,16 @@ class VacationRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findPendingForContributors([$contributor1, $contributor2]);
 
-        $this->assertCount(2, $results);
-        $this->assertSame(VacationStatus::PENDING, $results[0]->getStatus());
-        $this->assertSame(VacationStatus::PENDING, $results[1]->getStatus());
+        static::assertCount(2, $results);
+        static::assertSame(VacationStatus::PENDING, $results[0]->getStatus());
+        static::assertSame(VacationStatus::PENDING, $results[1]->getStatus());
     }
 
     public function testFindPendingForContributorsWithEmptyArray(): void
     {
         $results = $this->repository->findPendingForContributors([]);
 
-        $this->assertEmpty($results);
+        static::assertEmpty($results);
     }
 
     private function createVacation($contributor, string $startDate, string $endDate): Vacation

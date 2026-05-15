@@ -17,8 +17,8 @@ final class ContributorNotFoundExceptionTest extends TestCase
 
         $exception = ContributorNotFoundException::withId($id);
 
-        self::assertInstanceOf(ContributorNotFoundException::class, $exception);
-        self::assertInstanceOf(RuntimeException::class, $exception);
+        static::assertInstanceOf(ContributorNotFoundException::class, $exception);
+        static::assertInstanceOf(RuntimeException::class, $exception);
     }
 
     public function testWithIdMessageContainsId(): void
@@ -27,7 +27,7 @@ final class ContributorNotFoundExceptionTest extends TestCase
 
         $exception = ContributorNotFoundException::withId($id);
 
-        self::assertStringContainsString((string) $id, $exception->getMessage());
-        self::assertStringContainsString('not found', $exception->getMessage());
+        static::assertStringContainsString((string) $id, $exception->getMessage());
+        static::assertStringContainsString('not found', $exception->getMessage());
     }
 }

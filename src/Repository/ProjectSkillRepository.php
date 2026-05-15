@@ -87,7 +87,7 @@ class ProjectSkillRepository extends CompanyAwareRepository
     {
         $criticalSkills = $this->findCriticalByProject($project);
 
-        return array_all($criticalSkills, fn ($projectSkill) => $projectSkill->isMetByContributor($contributor));
+        return array_all($criticalSkills, static fn ($projectSkill) => $projectSkill->isMetByContributor($contributor));
     }
 
     /**
@@ -102,9 +102,11 @@ class ProjectSkillRepository extends CompanyAwareRepository
         $eligible = [];
 
         foreach ($candidates as $contributor) {
-            if ($this->contributorMeetsCriticalSkills($project, $contributor)) {
-                $eligible[] = $contributor;
+            if (!$this->contributorMeetsCriticalSkills($project, $contributor)) {
+                continue;
             }
+
+            $eligible[] = $contributor;
         }
 
         return $eligible;
@@ -154,9 +156,11 @@ class ProjectSkillRepository extends CompanyAwareRepository
         $missing = [];
 
         foreach ($projectSkills as $projectSkill) {
-            if (!$projectSkill->isMetByContributor($contributor)) {
-                $missing[] = $projectSkill;
+            if ($projectSkill->isMetByContributor($contributor)) {
+                continue;
             }
+
+            $missing[] = $projectSkill;
         }
 
         return $missing;

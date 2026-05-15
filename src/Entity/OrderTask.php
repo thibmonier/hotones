@@ -136,7 +136,7 @@ class OrderTask implements CompanyOwnedInterface
 
     private function updateTotalAmount(): void
     {
-        if (isset($this->soldDays) && isset($this->soldDailyRate)) {
+        if (isset($this->soldDays, $this->soldDailyRate)) {
             $this->totalAmount = bcmul($this->soldDays, $this->soldDailyRate, 2);
         }
     }

@@ -25,7 +25,7 @@ class AuthenticationTest extends WebTestCase
     {
         // This test is implementation-specific and depends on the exact form field names
         // which may vary. Mark as incomplete for now.
-        $this->markTestIncomplete('Login form field names need to be determined for proper testing');
+        static::markTestIncomplete('Login form field names need to be determined for proper testing');
     }
 
     public function testAccessToAdminAreaRequiresAdminRole(): void
@@ -39,7 +39,7 @@ class AuthenticationTest extends WebTestCase
         $regularUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$regularUser) {
-            $this->markTestSkipped('Regular user not found');
+            static::markTestSkipped('Regular user not found');
 
             return;
         }
@@ -57,13 +57,13 @@ class AuthenticationTest extends WebTestCase
     {
         // Ce test devrait vérifier que les mots de passe faibles sont rejetés
         // lors de l'inscription ou du changement de mot de passe
-        $this->markTestIncomplete('Password strength validation should be tested here');
+        static::markTestIncomplete('Password strength validation should be tested here');
     }
 
     public function testSessionTimeoutAfterInactivity(): void
     {
         // Ce test devrait vérifier que la session expire après une période d'inactivité
-        $this->markTestIncomplete('Session timeout should be tested here');
+        static::markTestIncomplete('Session timeout should be tested here');
     }
 
     public function testTwoFactorAuthenticationWhenEnabled(): void
@@ -76,7 +76,7 @@ class AuthenticationTest extends WebTestCase
         $user2fa = $userRepository->findOneBy(['totpSecret' => ['$ne' => null]]);
 
         if (!$user2fa) {
-            $this->markTestSkipped('No user with 2FA enabled found');
+            static::markTestSkipped('No user with 2FA enabled found');
 
             return;
         }
@@ -88,7 +88,7 @@ class AuthenticationTest extends WebTestCase
         // (dépend de la configuration de scheb/2fa-bundle)
         $response = $client->getResponse();
 
-        $this->assertTrue(
+        static::assertTrue(
             $response->isRedirection() || $response->isSuccessful(),
             '2FA verification should be required or user should be logged in',
         );
@@ -104,7 +104,7 @@ class AuthenticationTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Test user not found');
+            static::markTestSkipped('Test user not found');
 
             return;
         }

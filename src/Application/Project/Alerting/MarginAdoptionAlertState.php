@@ -102,6 +102,6 @@ final readonly class MarginAdoptionAlertState
         $aMid = $a->setTime(0, 0);
         $bMid = $b->setTime(0, 0);
 
-        return (int) abs(($bMid->getTimestamp() - $aMid->getTimestamp()) / 86400);
+        return (int) abs(($bMid->getTimestamp() - $aMid->getTimestamp()) / 86_400);
     }
 }

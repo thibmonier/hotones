@@ -45,7 +45,7 @@ final readonly class CheckMarginAdoptionRedThresholdHandler
 
     public function __invoke(?DateTimeImmutable $now = null): void
     {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $kpi = ($this->computeMarginAdoptionKpi)($now);
 
@@ -102,7 +102,7 @@ final readonly class CheckMarginAdoptionRedThresholdHandler
         $item = $this->kpiCache->getItem($key);
         $item->set($state);
         // State persists 30 days max — auto-cleanup if cron stops running.
-        $item->expiresAfter(30 * 86400);
+        $item->expiresAfter(30 * 86_400);
         $this->kpiCache->save($item);
     }
 

@@ -41,7 +41,7 @@ final class ApproveVacationHandlerTest extends TestCase
 
         $captured = null;
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->willReturnCallback(function ($msg) use (&$captured) {
+        $bus->method('dispatch')->willReturnCallback(static function ($msg) use (&$captured) {
             $captured = $msg;
 
             return new Envelope($msg);
@@ -53,8 +53,8 @@ final class ApproveVacationHandlerTest extends TestCase
             approvedByUserId: 99,
         ));
 
-        $this->assertInstanceOf(VacationNotificationMessage::class, $captured);
-        $this->assertSame('approved', $captured->getType());
+        static::assertInstanceOf(VacationNotificationMessage::class, $captured);
+        static::assertSame('approved', $captured->getType());
     }
 
     private function makePendingVacation(): Vacation

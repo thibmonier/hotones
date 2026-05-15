@@ -110,10 +110,11 @@ class BusinessUnitRepository extends CompanyAwareRepository
 
         // Build hierarchy
         foreach ($allBUs as $bu) {
-            if ($bu->getParent() === null) {
-                // Root BU
-                $tree[] = $bu;
+            if ($bu->getParent() !== null) {
+                continue;
             }
+
+            $tree[] = $bu;
         }
 
         return $tree;

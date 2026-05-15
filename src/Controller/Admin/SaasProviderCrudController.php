@@ -71,7 +71,7 @@ class SaasProviderCrudController extends AbstractCrudController
         yield TextareaField::new('notes', 'Notes')->hideOnIndex()->setHelp('Notes internes sur le fournisseur');
 
         yield IntegerField::new('services.count', 'Nombre de services')->hideOnForm()->formatValue(
-            fn ($value, SaasProvider $entity) => $entity->getServices()->count(),
+            static fn ($value, SaasProvider $entity) => $entity->getServices()->count(),
         );
 
         yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);

@@ -457,19 +457,19 @@ readonly class MetricsCalculationService
 
         // Recalculer mois par mois
         for ($month = 1; $month <= 12; ++$month) {
-            $date = new DateTime("$year-$month-01");
+            $date = new DateTime("{$year}-{$month}-01");
             $this->calculateMetricsForPeriod($date, 'monthly');
         }
 
         // Recalculer par trimestre
         for ($quarter = 1; $quarter <= 4; ++$quarter) {
             $month = (($quarter - 1) * 3) + 1;
-            $date = new DateTime("$year-$month-01");
+            $date = new DateTime("{$year}-{$month}-01");
             $this->calculateMetricsForPeriod($date, 'quarterly');
         }
 
         // Recalculer annuel
-        $date = new DateTime("$year-01-01");
+        $date = new DateTime("{$year}-01-01");
         $this->calculateMetricsForPeriod($date, 'yearly');
     }
 

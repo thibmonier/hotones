@@ -20,10 +20,10 @@ final class InvoiceIssuedEventTest extends TestCase
 
         $event = InvoiceIssuedEvent::create($invoiceId, $issuedAt, $dueDate);
 
-        self::assertInstanceOf(DomainEventInterface::class, $event);
-        self::assertSame($invoiceId, $event->getInvoiceId());
-        self::assertSame($issuedAt, $event->getIssuedAt());
-        self::assertSame($dueDate, $event->getDueDate());
+        static::assertInstanceOf(DomainEventInterface::class, $event);
+        static::assertSame($invoiceId, $event->getInvoiceId());
+        static::assertSame($issuedAt, $event->getIssuedAt());
+        static::assertSame($dueDate, $event->getDueDate());
     }
 
     public function testGetOccurredOnSetAtConstruction(): void
@@ -34,6 +34,6 @@ final class InvoiceIssuedEventTest extends TestCase
             new DateTimeImmutable('2026-06-12'),
         );
 
-        self::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
+        static::assertInstanceOf(DateTimeImmutable::class, $event->getOccurredOn());
     }
 }

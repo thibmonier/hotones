@@ -119,7 +119,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
         $dimTimes = [];
 
         for ($month = 1; $month <= 12; ++$month) {
-            $date = new DateTime("$year-$month-01");
+            $date = new DateTime("{$year}-{$month}-01");
 
             $dimTime = new DimTime();
             $dimTime->setDate($date);
@@ -186,8 +186,8 @@ Attention : Cette commande est uniquement pour les tests et le développement.
     private function generateMetrics(array $dimTimes, array $projectTypes, array $contributors): array
     {
         $metrics = [];
-        $projectManagers = array_filter($contributors, fn ($c): bool => $c->getRole() === 'project_manager');
-        $salesPersons = array_filter($contributors, fn ($c): bool => $c->getRole() === 'sales_person');
+        $projectManagers = array_filter($contributors, static fn ($c): bool => $c->getRole() === 'project_manager');
+        $salesPersons = array_filter($contributors, static fn ($c): bool => $c->getRole() === 'sales_person');
 
         foreach ($dimTimes as $dimTime) {
             foreach ($projectTypes as $projectType) {
@@ -223,7 +223,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             default => 1.0,
         };
 
-        $baseRevenue = random_int(10000, 50000) * $seasonalFactor;
+        $baseRevenue = random_int(10_000, 50_000) * $seasonalFactor;
         $baseCosts = $baseRevenue * (0.6 + (random_int(0, 20) / 100)); // 60-80% du CA
 
         $metric
@@ -236,7 +236,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             ->setContributorCount(random_int(2, 8))
             ->setTotalRevenue(number_format($baseRevenue, 2, '.', ''))
             ->setTotalCosts(number_format($baseCosts, 2, '.', ''))
-            ->setPendingRevenue(number_format((float) random_int(5000, 25000), 2, '.', ''))
+            ->setPendingRevenue(number_format((float) random_int(5000, 25_000), 2, '.', ''))
             ->setTotalSoldDays(number_format((float) random_int(20, 100), 2, '.', ''))
             ->setTotalWorkedDays(number_format((float) random_int(15, 95), 2, '.', ''));
 
@@ -286,7 +286,7 @@ Attention : Cette commande est uniquement pour les tests et le développement.
             ->setParameter('granularity', 'monthly')
             ->getSingleScalarResult();
 
-        $io->writeln("📊 Projets total : $totalProjects");
+        $io->writeln("📊 Projets total : {$totalProjects}");
 
         $io->writeln('');
         $io->writeln('🎯 Prochaines étapes :');

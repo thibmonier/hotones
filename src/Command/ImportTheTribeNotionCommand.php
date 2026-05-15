@@ -441,11 +441,13 @@ class ImportTheTribeNotionCommand extends Command
 
         // 4. Essayer un lookup case-insensitive sur les aliases inversés
         foreach (self::PROJECT_ALIASES as $alias => $dbName) {
-            if (mb_strtolower($alias) === $originalKey) {
-                $dbKey = mb_strtolower($dbName);
-                if (isset($this->projectCache[$dbKey])) {
-                    return $this->projectCache[$dbKey];
-                }
+            if (mb_strtolower($alias) !== $originalKey) {
+                continue;
+            }
+
+            $dbKey = mb_strtolower($dbName);
+            if (isset($this->projectCache[$dbKey])) {
+                return $this->projectCache[$dbKey];
             }
         }
 

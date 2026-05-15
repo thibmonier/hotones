@@ -14,21 +14,21 @@ final class VacationStatusTest extends TestCase
     {
         $status = VacationStatus::PENDING;
 
-        self::assertTrue($status->canTransitionTo(VacationStatus::APPROVED));
+        static::assertTrue($status->canTransitionTo(VacationStatus::APPROVED));
     }
 
     public function testPendingCanTransitionToRejected(): void
     {
         $status = VacationStatus::PENDING;
 
-        self::assertTrue($status->canTransitionTo(VacationStatus::REJECTED));
+        static::assertTrue($status->canTransitionTo(VacationStatus::REJECTED));
     }
 
     public function testPendingCanTransitionToCancelled(): void
     {
         $status = VacationStatus::PENDING;
 
-        self::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
+        static::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
     }
 
     public function testApprovedCanTransitionToCancelledForManagerCancel(): void
@@ -36,17 +36,17 @@ final class VacationStatusTest extends TestCase
         // US-069: a manager may cancel a vacation that has already been approved.
         $status = VacationStatus::APPROVED;
 
-        self::assertFalse($status->canTransitionTo(VacationStatus::PENDING));
-        self::assertFalse($status->canTransitionTo(VacationStatus::REJECTED));
-        self::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
+        static::assertFalse($status->canTransitionTo(VacationStatus::PENDING));
+        static::assertFalse($status->canTransitionTo(VacationStatus::REJECTED));
+        static::assertTrue($status->canTransitionTo(VacationStatus::CANCELLED));
     }
 
     public function testRejectedCannotTransition(): void
     {
         $status = VacationStatus::REJECTED;
 
-        self::assertFalse($status->canTransitionTo(VacationStatus::PENDING));
-        self::assertFalse($status->canTransitionTo(VacationStatus::APPROVED));
+        static::assertFalse($status->canTransitionTo(VacationStatus::PENDING));
+        static::assertFalse($status->canTransitionTo(VacationStatus::APPROVED));
     }
 
     public function testTransitionToThrowsOnInvalidTransition(): void
@@ -62,6 +62,6 @@ final class VacationStatusTest extends TestCase
     {
         $result = VacationStatus::PENDING->transitionTo(VacationStatus::APPROVED);
 
-        self::assertSame(VacationStatus::APPROVED, $result);
+        static::assertSame(VacationStatus::APPROVED, $result);
     }
 }

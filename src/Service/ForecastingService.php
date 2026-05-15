@@ -393,7 +393,7 @@ class ForecastingService
      */
     private function calculateTrendPredictionFromCache(DateTimeImmutable $targetMonth, array $historicalData): float
     {
-        $dataPoints = array_map(fn ($item): array => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
+        $dataPoints = array_map(static fn ($item): array => ['x' => $item['x'], 'y' => $item['y']], $historicalData['trend']);
 
         $regression = $this->linearRegressionSimple($dataPoints);
         $monthsAhead = $this->getMonthsDifference(new DateTimeImmutable(), $targetMonth);

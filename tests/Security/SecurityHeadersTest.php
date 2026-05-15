@@ -20,20 +20,20 @@ class SecurityHeadersTest extends WebTestCase
 
         // X-Content-Type-Options (recommandé)
         if ($response->headers->has('X-Content-Type-Options')) {
-            $this->assertSame(
+            static::assertSame(
                 'nosniff',
                 $response->headers->get('X-Content-Type-Options'),
                 'X-Content-Type-Options should be set to nosniff',
             );
         } else {
-            $this->markTestIncomplete(
+            static::markTestIncomplete(
                 'X-Content-Type-Options header is not configured. Consider adding it in web server config.',
             );
         }
 
         // X-Frame-Options (protection contre clickjacking) - recommandé
         if ($response->headers->has('X-Frame-Options')) {
-            $this->assertContains(
+            static::assertContains(
                 $response->headers->get('X-Frame-Options'),
                 ['DENY', 'SAMEORIGIN'],
                 'X-Frame-Options should be DENY or SAMEORIGIN',
@@ -42,7 +42,7 @@ class SecurityHeadersTest extends WebTestCase
 
         // Referrer-Policy (recommandé)
         if ($response->headers->has('Referrer-Policy')) {
-            $this->assertNotEmpty($response->headers->get('Referrer-Policy'), 'Referrer-Policy should have a value');
+            static::assertNotEmpty($response->headers->get('Referrer-Policy'), 'Referrer-Policy should have a value');
         }
 
         // Note: Ces headers peuvent être configurés au niveau du serveur web (Nginx/Apache)
@@ -85,7 +85,7 @@ class SecurityHeadersTest extends WebTestCase
         $response = $client->getResponse();
 
         // La route doit être protégée : soit redirection vers login, soit 403, soit 401
-        $this->assertTrue($response->isRedirect()
+        static::assertTrue($response->isRedirect()
         || $response->getStatusCode() === 403
         || $response->getStatusCode() === 401, sprintf(
             'Route %s should be protected (redirect, 403, or 401), got %d',

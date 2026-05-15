@@ -21,7 +21,7 @@ class SqlInjectionTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Test user not found');
+            static::markTestSkipped('Test user not found');
 
             return;
         }
@@ -33,7 +33,7 @@ class SqlInjectionTest extends WebTestCase
 
         // L'application ne devrait pas crasher
         $response = $client->getResponse();
-        $this->assertNotSame(
+        static::assertNotSame(
             500,
             $response->getStatusCode(),
             sprintf('Application should handle SQL injection attempt: %s', $payload),
@@ -41,9 +41,9 @@ class SqlInjectionTest extends WebTestCase
 
         // Vérifier qu'aucune erreur SQL n'est exposée dans la réponse
         $content = $response->getContent();
-        $this->assertIsString($content);
-        $this->assertStringNotContainsStringIgnoringCase('SQL', $content, 'SQL errors should not be exposed to users');
-        $this->assertStringNotContainsStringIgnoringCase(
+        static::assertIsString($content);
+        static::assertStringNotContainsStringIgnoringCase('SQL', $content, 'SQL errors should not be exposed to users');
+        static::assertStringNotContainsStringIgnoringCase(
             'syntax error',
             $content,
             'SQL syntax errors should not be exposed to users',
@@ -77,8 +77,8 @@ class SqlInjectionTest extends WebTestCase
         $projects = $projectRepository->findBy(['name' => $maliciousInput]);
 
         // Devrait retourner un tableau vide (aucun projet avec ce nom exact)
-        $this->assertIsArray($projects);
-        $this->assertCount(0, $projects, 'Query should not be vulnerable to SQL injection');
+        static::assertIsArray($projects);
+        static::assertCount(0, $projects, 'Query should not be vulnerable to SQL injection');
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
@@ -90,7 +90,7 @@ class SqlInjectionTest extends WebTestCase
         $testUser = $userRepository->findOneBy(['email' => 'test@example.com']);
 
         if (!$testUser) {
-            $this->markTestSkipped('Test user not found');
+            static::markTestSkipped('Test user not found');
 
             return;
         }
@@ -101,10 +101,10 @@ class SqlInjectionTest extends WebTestCase
         $client->request('GET', '/projects', ['search' => $payload]);
 
         $content = $client->getResponse()->getContent();
-        $this->assertIsString($content);
+        static::assertIsString($content);
 
         // Le payload ne devrait pas être exécuté (script tags doivent être échappés)
-        $this->assertStringNotContainsString('<script>', $content, 'Script tags should be escaped in output');
+        static::assertStringNotContainsString('<script>', $content, 'Script tags should be escaped in output');
     }
 
     /**

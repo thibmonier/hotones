@@ -22,10 +22,10 @@ final class HierarchicalThresholdResolutionTest extends TestCase
     {
         $reflection = new ReflectionClass(CalculateProjectMarginUseCase::class);
 
-        self::assertTrue($reflection->hasMethod('resolveThresholdPercent'));
+        static::assertTrue($reflection->hasMethod('resolveThresholdPercent'));
         $method = $reflection->getMethod('resolveThresholdPercent');
-        self::assertTrue($method->isPrivate());
-        self::assertCount(2, $method->getParameters());
+        static::assertTrue($method->isPrivate());
+        static::assertCount(2, $method->getParameters());
     }
 
     public function testResolveThresholdPercentReturnType(): void
@@ -34,8 +34,8 @@ final class HierarchicalThresholdResolutionTest extends TestCase
         $method = $reflection->getMethod('resolveThresholdPercent');
 
         $returnType = $method->getReturnType();
-        self::assertNotNull($returnType);
-        self::assertSame('float', (string) $returnType);
+        static::assertNotNull($returnType);
+        static::assertSame('float', (string) $returnType);
     }
 
     public function testResolveThresholdPercentParameterTypes(): void
@@ -44,10 +44,10 @@ final class HierarchicalThresholdResolutionTest extends TestCase
         $method = $reflection->getMethod('resolveThresholdPercent');
         $params = $method->getParameters();
 
-        self::assertSame('projectIdLegacy', $params[0]->getName());
-        self::assertSame('string', (string) $params[0]->getType());
+        static::assertSame('projectIdLegacy', $params[0]->getName());
+        static::assertSame('string', (string) $params[0]->getType());
 
-        self::assertSame('defaultPercent', $params[1]->getName());
-        self::assertSame('float', (string) $params[1]->getType());
+        static::assertSame('defaultPercent', $params[1]->getName());
+        static::assertSame('float', (string) $params[1]->getType());
     }
 }

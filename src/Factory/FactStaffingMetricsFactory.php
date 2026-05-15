@@ -60,10 +60,10 @@ final class FactStaffingMetricsFactory extends PersistentObjectFactory
     #[Override]
     protected function initialize(): static
     {
-        return $this->afterInstantiate(function (FactStaffingMetrics $factStaffingMetrics): void {
+        return $this->afterInstantiate(static function (FactStaffingMetrics $factStaffingMetrics): void {
             // Auto-calculate metrics after instantiation
             $factStaffingMetrics->calculateMetrics();
-        })->afterPersist(function (FactStaffingMetrics $factStaffingMetrics): void {
+        })->afterPersist(static function (FactStaffingMetrics $factStaffingMetrics): void {
             // DimTime should already be persisted by cascade
         });
     }

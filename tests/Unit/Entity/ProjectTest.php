@@ -18,19 +18,19 @@ class ProjectTest extends TestCase
         $project->setName('Test Project'); // Name is required
 
         // Test initial state
-        $this->assertNull($project->getId());
-        $this->assertEquals('Test Project', $project->getName());
-        $this->assertNull($project->getClient());
-        $this->assertNull($project->getDescription());
-        $this->assertNull($project->getPurchasesAmount());
-        $this->assertNull($project->getPurchasesDescription());
-        $this->assertNull($project->getStartDate());
-        $this->assertNull($project->getEndDate());
-        $this->assertEquals('active', $project->getStatus());
-        $this->assertFalse($project->isInternal());
-        $this->assertEquals('forfait', $project->getProjectType());
-        $this->assertNull($project->getKeyAccountManager());
-        $this->assertNull($project->getProjectManager());
+        static::assertNull($project->getId());
+        static::assertSame('Test Project', $project->getName());
+        static::assertNull($project->getClient());
+        static::assertNull($project->getDescription());
+        static::assertNull($project->getPurchasesAmount());
+        static::assertNull($project->getPurchasesDescription());
+        static::assertNull($project->getStartDate());
+        static::assertNull($project->getEndDate());
+        static::assertSame('active', $project->getStatus());
+        static::assertFalse($project->isInternal());
+        static::assertSame('forfait', $project->getProjectType());
+        static::assertNull($project->getKeyAccountManager());
+        static::assertNull($project->getProjectManager());
     }
 
     public function testProjectPropertiesSettersAndGetters(): void
@@ -53,18 +53,18 @@ class ProjectTest extends TestCase
         $project->setKeyAccountManager($kam);
         $project->setProjectManager($pm);
 
-        $this->assertEquals('Test Project', $project->getName());
-        $this->assertSame($client, $project->getClient());
-        $this->assertEquals('A test project description', $project->getDescription());
-        $this->assertEquals('1000.00', $project->getPurchasesAmount());
-        $this->assertEquals('External services', $project->getPurchasesDescription());
-        $this->assertEquals(new DateTime('2023-01-01'), $project->getStartDate());
-        $this->assertEquals(new DateTime('2023-12-31'), $project->getEndDate());
-        $this->assertEquals('completed', $project->getStatus());
-        $this->assertTrue($project->isInternal());
-        $this->assertEquals('regie', $project->getProjectType());
-        $this->assertSame($kam, $project->getKeyAccountManager());
-        $this->assertSame($pm, $project->getProjectManager());
+        static::assertSame('Test Project', $project->getName());
+        static::assertSame($client, $project->getClient());
+        static::assertSame('A test project description', $project->getDescription());
+        static::assertSame('1000.00', $project->getPurchasesAmount());
+        static::assertSame('External services', $project->getPurchasesDescription());
+        static::assertEquals(new DateTime('2023-01-01'), $project->getStartDate());
+        static::assertEquals(new DateTime('2023-12-31'), $project->getEndDate());
+        static::assertSame('completed', $project->getStatus());
+        static::assertTrue($project->isInternal());
+        static::assertSame('regie', $project->getProjectType());
+        static::assertSame($kam, $project->getKeyAccountManager());
+        static::assertSame($pm, $project->getProjectManager());
     }
 
     public function testProjectStatusValidation(): void
@@ -75,7 +75,7 @@ class ProjectTest extends TestCase
         $validStatuses = ['active', 'completed', 'cancelled'];
         foreach ($validStatuses as $status) {
             $project->setStatus($status);
-            $this->assertEquals($status, $project->getStatus());
+            static::assertEquals($status, $project->getStatus());
         }
     }
 
@@ -87,7 +87,7 @@ class ProjectTest extends TestCase
         $validTypes = ['forfait', 'regie'];
         foreach ($validTypes as $type) {
             $project->setProjectType($type);
-            $this->assertEquals($type, $project->getProjectType());
+            static::assertEquals($type, $project->getProjectType());
         }
     }
 
@@ -100,14 +100,14 @@ class ProjectTest extends TestCase
         $project->setStartDate($startDate);
         $project->setEndDate($endDate);
 
-        $this->assertSame($startDate, $project->getStartDate());
-        $this->assertSame($endDate, $project->getEndDate());
+        static::assertSame($startDate, $project->getStartDate());
+        static::assertSame($endDate, $project->getEndDate());
 
         // Test null dates
         $project->setStartDate(null);
         $project->setEndDate(null);
-        $this->assertNull($project->getStartDate());
-        $this->assertNull($project->getEndDate());
+        static::assertNull($project->getStartDate());
+        static::assertNull($project->getEndDate());
     }
 
     public function testProjectStringRepresentation(): void
@@ -116,7 +116,7 @@ class ProjectTest extends TestCase
         $project->setName('Test Project');
 
         // Project doesn't implement Stringable, so we test the name getter instead
-        $this->assertEquals('Test Project', $project->getName());
+        static::assertSame('Test Project', $project->getName());
     }
 
     public function testProjectClientAssociation(): void
@@ -125,9 +125,9 @@ class ProjectTest extends TestCase
         $client = new Client();
 
         $project->setClient($client);
-        $this->assertSame($client, $project->getClient());
+        static::assertSame($client, $project->getClient());
 
         $project->setClient(null);
-        $this->assertNull($project->getClient());
+        static::assertNull($project->getClient());
     }
 }

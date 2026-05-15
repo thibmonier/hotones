@@ -33,15 +33,15 @@ final class WorkItemTest extends TestCase
 
         $workItem = WorkItem::create($id, $projectId, $contributorId, $workedOn, $hours, $costRate, $billedRate);
 
-        self::assertTrue($workItem->getId()->equals($id));
-        self::assertTrue($workItem->getProjectId()->equals($projectId));
-        self::assertTrue($workItem->getContributorId()->equals($contributorId));
-        self::assertEquals($workedOn, $workItem->getWorkedOn());
-        self::assertTrue($workItem->getHours()->equals($hours));
-        self::assertTrue($workItem->getCostRate()->equals($costRate));
-        self::assertTrue($workItem->getBilledRate()->equals($billedRate));
-        self::assertNull($workItem->getNotes());
-        self::assertNull($workItem->getUpdatedAt());
+        static::assertTrue($workItem->getId()->equals($id));
+        static::assertTrue($workItem->getProjectId()->equals($projectId));
+        static::assertTrue($workItem->getContributorId()->equals($contributorId));
+        static::assertEquals($workedOn, $workItem->getWorkedOn());
+        static::assertTrue($workItem->getHours()->equals($hours));
+        static::assertTrue($workItem->getCostRate()->equals($costRate));
+        static::assertTrue($workItem->getBilledRate()->equals($billedRate));
+        static::assertNull($workItem->getNotes());
+        static::assertNull($workItem->getUpdatedAt());
     }
 
     public function testCreateRecordsWorkItemRecordedEvent(): void
@@ -49,8 +49,8 @@ final class WorkItemTest extends TestCase
         $workItem = $this->newWorkItem();
         $events = $workItem->pullDomainEvents();
 
-        self::assertCount(1, $events);
-        self::assertInstanceOf(WorkItemRecordedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(WorkItemRecordedEvent::class, $events[0]);
     }
 
     public function testReconstituteDoesNotRecordEvents(): void
@@ -66,8 +66,8 @@ final class WorkItemTest extends TestCase
             ['notes' => 'imported from legacy'],
         );
 
-        self::assertSame([], $workItem->pullDomainEvents());
-        self::assertSame('imported from legacy', $workItem->getNotes());
+        static::assertSame([], $workItem->pullDomainEvents());
+        static::assertSame('imported from legacy', $workItem->getNotes());
     }
 
     public function testReviseHoursMutatesAndRecordsEvent(): void
@@ -78,12 +78,12 @@ final class WorkItemTest extends TestCase
         $newHours = WorkedHours::fromFloat(8.0);
         $workItem->reviseHours($newHours);
 
-        self::assertTrue($workItem->getHours()->equals($newHours));
-        self::assertNotNull($workItem->getUpdatedAt());
+        static::assertTrue($workItem->getHours()->equals($newHours));
+        static::assertNotNull($workItem->getUpdatedAt());
 
         $events = $workItem->pullDomainEvents();
-        self::assertCount(1, $events);
-        self::assertInstanceOf(WorkItemRevisedEvent::class, $events[0]);
+        static::assertCount(1, $events);
+        static::assertInstanceOf(WorkItemRevisedEvent::class, $events[0]);
     }
 
     public function testReviseHoursSameValueIsNoOp(): void
@@ -94,16 +94,16 @@ final class WorkItemTest extends TestCase
 
         $workItem->reviseHours(WorkedHours::fromFloat(7.5)); // same as default
 
-        self::assertSame($beforeUpdatedAt, $workItem->getUpdatedAt());
-        self::assertSame([], $workItem->pullDomainEvents());
+        static::assertSame($beforeUpdatedAt, $workItem->getUpdatedAt());
+        static::assertSame([], $workItem->pullDomainEvents());
     }
 
     public function testSetNotes(): void
     {
         $workItem = $this->newWorkItem();
         $workItem->setNotes('billable client X');
-        self::assertSame('billable client X', $workItem->getNotes());
-        self::assertNotNull($workItem->getUpdatedAt());
+        static::assertSame('billable client X', $workItem->getNotes());
+        static::assertNotNull($workItem->getUpdatedAt());
     }
 
     public function testSetNotesToNull(): void
@@ -111,35 +111,35 @@ final class WorkItemTest extends TestCase
         $workItem = $this->newWorkItem();
         $workItem->setNotes('initial');
         $workItem->setNotes(null);
-        self::assertNull($workItem->getNotes());
+        static::assertNull($workItem->getNotes());
     }
 
     public function testCostCalculation(): void
     {
         // 7.5h × 50 EUR/h = 375 EUR
         $workItem = $this->newWorkItem();
-        self::assertSame(37500, $workItem->cost()->getAmountCents());
+        static::assertSame(37_500, $workItem->cost()->getAmountCents());
     }
 
     public function testRevenueCalculation(): void
     {
         // 7.5h × 100 EUR/h = 750 EUR
         $workItem = $this->newWorkItem();
-        self::assertSame(75000, $workItem->revenue()->getAmountCents());
+        static::assertSame(75_000, $workItem->revenue()->getAmountCents());
     }
 
     public function testMarginCalculation(): void
     {
         // revenue 750 - cost 375 = 375 EUR
         $workItem = $this->newWorkItem();
-        self::assertSame(37500, $workItem->margin()->getAmountCents());
+        static::assertSame(37_500, $workItem->margin()->getAmountCents());
     }
 
     public function testMarginPercentCalculation(): void
     {
         // 375 / 750 = 50 %
         $workItem = $this->newWorkItem();
-        self::assertSame(50.0, $workItem->marginPercent());
+        static::assertSame(50.0, $workItem->marginPercent());
     }
 
     public function testMarginPercentZeroWhenRevenueZero(): void
@@ -154,7 +154,7 @@ final class WorkItemTest extends TestCase
             HourlyRate::fromAmount(0.0),
         );
 
-        self::assertSame(0.0, $workItem->marginPercent());
+        static::assertSame(0.0, $workItem->marginPercent());
     }
 
     public function testRatesAreFrozenAcrossReviseHours(): void
@@ -166,8 +166,8 @@ final class WorkItemTest extends TestCase
 
         $workItem->reviseHours(WorkedHours::fromFloat(8.0));
 
-        self::assertTrue($workItem->getCostRate()->equals($originalCostRate));
-        self::assertTrue($workItem->getBilledRate()->equals($originalBilledRate));
+        static::assertTrue($workItem->getCostRate()->equals($originalCostRate));
+        static::assertTrue($workItem->getBilledRate()->equals($originalBilledRate));
     }
 
     public function testNegativeMarginWhenCostExceedsRevenue(): void
@@ -183,8 +183,8 @@ final class WorkItemTest extends TestCase
             HourlyRate::fromAmount(50.0),
         );
 
-        self::assertSame(80000, $workItem->cost()->getAmountCents());
-        self::assertSame(40000, $workItem->revenue()->getAmountCents());
+        static::assertSame(80_000, $workItem->cost()->getAmountCents());
+        static::assertSame(40_000, $workItem->revenue()->getAmountCents());
         // Note : Money n'autorise pas le négatif → subtract throw probably.
         // Si Money supporte négatif, margin = -400. Sinon throw — couvert par
         // testNegativeMarginThrowsWhenMoneyForbidsNegative ci-dessous.
@@ -193,7 +193,7 @@ final class WorkItemTest extends TestCase
     public function testCreateWithoutTaskIdDefaultsNull(): void
     {
         $workItem = $this->newWorkItem();
-        self::assertNull($workItem->getTaskId(), 'taskId nullable par défaut (ADR-0015 Q1)');
+        static::assertNull($workItem->getTaskId(), 'taskId nullable par défaut (ADR-0015 Q1)');
     }
 
     public function testCreateWithTaskIdStoresIt(): void
@@ -210,8 +210,8 @@ final class WorkItemTest extends TestCase
             taskId: $taskId,
         );
 
-        self::assertNotNull($workItem->getTaskId());
-        self::assertTrue($workItem->getTaskId()->equals($taskId));
+        static::assertNotNull($workItem->getTaskId());
+        static::assertTrue($workItem->getTaskId()->equals($taskId));
     }
 
     public function testReconstituteWithTaskIdInExtra(): void
@@ -228,9 +228,9 @@ final class WorkItemTest extends TestCase
             ['taskId' => $taskId, 'notes' => 'imported'],
         );
 
-        self::assertNotNull($workItem->getTaskId());
-        self::assertTrue($workItem->getTaskId()->equals($taskId));
-        self::assertSame('imported', $workItem->getNotes());
+        static::assertNotNull($workItem->getTaskId());
+        static::assertTrue($workItem->getTaskId()->equals($taskId));
+        static::assertSame('imported', $workItem->getNotes());
     }
 
     private function newWorkItem(): WorkItem

@@ -17,9 +17,9 @@ final class ClientIdLegacyTest extends TestCase
     {
         $id = ClientId::fromLegacyInt(42);
 
-        $this->assertSame('legacy:42', $id->getValue());
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testFromLegacyIntRejectsZero(): void
@@ -37,7 +37,7 @@ final class ClientIdLegacyTest extends TestCase
     public function testIsLegacyFalseForUuid(): void
     {
         $id = ClientId::generate();
-        $this->assertFalse($id->isLegacy());
+        static::assertFalse($id->isLegacy());
     }
 
     public function testToLegacyIntRejectsUuid(): void
@@ -50,8 +50,8 @@ final class ClientIdLegacyTest extends TestCase
     public function testFromStringAcceptsLegacyFormat(): void
     {
         $id = ClientId::fromString('legacy:99');
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(99, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(99, $id->toLegacyInt());
     }
 
     public function testFromStringRejectsArbitraryString(): void

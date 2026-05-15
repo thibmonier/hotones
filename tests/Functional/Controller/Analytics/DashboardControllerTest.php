@@ -136,9 +136,9 @@ class DashboardControllerTest extends WebTestCase
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         );
         $contentDisposition = $client->getResponse()->headers->get('Content-Disposition');
-        $this->assertStringContainsString('attachment', $contentDisposition);
-        $this->assertStringContainsString('dashboard_analytics_', $contentDisposition);
-        $this->assertStringContainsString('.xlsx', $contentDisposition);
+        static::assertStringContainsString('attachment', $contentDisposition);
+        static::assertStringContainsString('dashboard_analytics_', $contentDisposition);
+        static::assertStringContainsString('.xlsx', $contentDisposition);
     }
 
     public function testExcelExportWithFilters(): void
@@ -192,7 +192,7 @@ class DashboardControllerTest extends WebTestCase
         );
 
         // Should redirect or return success
-        $this->assertTrue($client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection());
+        static::assertTrue($client->getResponse()->isSuccessful() || $client->getResponse()->isRedirection());
     }
 
     public function testSessionPersistsPeriodSelection(): void
@@ -212,6 +212,6 @@ class DashboardControllerTest extends WebTestCase
 
         // Session should have stored the period
         $session = $client->getRequest()->getSession();
-        $this->assertEquals('quarter', $session->get('dashboard_period'));
+        static::assertSame('quarter', $session->get('dashboard_period'));
     }
 }

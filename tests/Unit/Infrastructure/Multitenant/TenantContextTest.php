@@ -15,7 +15,7 @@ final class TenantContextTest extends TestCase
     {
         $context = new TenantContext();
 
-        $this->assertFalse($context->hasTenant());
+        static::assertFalse($context->hasTenant());
     }
 
     public function testGetCurrentTenantThrowsWhenUnset(): void
@@ -35,8 +35,8 @@ final class TenantContextTest extends TestCase
 
         $context->setCurrentTenant($tenantId);
 
-        $this->assertTrue($context->hasTenant());
-        $this->assertSame(42, $context->getCurrentTenant()->value);
+        static::assertTrue($context->hasTenant());
+        static::assertSame(42, $context->getCurrentTenant()->value);
     }
 
     public function testSetCurrentTenantOverwritesPrevious(): void
@@ -46,7 +46,7 @@ final class TenantContextTest extends TestCase
         $context->setCurrentTenant(TenantId::fromInt(1));
         $context->setCurrentTenant(TenantId::fromInt(2));
 
-        $this->assertSame(2, $context->getCurrentTenant()->value);
+        static::assertSame(2, $context->getCurrentTenant()->value);
     }
 
     public function testClearResetsContext(): void
@@ -56,7 +56,7 @@ final class TenantContextTest extends TestCase
 
         $context->clear();
 
-        $this->assertFalse($context->hasTenant());
+        static::assertFalse($context->hasTenant());
         $this->expectException(NoTenantContextException::class);
         $context->getCurrentTenant();
     }
@@ -69,6 +69,6 @@ final class TenantContextTest extends TestCase
 
         $retrieved = $context->getCurrentTenant();
 
-        $this->assertTrue($retrieved->equals($original));
+        static::assertTrue($retrieved->equals($original));
     }
 }

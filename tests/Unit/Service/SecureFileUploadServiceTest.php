@@ -59,13 +59,13 @@ class SecureFileUploadServiceTest extends TestCase
         $this->filesystem
             ->expects($this->once())
             ->method('writeStream')
-            ->with($this->matchesRegularExpression('#avatars/test-[a-z0-9]+\.jpg#'), $this->anything());
+            ->with(static::matchesRegularExpression('#avatars/test-[a-z0-9]+\.jpg#'), static::anything());
 
         // When: upload image
         $result = $this->service->uploadImage($file);
 
         // Then: filename returned
-        $this->assertMatchesRegularExpression('/^test-[a-z0-9]+\.jpg$/', $result);
+        static::assertMatchesRegularExpression('/^test-[a-z0-9]+\.jpg$/', $result);
     }
 
     /**
@@ -84,7 +84,7 @@ class SecureFileUploadServiceTest extends TestCase
         $result = $this->service->uploadImage($file, 'logos');
 
         // Then: filename with PNG extension
-        $this->assertMatchesRegularExpression('/^logo-[a-z0-9]+\.png$/', $result);
+        static::assertMatchesRegularExpression('/^logo-[a-z0-9]+\.png$/', $result);
     }
 
     /**
@@ -169,13 +169,13 @@ class SecureFileUploadServiceTest extends TestCase
         $this->filesystem
             ->expects($this->once())
             ->method('writeStream')
-            ->with($this->matchesRegularExpression('#documents/contract-[a-z0-9]+\.pdf#'), $this->anything());
+            ->with(static::matchesRegularExpression('#documents/contract-[a-z0-9]+\.pdf#'), static::anything());
 
         // When: upload document
         $result = $this->service->uploadDocument($file);
 
         // Then: filename returned
-        $this->assertMatchesRegularExpression('/^contract-[a-z0-9]+\.pdf$/', $result);
+        static::assertMatchesRegularExpression('/^contract-[a-z0-9]+\.pdf$/', $result);
     }
 
     /**
@@ -196,9 +196,9 @@ class SecureFileUploadServiceTest extends TestCase
         $result2 = $this->service->uploadDocument($file2, 'reports');
 
         // Then: different filenames generated
-        $this->assertNotEquals($result1, $result2);
-        $this->assertStringStartsWith('report-', $result1);
-        $this->assertStringStartsWith('report-', $result2);
+        static::assertNotEquals($result1, $result2);
+        static::assertStringStartsWith('report-', $result1);
+        static::assertStringStartsWith('report-', $result2);
     }
 
     /**
@@ -233,7 +233,7 @@ class SecureFileUploadServiceTest extends TestCase
         $result = $this->service->deleteFile('test-123.jpg', 'avatars');
 
         // Then: true returned
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     /**
@@ -255,7 +255,7 @@ class SecureFileUploadServiceTest extends TestCase
         $result = $this->service->deleteFile('missing.pdf', 'documents');
 
         // Then: false returned
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     /**
@@ -271,7 +271,7 @@ class SecureFileUploadServiceTest extends TestCase
         $result = $this->service->deleteFile('test.jpg', 'avatars');
 
         // Then: false returned (error handled gracefully)
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     /**
@@ -287,7 +287,7 @@ class SecureFileUploadServiceTest extends TestCase
         $url = $this->service->getPublicUrl('avatar-123.jpg', 'avatars');
 
         // Then: local path returned
-        $this->assertSame('/uploads/avatars/avatar-123.jpg', $url);
+        static::assertSame('/uploads/avatars/avatar-123.jpg', $url);
     }
 
     /**
@@ -309,7 +309,7 @@ class SecureFileUploadServiceTest extends TestCase
         $url = $service->getPublicUrl('document-456.pdf', 'documents');
 
         // Then: S3 URL returned
-        $this->assertSame('https://cdn.example.com/documents/document-456.pdf', $url);
+        static::assertSame('https://cdn.example.com/documents/document-456.pdf', $url);
     }
 
     /**
@@ -331,8 +331,8 @@ class SecureFileUploadServiceTest extends TestCase
         $url = $service->getPublicUrl('file.jpg', 'images');
 
         // Then: no double slashes in URL
-        $this->assertSame('https://cdn.example.com/images/file.jpg', $url);
-        $this->assertStringNotContainsString('//', substr($url, 8)); // Skip https://
+        static::assertSame('https://cdn.example.com/images/file.jpg', $url);
+        static::assertStringNotContainsString('//', substr($url, 8)); // Skip https://
     }
 
     /**
@@ -360,9 +360,9 @@ class SecureFileUploadServiceTest extends TestCase
         $result = $this->service->uploadImage($file);
 
         // Then: filename is sanitized (no path traversal, pathinfo stripped the path)
-        $this->assertMatchesRegularExpression('/^passwd-sanitized-[a-z0-9]+\.jpg$/', $result);
-        $this->assertStringNotContainsString('..', $result);
-        $this->assertStringNotContainsString('/', $result);
+        static::assertMatchesRegularExpression('/^passwd-sanitized-[a-z0-9]+\.jpg$/', $result);
+        static::assertStringNotContainsString('..', $result);
+        static::assertStringNotContainsString('/', $result);
     }
 
     /**
@@ -383,9 +383,9 @@ class SecureFileUploadServiceTest extends TestCase
         $result2 = $this->service->uploadImage($file2);
 
         // Then: different filenames (thanks to uniqid())
-        $this->assertNotEquals($result1, $result2);
-        $this->assertStringStartsWith('test-', $result1);
-        $this->assertStringStartsWith('test-', $result2);
+        static::assertNotEquals($result1, $result2);
+        static::assertStringStartsWith('test-', $result1);
+        static::assertStringStartsWith('test-', $result2);
     }
 
     // ========== Helper Methods ==========
@@ -436,7 +436,7 @@ class SecureFileUploadServiceTest extends TestCase
             MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIA
             AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEB
             AQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k=
-        ');
+        ', strict: true);
     }
 
     /**
@@ -448,6 +448,6 @@ class SecureFileUploadServiceTest extends TestCase
         return base64_decode('
             iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9
             awAAAABJRU5ErkJggg==
-        ');
+        ', strict: true);
     }
 }

@@ -23,12 +23,12 @@ final class ClientTest extends TestCase
     {
         $client = $this->makeClient();
 
-        $this->assertSame('Acme Corp', $client->getName()->getValue());
-        $this->assertSame(ServiceLevel::STANDARD, $client->getServiceLevel());
-        $this->assertTrue($client->isActive());
-        $this->assertNull($client->getEmail());
-        $this->assertNull($client->getUpdatedAt());
-        $this->assertNotNull($client->getCreatedAt());
+        static::assertSame('Acme Corp', $client->getName()->getValue());
+        static::assertSame(ServiceLevel::STANDARD, $client->getServiceLevel());
+        static::assertTrue($client->isActive());
+        static::assertNull($client->getEmail());
+        static::assertNull($client->getUpdatedAt());
+        static::assertNotNull($client->getCreatedAt());
     }
 
     public function testCreateRecordsClientCreatedEvent(): void
@@ -36,9 +36,9 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $events = $client->pullDomainEvents();
 
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ClientCreatedEvent::class, $events[0]);
-        $this->assertSame([], $client->pullDomainEvents());
+        static::assertCount(1, $events);
+        static::assertInstanceOf(ClientCreatedEvent::class, $events[0]);
+        static::assertSame([], $client->pullDomainEvents());
     }
 
     public function testCreateWithExplicitServiceLevel(): void
@@ -49,7 +49,7 @@ final class ClientTest extends TestCase
             ServiceLevel::ENTERPRISE,
         );
 
-        $this->assertSame(ServiceLevel::ENTERPRISE, $client->getServiceLevel());
+        static::assertSame(ServiceLevel::ENTERPRISE, $client->getServiceLevel());
     }
 
     public function testUpdateContactInfo(): void
@@ -64,22 +64,22 @@ final class ClientTest extends TestCase
             'FR',
         );
 
-        $this->assertSame('contact@acme.com', $client->getEmail()->getValue());
-        $this->assertSame('+33123456789', $client->getPhone());
-        $this->assertSame('Paris', $client->getCity());
-        $this->assertSame('75001', $client->getPostalCode());
-        $this->assertSame('FR', $client->getCountry());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertSame('contact@acme.com', $client->getEmail()->getValue());
+        static::assertSame('+33123456789', $client->getPhone());
+        static::assertSame('Paris', $client->getCity());
+        static::assertSame('75001', $client->getPostalCode());
+        static::assertSame('FR', $client->getCountry());
+        static::assertNotNull($client->getUpdatedAt());
     }
 
     public function testUpdateServiceLevel(): void
     {
         $client = $this->makeClient();
-        $this->assertNull($client->getUpdatedAt());
+        static::assertNull($client->getUpdatedAt());
 
         $client->updateServiceLevel(ServiceLevel::PREMIUM);
-        $this->assertSame(ServiceLevel::PREMIUM, $client->getServiceLevel());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertSame(ServiceLevel::PREMIUM, $client->getServiceLevel());
+        static::assertNotNull($client->getUpdatedAt());
     }
 
     public function testUpdateServiceLevelNoOpIfSame(): void
@@ -87,7 +87,7 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $client->updateServiceLevel(ServiceLevel::STANDARD); // same as default
 
-        $this->assertNull($client->getUpdatedAt());
+        static::assertNull($client->getUpdatedAt());
     }
 
     public function testRename(): void
@@ -95,8 +95,8 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $client->rename(CompanyName::fromString('New Name'));
 
-        $this->assertSame('New Name', $client->getName()->getValue());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertSame('New Name', $client->getName()->getValue());
+        static::assertNotNull($client->getUpdatedAt());
     }
 
     public function testRenameNoOpIfSame(): void
@@ -104,20 +104,20 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $client->rename(CompanyName::fromString('Acme Corp'));
 
-        $this->assertNull($client->getUpdatedAt());
+        static::assertNull($client->getUpdatedAt());
     }
 
     public function testActivateDeactivate(): void
     {
         $client = $this->makeClient();
-        $this->assertTrue($client->isActive());
+        static::assertTrue($client->isActive());
 
         $client->deactivate();
-        $this->assertFalse($client->isActive());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertFalse($client->isActive());
+        static::assertNotNull($client->getUpdatedAt());
 
         $client->activate();
-        $this->assertTrue($client->isActive());
+        static::assertTrue($client->isActive());
     }
 
     public function testDeactivateNoOpIfAlreadyInactive(): void
@@ -127,7 +127,7 @@ final class ClientTest extends TestCase
         $firstUpdate = $client->getUpdatedAt();
 
         $client->deactivate();
-        $this->assertSame($firstUpdate, $client->getUpdatedAt());
+        static::assertSame($firstUpdate, $client->getUpdatedAt());
     }
 
     public function testUpdateVatNumber(): void
@@ -135,8 +135,8 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $client->updateVatNumber('FR12345678901');
 
-        $this->assertSame('FR12345678901', $client->getVatNumber());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertSame('FR12345678901', $client->getVatNumber());
+        static::assertNotNull($client->getUpdatedAt());
     }
 
     public function testAddNotes(): void
@@ -144,7 +144,7 @@ final class ClientTest extends TestCase
         $client = $this->makeClient();
         $client->addNotes('Important client');
 
-        $this->assertSame('Important client', $client->getNotes());
-        $this->assertNotNull($client->getUpdatedAt());
+        static::assertSame('Important client', $client->getNotes());
+        static::assertNotNull($client->getUpdatedAt());
     }
 }

@@ -31,8 +31,8 @@ final class SendBillingLeadTimeRedAlertOnInvoiceCreatedTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::stringContains('Temps de facturation médian 30j'),
-                self::stringContains('40.0 j'),
+                static::stringContains('Temps de facturation médian 30j'),
+                static::stringContains('40.0 j'),
                 AlertSeverity::CRITICAL,
             )
             ->willReturn(true);
@@ -73,8 +73,8 @@ final class SendBillingLeadTimeRedAlertOnInvoiceCreatedTest extends TestCase
         $logger->expects(self::once())
             ->method('info')
             ->with(
-                self::stringContains('Billing lead time red alert triggered'),
-                self::callback(fn (array $ctx) => isset($ctx['median_30_days'], $ctx['threshold_days'], $ctx['slack_sent'])
+                static::stringContains('Billing lead time red alert triggered'),
+                static::callback(static fn (array $ctx) => isset($ctx['median_30_days'], $ctx['threshold_days'], $ctx['slack_sent'])
                     && $ctx['threshold_days'] === SendBillingLeadTimeRedAlertOnInvoiceCreated::DEFAULT_RED_THRESHOLD_DAYS
                     && $ctx['slack_sent'] === true),
             );
@@ -94,8 +94,8 @@ final class SendBillingLeadTimeRedAlertOnInvoiceCreatedTest extends TestCase
         $slack->expects(self::once())
             ->method('sendAlert')
             ->with(
-                self::anything(),
-                self::stringContains('Beta'),
+                static::anything(),
+                static::stringContains('Beta'),
                 AlertSeverity::CRITICAL,
             )
             ->willReturn(true);

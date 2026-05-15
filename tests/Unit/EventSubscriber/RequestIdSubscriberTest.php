@@ -27,10 +27,10 @@ final class RequestIdSubscriberTest extends TestCase
         $subscriber->onKernelRequest($this->makeRequestEvent($request));
 
         $stored = $request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME);
-        self::assertIsString($stored);
-        self::assertNotEmpty($stored);
+        static::assertIsString($stored);
+        static::assertNotEmpty($stored);
         // Format `<YmdHis>-<8 hex>`
-        self::assertMatchesRegularExpression('/^\d{14}-[a-f0-9]{8}$/', $stored);
+        static::assertMatchesRegularExpression('/^\d{14}-[a-f0-9]{8}$/', $stored);
     }
 
     public function testReusesIncomingHeaderWhenValid(): void
@@ -41,7 +41,7 @@ final class RequestIdSubscriberTest extends TestCase
         $subscriber = new RequestIdSubscriber();
         $subscriber->onKernelRequest($this->makeRequestEvent($request));
 
-        self::assertSame(
+        static::assertSame(
             'cf-edge-abc123',
             $request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME),
         );
@@ -57,10 +57,10 @@ final class RequestIdSubscriberTest extends TestCase
         $subscriber->onKernelRequest($this->makeRequestEvent($request));
 
         $stored = $request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME);
-        self::assertIsString($stored);
-        self::assertStringNotContainsString("\r", $stored);
-        self::assertStringNotContainsString("\n", $stored);
-        self::assertStringNotContainsString('Set-Cookie', $stored);
+        static::assertIsString($stored);
+        static::assertStringNotContainsString("\r", $stored);
+        static::assertStringNotContainsString("\n", $stored);
+        static::assertStringNotContainsString('Set-Cookie', $stored);
     }
 
     public function testRejectsIncomingHeaderTooLong(): void
@@ -72,9 +72,9 @@ final class RequestIdSubscriberTest extends TestCase
         $subscriber->onKernelRequest($this->makeRequestEvent($request));
 
         $stored = $request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME);
-        self::assertIsString($stored);
-        self::assertLessThanOrEqual(128, strlen($stored));
-        self::assertNotSame(str_repeat('a', 200), $stored);
+        static::assertIsString($stored);
+        static::assertLessThanOrEqual(128, strlen($stored));
+        static::assertNotSame(str_repeat('a', 200), $stored);
     }
 
     public function testIgnoresSubRequests(): void
@@ -84,7 +84,7 @@ final class RequestIdSubscriberTest extends TestCase
 
         $subscriber->onKernelRequest($this->makeRequestEvent($request, HttpKernelInterface::SUB_REQUEST));
 
-        self::assertNull($request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME));
+        static::assertNull($request->attributes->get(RequestIdSubscriber::ATTRIBUTE_NAME));
     }
 
     public function testResponseHeaderIsSetFromRequestAttribute(): void
@@ -97,7 +97,7 @@ final class RequestIdSubscriberTest extends TestCase
 
         $subscriber->onKernelResponse($this->makeResponseEvent($request, $response));
 
-        self::assertSame(
+        static::assertSame(
             'test-correlation-42',
             $response->headers->get(RequestIdSubscriber::HEADER_NAME),
         );
@@ -111,7 +111,7 @@ final class RequestIdSubscriberTest extends TestCase
 
         $subscriber->onKernelResponse($this->makeResponseEvent($request, $response));
 
-        self::assertNull($response->headers->get(RequestIdSubscriber::HEADER_NAME));
+        static::assertNull($response->headers->get(RequestIdSubscriber::HEADER_NAME));
     }
 
     public function testResponseHeaderIgnoresSubRequests(): void
@@ -124,15 +124,15 @@ final class RequestIdSubscriberTest extends TestCase
 
         $subscriber->onKernelResponse($this->makeResponseEvent($request, $response, HttpKernelInterface::SUB_REQUEST));
 
-        self::assertNull($response->headers->get(RequestIdSubscriber::HEADER_NAME));
+        static::assertNull($response->headers->get(RequestIdSubscriber::HEADER_NAME));
     }
 
     public function testSubscribedEventsCoverRequestAndResponse(): void
     {
         $events = RequestIdSubscriber::getSubscribedEvents();
 
-        self::assertArrayHasKey('kernel.request', $events);
-        self::assertArrayHasKey('kernel.response', $events);
+        static::assertArrayHasKey('kernel.request', $events);
+        static::assertArrayHasKey('kernel.response', $events);
     }
 
     private function makeRequestEvent(

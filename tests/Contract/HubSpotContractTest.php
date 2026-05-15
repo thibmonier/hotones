@@ -48,7 +48,7 @@ final class HubSpotContractTest extends TestCase
     {
         $client = new HubSpotClient(HttpClient::create(), new NullLogger());
 
-        self::assertTrue(
+        static::assertTrue(
             $client->testConnection($this->settings),
             'HubSpot sandbox /crm/v3/objects/contacts did not return 200.',
         );
@@ -60,9 +60,9 @@ final class HubSpotContractTest extends TestCase
 
         $accountInfo = $client->getAccountInfo($this->settings);
 
-        self::assertNotNull($accountInfo, 'Account info call returned null.');
-        self::assertIsArray($accountInfo);
-        self::assertArrayHasKey(
+        static::assertNotNull($accountInfo, 'Account info call returned null.');
+        static::assertIsArray($accountInfo);
+        static::assertArrayHasKey(
             'portalId',
             $accountInfo,
             'HubSpot account info no longer exposes "portalId" — schema changed.',
@@ -75,6 +75,6 @@ final class HubSpotContractTest extends TestCase
 
         $pipelines = $client->getDealPipelines($this->settings);
 
-        self::assertIsArray($pipelines, 'getDealPipelines() must return an array.');
+        static::assertIsArray($pipelines, 'getDealPipelines() must return an array.');
     }
 }

@@ -42,7 +42,7 @@ final class DailyHoursValidatorTest extends TestCase
 
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
-        self::assertSame(7.0, $validator->dailyMaxHours($contributorId, $date)->getValue());
+        static::assertSame(7.0, $validator->dailyMaxHours($contributorId, $date)->getValue());
     }
 
     public function testDailyMaxHoursPartTime80Percent(): void
@@ -62,7 +62,7 @@ final class DailyHoursValidatorTest extends TestCase
 
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
-        self::assertSame(5.6, $validator->dailyMaxHours($contributorId, $date)->getValue());
+        static::assertSame(5.6, $validator->dailyMaxHours($contributorId, $date)->getValue());
     }
 
     public function testDailyMaxHoursThrowsWhenNoActivePeriod(): void
@@ -102,7 +102,7 @@ final class DailyHoursValidatorTest extends TestCase
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
         // existing 6h + additional 2h = 8h > maxHours 7h
-        self::assertTrue($validator->isExceeded($contributorId, $date, WorkedHours::fromFloat(2.0)));
+        static::assertTrue($validator->isExceeded($contributorId, $date, WorkedHours::fromFloat(2.0)));
     }
 
     public function testIsExceededFalseWhenSumWithinMax(): void
@@ -126,7 +126,7 @@ final class DailyHoursValidatorTest extends TestCase
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
         // existing 5h + additional 1h = 6h <= maxHours 7h
-        self::assertFalse($validator->isExceeded($contributorId, $date, WorkedHours::fromFloat(1.0)));
+        static::assertFalse($validator->isExceeded($contributorId, $date, WorkedHours::fromFloat(1.0)));
     }
 
     public function testCurrentDailyTotalSumsHours(): void
@@ -145,7 +145,7 @@ final class DailyHoursValidatorTest extends TestCase
 
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
-        self::assertSame(5.0, $validator->currentDailyTotal($contributorId, $date));
+        static::assertSame(5.0, $validator->currentDailyTotal($contributorId, $date));
     }
 
     public function testCurrentDailyTotalZeroWhenNoWorkItems(): void
@@ -159,7 +159,7 @@ final class DailyHoursValidatorTest extends TestCase
 
         $validator = new DailyHoursValidator($employmentRepo, $workItemRepo);
 
-        self::assertSame(0.0, $validator->currentDailyTotal($contributorId, $date));
+        static::assertSame(0.0, $validator->currentDailyTotal($contributorId, $date));
     }
 
     private function makeWorkItem(ContributorId $contributorId, DateTimeImmutable $date, float $hours): WorkItem

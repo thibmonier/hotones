@@ -24,9 +24,9 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertFalse($result['canPredict']);
-        $this->assertEquals(25.0, $result['currentProgress']);
-        $this->assertStringContainsString('progression < 30%', $result['message']);
+        static::assertFalse($result['canPredict']);
+        static::assertSame(25.0, $result['currentProgress']);
+        static::assertStringContainsString('progression < 30%', $result['message']);
     }
 
     public function testPredictProfitabilityReturnsFalseWhenInsufficientData(): void
@@ -39,8 +39,8 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertFalse($result['canPredict']);
-        $this->assertArrayHasKey('message', $result);
+        static::assertFalse($result['canPredict']);
+        static::assertArrayHasKey('message', $result);
     }
 
     public function testPredictProfitabilityReturnsValidPredictionWhenSufficientData(): void
@@ -54,27 +54,27 @@ class ProfitabilityPredictorTest extends TestCase
         $result = $this->service->predictProfitability($project);
 
         // Assertions
-        $this->assertTrue($result['canPredict']);
-        $this->assertEquals(50.0, $result['currentProgress']);
-        $this->assertArrayHasKey('currentMargin', $result);
-        $this->assertArrayHasKey('predictedMargin', $result);
-        $this->assertArrayHasKey('budgetDrift', $result);
-        $this->assertArrayHasKey('recommendations', $result);
-        $this->assertArrayHasKey('scenarios', $result);
+        static::assertTrue($result['canPredict']);
+        static::assertSame(50.0, $result['currentProgress']);
+        static::assertArrayHasKey('currentMargin', $result);
+        static::assertArrayHasKey('predictedMargin', $result);
+        static::assertArrayHasKey('budgetDrift', $result);
+        static::assertArrayHasKey('recommendations', $result);
+        static::assertArrayHasKey('scenarios', $result);
 
         // Check predicted margin structure (actual keys returned by service)
-        $this->assertArrayHasKey('projected', $result['predictedMargin']);
-        $this->assertArrayHasKey('budgeted', $result['predictedMargin']);
-        $this->assertArrayHasKey('difference', $result['predictedMargin']);
+        static::assertArrayHasKey('projected', $result['predictedMargin']);
+        static::assertArrayHasKey('budgeted', $result['predictedMargin']);
+        static::assertArrayHasKey('difference', $result['predictedMargin']);
 
         // Check scenarios structure (realistic, optimistic, pessimistic are in scenarios, not predictedMargin)
-        $this->assertArrayHasKey('realistic', $result['scenarios']);
-        $this->assertArrayHasKey('optimistic', $result['scenarios']);
-        $this->assertArrayHasKey('pessimistic', $result['scenarios']);
+        static::assertArrayHasKey('realistic', $result['scenarios']);
+        static::assertArrayHasKey('optimistic', $result['scenarios']);
+        static::assertArrayHasKey('pessimistic', $result['scenarios']);
 
         // Check budget drift structure (actual keys returned by service)
-        $this->assertArrayHasKey('overrunPercentage', $result['budgetDrift']);
-        $this->assertArrayHasKey('severity', $result['budgetDrift']);
+        static::assertArrayHasKey('overrunPercentage', $result['budgetDrift']);
+        static::assertArrayHasKey('severity', $result['budgetDrift']);
     }
 
     public function testPredictProfitabilityDetectsBudgetOverrun(): void
@@ -87,14 +87,14 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertTrue($result['canPredict']);
+        static::assertTrue($result['canPredict']);
 
         // Budget drift should be detected (using actual key 'overrunPercentage')
-        $this->assertGreaterThan(0, $result['budgetDrift']['overrunPercentage']);
-        $this->assertContains($result['budgetDrift']['severity'], ['medium', 'high', 'critical']);
+        static::assertGreaterThan(0, $result['budgetDrift']['overrunPercentage']);
+        static::assertContains($result['budgetDrift']['severity'], ['medium', 'high', 'critical']);
 
         // Recommendations should be provided
-        $this->assertNotEmpty($result['recommendations']);
+        static::assertNotEmpty($result['recommendations']);
     }
 
     public function testPredictProfitabilityGeneratesScenarios(): void
@@ -107,21 +107,21 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertTrue($result['canPredict']);
-        $this->assertArrayHasKey('scenarios', $result);
-        $this->assertNotEmpty($result['scenarios']);
+        static::assertTrue($result['canPredict']);
+        static::assertArrayHasKey('scenarios', $result);
+        static::assertNotEmpty($result['scenarios']);
 
         // Check each scenario has required keys (actual structure from service)
-        $this->assertArrayHasKey('realistic', $result['scenarios']);
-        $this->assertArrayHasKey('optimistic', $result['scenarios']);
-        $this->assertArrayHasKey('pessimistic', $result['scenarios']);
+        static::assertArrayHasKey('realistic', $result['scenarios']);
+        static::assertArrayHasKey('optimistic', $result['scenarios']);
+        static::assertArrayHasKey('pessimistic', $result['scenarios']);
 
         // Check that each scenario has the expected structure
         foreach ($result['scenarios'] as $scenario) {
-            $this->assertArrayHasKey('label', $scenario);
-            $this->assertArrayHasKey('totalHours', $scenario);
-            $this->assertArrayHasKey('margin', $scenario);
-            $this->assertArrayHasKey('totalCost', $scenario);
+            static::assertArrayHasKey('label', $scenario);
+            static::assertArrayHasKey('totalHours', $scenario);
+            static::assertArrayHasKey('margin', $scenario);
+            static::assertArrayHasKey('totalCost', $scenario);
         }
     }
 
@@ -135,17 +135,17 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertTrue($result['canPredict']);
+        static::assertTrue($result['canPredict']);
 
         // Should have negative or very low predicted margin (use 'projected' key, not 'realistic')
-        $this->assertLessThan(10, $result['predictedMargin']['projected']);
+        static::assertLessThan(10, $result['predictedMargin']['projected']);
 
         // Should have recommendations
-        $this->assertNotEmpty($result['recommendations']);
+        static::assertNotEmpty($result['recommendations']);
 
         // Check recommendations contain actionable items
         $recommendationTexts = array_column($result['recommendations'], 'message');
-        $this->assertNotEmpty($recommendationTexts);
+        static::assertNotEmpty($recommendationTexts);
     }
 
     public function testPredictProfitabilityOptimisticScenarioIsBetterThanPessimistic(): void
@@ -158,16 +158,16 @@ class ProfitabilityPredictorTest extends TestCase
 
         $result = $this->service->predictProfitability($project);
 
-        $this->assertTrue($result['canPredict']);
+        static::assertTrue($result['canPredict']);
 
         // Optimistic margin should be higher than realistic (scenarios are in 'scenarios', not 'predictedMargin')
-        $this->assertGreaterThan(
+        static::assertGreaterThan(
             $result['scenarios']['realistic']['margin'],
             $result['scenarios']['optimistic']['margin'],
         );
 
         // Pessimistic margin should be lower than realistic (scenarios are in 'scenarios', not 'predictedMargin')
-        $this->assertLessThan(
+        static::assertLessThan(
             $result['scenarios']['realistic']['margin'],
             $result['scenarios']['pessimistic']['margin'],
         );

@@ -31,7 +31,7 @@ final readonly class ComputeDsoKpiHandler
 
     public function __invoke(?DateTimeImmutable $now = null): DsoKpiDto
     {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $dso30 = $this->computeWindow(30, $now);
         $dso90 = $this->computeWindow(90, $now);

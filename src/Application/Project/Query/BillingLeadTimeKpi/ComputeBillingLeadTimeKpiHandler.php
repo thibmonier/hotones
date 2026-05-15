@@ -33,7 +33,7 @@ final readonly class ComputeBillingLeadTimeKpiHandler
 
     public function __invoke(?DateTimeImmutable $now = null): BillingLeadTimeKpiDto
     {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $records30 = $this->repository->findEmittedInRollingWindow(30, $now);
         $records90 = $this->repository->findEmittedInRollingWindow(90, $now);

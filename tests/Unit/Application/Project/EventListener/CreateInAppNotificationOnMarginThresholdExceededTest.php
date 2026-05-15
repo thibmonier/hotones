@@ -31,7 +31,7 @@ final class CreateInAppNotificationOnMarginThresholdExceededTest extends TestCas
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::atLeastOnce())
             ->method('warning')
-            ->with(self::stringContains('not found'));
+            ->with(static::stringContains('not found'));
 
         $handler = new CreateInAppNotificationOnMarginThresholdExceeded(
             $notificationService,
@@ -61,7 +61,7 @@ final class CreateInAppNotificationOnMarginThresholdExceededTest extends TestCas
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::atLeastOnce())
             ->method('info')
-            ->with(self::stringContains('No recipients'));
+            ->with(static::stringContains('No recipients'));
 
         $handler = new CreateInAppNotificationOnMarginThresholdExceeded(
             $notificationService,
@@ -94,13 +94,11 @@ final class CreateInAppNotificationOnMarginThresholdExceededTest extends TestCas
             ->with(
                 $pm,
                 NotificationType::LOW_MARGIN_ALERT,
-                self::stringContains('Alerte marge'),
-                self::stringContains('Test Project'),
-                self::callback(function (array $data): bool {
-                    return ($data['margin_percent'] ?? null) === 5.0;
-                }),
+                static::stringContains('Alerte marge'),
+                static::stringContains('Test Project'),
+                static::callback(static fn (array $data): bool => ($data['margin_percent'] ?? null) === 5.0),
                 'Project',
-                self::anything(),
+                static::anything(),
             );
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -152,7 +150,7 @@ final class CreateInAppNotificationOnMarginThresholdExceededTest extends TestCas
             projectId: ProjectId::fromLegacyInt(42),
             projectName: 'Test Project',
             costTotal: Money::fromAmount(9500.00),
-            invoicedPaidTotal: Money::fromAmount(10000.00),
+            invoicedPaidTotal: Money::fromAmount(10_000.00),
             marginPercent: 5.0,
             thresholdPercent: 10.0,
         );

@@ -27,11 +27,11 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertSame(42, $ddd->getId()->toLegacyInt());
-        $this->assertSame(7, $ddd->getClientId()->toLegacyInt());
-        $this->assertSame(ContractType::FIXED_PRICE, $ddd->getContractType());
-        $this->assertSame(OrderStatus::TO_SIGN, $ddd->getStatus());
-        $this->assertSame(10000.0, $ddd->getAmount()->getAmount());
+        static::assertSame(42, $ddd->getId()->toLegacyInt());
+        static::assertSame(7, $ddd->getClientId()->toLegacyInt());
+        static::assertSame(ContractType::FIXED_PRICE, $ddd->getContractType());
+        static::assertSame(OrderStatus::TO_SIGN, $ddd->getStatus());
+        static::assertSame(10_000.0, $ddd->getAmount()->getAmount());
     }
 
     public function testTranslateWithoutProjectFallsBackToPlaceholderClient(): void
@@ -40,7 +40,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertSame(PHP_INT_MAX, $ddd->getClientId()->toLegacyInt());
+        static::assertSame(PHP_INT_MAX, $ddd->getClientId()->toLegacyInt());
     }
 
     public function testTranslateRegieContractType(): void
@@ -49,8 +49,8 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertSame(ContractType::TIME_AND_MATERIAL, $ddd->getContractType());
-        $this->assertSame(OrderStatus::WON, $ddd->getStatus());
+        static::assertSame(ContractType::TIME_AND_MATERIAL, $ddd->getContractType());
+        static::assertSame(OrderStatus::WON, $ddd->getStatus());
     }
 
     public function testTranslateStatusMappings(): void
@@ -68,7 +68,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
         foreach ($cases as $flatStatus => $expected) {
             $entity = $this->makeFlat(id: 1, status: $flatStatus, contractType: 'forfait', amount: '0.00');
             $ddd = new OrderFlatToDddTranslator()->translate($entity);
-            $this->assertSame($expected, $ddd->getStatus(), sprintf('Status mapping for %s', $flatStatus));
+            static::assertSame($expected, $ddd->getStatus(), sprintf('Status mapping for %s', $flatStatus));
         }
     }
 
@@ -78,7 +78,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertSame(OrderStatus::TO_SIGN, $ddd->getStatus());
+        static::assertSame(OrderStatus::TO_SIGN, $ddd->getStatus());
     }
 
     public function testTranslateUnknownContractTypeFallsBackToFixedPrice(): void
@@ -87,7 +87,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertSame(ContractType::FIXED_PRICE, $ddd->getContractType());
+        static::assertSame(ContractType::FIXED_PRICE, $ddd->getContractType());
     }
 
     public function testTranslateUnsavedOrderThrows(): void
@@ -109,7 +109,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertEquals(new DateTimeImmutable('2026-03-15'), $ddd->getSignedAt());
+        static::assertEquals(new DateTimeImmutable('2026-03-15'), $ddd->getSignedAt());
     }
 
     public function testTranslatePropagatesCreatedAtViaGetter(): void
@@ -119,7 +119,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertEquals(new DateTimeImmutable('2026-01-15'), $ddd->getCreatedAt());
+        static::assertEquals(new DateTimeImmutable('2026-01-15'), $ddd->getCreatedAt());
     }
 
     public function testTranslateNullCreatedAtFallsBackToNow(): void
@@ -129,7 +129,7 @@ final class OrderFlatToDddTranslatorTest extends TestCase
 
         $ddd = new OrderFlatToDddTranslator()->translate($flat);
 
-        $this->assertNotNull($ddd->getCreatedAt());
+        static::assertNotNull($ddd->getCreatedAt());
     }
 
     private function makeFlat(int $id, string $status, string $contractType, string $amount): FlatOrder

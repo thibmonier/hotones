@@ -24,9 +24,9 @@ final class BusinessKpiServiceTest extends TestCase
             'projects_per_day' => 1.2,
             'signed_quotes_this_month' => 5,
             'invoices_this_month_count' => 8,
-            'invoices_this_month_amount' => 12500.50,
+            'invoices_this_month_amount' => 12_500.50,
             'conversion_rate_pct' => 35.0,
-            'revenue_trail_30d' => 25000.0,
+            'revenue_trail_30d' => 25_000.0,
             'avg_project_margin' => 3500.0,
         ];
 
@@ -42,7 +42,7 @@ final class BusinessKpiServiceTest extends TestCase
 
         $kpis = $service->computeAll();
 
-        $this->assertSame($cachedPayload, $kpis);
+        static::assertSame($cachedPayload, $kpis);
     }
 
     public function testComputeAllReturnsAllExpectedKeys(): void
@@ -78,18 +78,18 @@ final class BusinessKpiServiceTest extends TestCase
         ];
 
         foreach ($expectedKeys as $key) {
-            $this->assertArrayHasKey($key, $kpis, sprintf('KPI key "%s" missing', $key));
+            static::assertArrayHasKey($key, $kpis, sprintf('KPI key "%s" missing', $key));
         }
 
         // 9 keys total
-        $this->assertCount(9, $kpis);
+        static::assertCount(9, $kpis);
     }
 
     public function testComputeAllUsesTenantSpecificCacheKey(): void
     {
         $capturedKey = null;
         $cache = $this->createMock(CacheInterface::class);
-        $cache->method('get')->willReturnCallback(function (string $key) use (&$capturedKey): array {
+        $cache->method('get')->willReturnCallback(static function (string $key) use (&$capturedKey): array {
             $capturedKey = $key;
 
             return [
@@ -109,8 +109,8 @@ final class BusinessKpiServiceTest extends TestCase
 
         $service->computeAll();
 
-        $this->assertNotNull($capturedKey);
-        $this->assertStringContainsString('business_kpis_company_', $capturedKey);
+        static::assertNotNull($capturedKey);
+        static::assertStringContainsString('business_kpis_company_', $capturedKey);
     }
 
     private function makeCompanyContext(): CompanyContext

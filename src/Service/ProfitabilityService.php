@@ -42,9 +42,11 @@ class ProfitabilityService
         // IDs des projets concernés
         $projectIds = [];
         foreach ($projects as $p) {
-            if ($p instanceof Project && $p->id !== null) {
-                $projectIds[] = $p->id;
+            if (!($p instanceof Project && $p->id !== null)) {
+                continue;
             }
+
+            $projectIds[] = $p->id;
         }
 
         if (empty($projectIds)) {
@@ -285,10 +287,12 @@ class ProfitabilityService
 
         foreach ($project->getOrders() as $order) {
             // Ne compter que les devis signés/gagnés
-            if (in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
-                $orderTotal = $this->calculateOrderTotal($order);
-                $totalRevenue = bcadd($totalRevenue, $orderTotal, 2);
+            if (!in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
+                continue;
             }
+
+            $orderTotal = $this->calculateOrderTotal($order);
+            $totalRevenue = bcadd($totalRevenue, $orderTotal, 2);
         }
 
         return $totalRevenue;
@@ -325,11 +329,13 @@ class ProfitabilityService
         $totalDays = '0';
 
         foreach ($project->getOrders() as $order) {
-            if (in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
-                foreach ($order->getSections() as $section) {
-                    foreach ($section->getLines() as $line) {
-                        $totalDays = bcadd($totalDays, (string) $line->getDays(), 2);
-                    }
+            if (!in_array($order->getStatus(), ['signed', 'won', 'completed'], true)) {
+                continue;
+            }
+
+            foreach ($order->getSections() as $section) {
+                foreach ($section->getLines() as $line) {
+                    $totalDays = bcadd($totalDays, (string) $line->getDays(), 2);
                 }
             }
         }
@@ -347,11 +353,13 @@ class ProfitabilityService
 
         // Coût des temps passés (hors AVV et non-vendu)
         foreach ($project->getTimesheets() as $timesheet) {
-            if ($this->shouldCountTimesheet($timesheet)) {
-                $contributorCost = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
-                $timeCostPerDay = bcdiv(bcmul((string) $timesheet->getHours(), $contributorCost, 4), '8', 2);
-                $totalCost = bcadd($totalCost, $timeCostPerDay, 2);
+            if (!$this->shouldCountTimesheet($timesheet)) {
+                continue;
             }
+
+            $contributorCost = $this->getContributorDailyCost($timesheet->getContributor(), $timesheet->getDate());
+            $timeCostPerDay = bcdiv(bcmul((string) $timesheet->getHours(), $contributorCost, 4), '8', 2);
+            $totalCost = bcadd($totalCost, $timeCostPerDay, 2);
         }
 
         // Ajouter les achats du projet
@@ -363,9 +371,11 @@ class ProfitabilityService
         foreach ($project->getOrders() as $order) {
             foreach ($order->getSections() as $section) {
                 foreach ($section->getLines() as $line) {
-                    if ($line->getPurchaseAmount()) {
-                        $totalCost = bcadd($totalCost, (string) $line->getPurchaseAmount(), 2);
+                    if (!$line->getPurchaseAmount()) {
+                        continue;
                     }
+
+                    $totalCost = bcadd($totalCost, (string) $line->getPurchaseAmount(), 2);
                 }
             }
         }
@@ -396,13 +406,15 @@ class ProfitabilityService
     {
         // Récupérer la période d'emploi active à cette date
         foreach ($contributor->getEmploymentPeriods() as $period) {
-            if ($this->isPeriodActiveAt($period, $date)) {
-                $cjm = $period->getCjm() ?? $contributor->getCjm() ?? '0';
-                // Ajuster selon le pourcentage de temps de travail
-                $workTimePercentage = $period->getWorkTimePercentage() ?? 100;
-
-                return bcmul($cjm, bcdiv($workTimePercentage, '100', 4), 2);
+            if (!$this->isPeriodActiveAt($period, $date)) {
+                continue;
             }
+
+            $cjm = $period->getCjm() ?? $contributor->getCjm() ?? '0';
+            // Ajuster selon le pourcentage de temps de travail
+            $workTimePercentage = $period->getWorkTimePercentage() ?? 100;
+
+            return bcmul($cjm, bcdiv($workTimePercentage, '100', 4), 2);
         }
 
         // Si pas de période trouvée, utiliser le CJM du contributeur
@@ -448,9 +460,11 @@ class ProfitabilityService
     {
         $excludedHours = '0';
         foreach ($project->getTimesheets() as $timesheet) {
-            if (!$this->shouldCountTimesheet($timesheet)) {
-                $excludedHours = bcadd($excludedHours, (string) $timesheet->getHours(), 2);
+            if ($this->shouldCountTimesheet($timesheet)) {
+                continue;
             }
+
+            $excludedHours = bcadd($excludedHours, (string) $timesheet->getHours(), 2);
         }
 
         return $excludedHours;

@@ -231,7 +231,7 @@ Répartition des contributeurs :
             throw new RuntimeException('Données de référence manquantes');
         }
 
-        $io->writeln("✓ $profileCount profils et $techCount technologies trouvés");
+        $io->writeln("✓ {$profileCount} profils et {$techCount} technologies trouvés");
     }
 
     private function createUsers(SymfonyStyle $io, Company $company): array
@@ -296,7 +296,7 @@ Répartition des contributeurs :
         foreach (self::CONTRIBUTORS_DISTRIBUTION as $profileName => $count) {
             $profile = $profileRepo->findOneBy(['name' => $profileName]);
             if (!$profile) {
-                $io->warning("Profil '$profileName' introuvable, passage...");
+                $io->warning("Profil '{$profileName}' introuvable, passage...");
                 continue;
             }
 
@@ -305,7 +305,7 @@ Répartition des contributeurs :
                 do {
                     $firstName = self::FIRST_NAMES[array_rand(self::FIRST_NAMES)];
                     $lastName = self::LAST_NAMES[array_rand(self::LAST_NAMES)];
-                    $fullName = "$firstName $lastName";
+                    $fullName = "{$firstName} {$lastName}";
                 } while (in_array($fullName, $usedNames, true));
 
                 $usedNames[] = $fullName;
@@ -321,9 +321,9 @@ Répartition des contributeurs :
                     $contributor->setCompany($company);
                     $contributor->setFirstName($firstName);
                     $contributor->setLastName($lastName);
-                    $io->writeln("✓ Contributeur créé : $firstName $lastName ($profileName)");
+                    $io->writeln("✓ Contributeur créé : {$firstName} {$lastName} ({$profileName})");
                 } else {
-                    $io->writeln("• Contributeur existant : $firstName $lastName");
+                    $io->writeln("• Contributeur existant : {$firstName} {$lastName}");
                 }
 
                 // CJM selon le profil
@@ -406,9 +406,9 @@ Répartition des contributeurs :
                 $client = new Client();
                 $client->setCompany($company);
                 $client->setName($name);
-                $io->writeln("✓ Client créé : $name");
+                $io->writeln("✓ Client créé : {$name}");
             } else {
-                $io->writeln("• Client existant : $name");
+                $io->writeln("• Client existant : {$name}");
             }
             $this->entityManager->persist($client);
             $clients[] = $client;
@@ -691,28 +691,29 @@ Répartition des contributeurs :
 
             // Chaque contributeur a 70% de chance de travailler un jour donné
             foreach ($contributors as $contributor) {
-                if (random_int(1, 100) <= 70) {
-                    // Sélectionner un projet aléatoire
-                    $project = $projects[array_rand($projects)];
-
-                    // Heures travaillées entre 4 et 8
-                    $hours = (string) (4 + (random_int(0, 40) / 10)); // 4.0 à 8.0
-
-                    $timesheet = new Timesheet();
-                    $timesheet->setCompany($project->getCompany());
-                    $timesheet->setContributor($contributor);
-                    $timesheet->setProject($project);
-                    $timesheet->setDate($date);
-                    $timesheet->setHours($hours);
-                    $timesheet->setNotes("Travail sur le projet {$project->getName()}");
-
-                    $this->entityManager->persist($timesheet);
-                    ++$timesheetsCreated;
+                if (random_int(1, 100) > 70) {
+                    continue;
                 }
+
+                $project = $projects[array_rand($projects)];
+
+                // Heures travaillées entre 4 et 8
+                $hours = (string) (4 + (random_int(0, 40) / 10)); // 4.0 à 8.0
+
+                $timesheet = new Timesheet();
+                $timesheet->setCompany($project->getCompany());
+                $timesheet->setContributor($contributor);
+                $timesheet->setProject($project);
+                $timesheet->setDate($date);
+                $timesheet->setHours($hours);
+                $timesheet->setNotes("Travail sur le projet {$project->getName()}");
+
+                $this->entityManager->persist($timesheet);
+                ++$timesheetsCreated;
             }
         }
 
-        $io->writeln("✓ $timesheetsCreated feuilles de temps créées");
+        $io->writeln("✓ {$timesheetsCreated} feuilles de temps créées");
     }
 
     private function createPlannings(SymfonyStyle $io, array $projects, array $contributors, Company $company): void
@@ -762,6 +763,6 @@ Répartition des contributeurs :
             }
         }
 
-        $io->writeln("✓ $planningCreated blocs de planning créés");
+        $io->writeln("✓ {$planningCreated} blocs de planning créés");
     }
 }

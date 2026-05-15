@@ -70,19 +70,19 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
 
         $repository = static::getContainer()->get(BillingLeadTimeReadModelRepositoryInterface::class);
         $beforeDispatch = $repository->findEmittedInRollingWindow(30, $this->now);
-        self::assertCount(1, $beforeDispatch);
+        static::assertCount(1, $beforeDispatch);
 
         $cacheKey = sprintf(
             'billing_lead_time.emitted_records.company_%d.window_30.day_%s',
             $this->getTestCompany()->getId(),
             $this->now->format('Y-m-d'),
         );
-        self::assertTrue($this->kpiCache->hasItem($cacheKey), 'cache populated after first read');
+        static::assertTrue($this->kpiCache->hasItem($cacheKey), 'cache populated after first read');
 
         $invalidator = static::getContainer()->get(InvalidateBillingLeadTimeCacheOnInvoiceCreated::class);
         $invalidator($this->makeEvent());
 
-        self::assertFalse(
+        static::assertFalse(
             $this->kpiCache->hasItem($cacheKey),
             'cache.kpi pool cleared by InvalidateBillingLeadTimeCacheOnInvoiceCreated',
         );
@@ -103,7 +103,7 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
 
         $listener($this->makeEvent());
 
-        self::assertSame(1, $slackSpy->callCount, 'Slack alert sent when médiane 30j > 30j');
+        static::assertSame(1, $slackSpy->callCount, 'Slack alert sent when médiane 30j > 30j');
     }
 
     public function testNoSlackAlertWhenMedianBelowThreshold(): void
@@ -121,7 +121,7 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
 
         $listener($this->makeEvent());
 
-        self::assertSame(0, $slackSpy->callCount);
+        static::assertSame(0, $slackSpy->callCount);
     }
 
     public function testKpiRefreshesAfterEventDispatchWithNewInvoiceData(): void
@@ -131,7 +131,7 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
         // Initial state : 1 invoice 10-day lead time → médiane ≈ 10
         $this->createQuoteInvoice($client, daysAgoEmitted: 10, leadTimeDays: 10);
         $first = ($this->computeBillingLeadTimeKpi)($this->now);
-        self::assertEqualsWithDelta(10.0, $first->stats30->p50->getDays(), 0.5);
+        static::assertEqualsWithDelta(10.0, $first->stats30->p50->getDays(), 0.5);
 
         // Add slow invoice 50-day lead time → should shift median up
         $this->createQuoteInvoice($client, daysAgoEmitted: 5, leadTimeDays: 50);
@@ -140,7 +140,7 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
         $invalidator($this->makeEvent());
 
         $after = ($this->computeBillingLeadTimeKpi)($this->now);
-        self::assertGreaterThan(
+        static::assertGreaterThan(
             $first->stats30->p50->getDays(),
             $after->stats30->p50->getDays(),
             'Lead time median should increase after slow invoice once cache cleared',
@@ -163,13 +163,13 @@ final class InvoiceCreatedEventBillingLeadTimeFlowTest extends KernelTestCase
 
         $kpi = ($this->computeBillingLeadTimeKpi)($this->now);
 
-        self::assertCount(3, $kpi->topSlowClients);
-        self::assertSame('Gamma', $kpi->topSlowClients[0]->clientName);
-        self::assertEqualsWithDelta(50.0, $kpi->topSlowClients[0]->averageLeadTimeDays, 0.5);
-        self::assertSame('Acme', $kpi->topSlowClients[1]->clientName);
-        self::assertEqualsWithDelta(30.0, $kpi->topSlowClients[1]->averageLeadTimeDays, 0.5);
-        self::assertSame(2, $kpi->topSlowClients[1]->sampleCount);
-        self::assertSame('Beta', $kpi->topSlowClients[2]->clientName);
+        static::assertCount(3, $kpi->topSlowClients);
+        static::assertSame('Gamma', $kpi->topSlowClients[0]->clientName);
+        static::assertEqualsWithDelta(50.0, $kpi->topSlowClients[0]->averageLeadTimeDays, 0.5);
+        static::assertSame('Acme', $kpi->topSlowClients[1]->clientName);
+        static::assertEqualsWithDelta(30.0, $kpi->topSlowClients[1]->averageLeadTimeDays, 0.5);
+        static::assertSame(2, $kpi->topSlowClients[1]->sampleCount);
+        static::assertSame('Beta', $kpi->topSlowClients[2]->clientName);
     }
 
     private function createQuoteInvoice(object $client, int $daysAgoEmitted, int $leadTimeDays): void

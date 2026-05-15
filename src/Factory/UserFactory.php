@@ -41,7 +41,7 @@ final class UserFactory extends PersistentObjectFactory
         }
 
         return [
-            'company' => $company ?? lazy(fn (): mixed => CompanyFactory::createOne()),
+            'company' => $company ?? lazy(static fn (): mixed => CompanyFactory::createOne()),
             'email' => $faker->unique()->safeEmail(),
             'roles' => [],
             // Set a plain password; it will be hashed in initialize().

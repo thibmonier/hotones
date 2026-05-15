@@ -36,7 +36,7 @@ final readonly class InvoicePaymentRecord
             return 0.0;
         }
 
-        $secondsPerDay = 86400;
+        $secondsPerDay = 86_400;
         $diff = $this->paidAt->getTimestamp() - $this->issuedAt->getTimestamp();
 
         return $diff / $secondsPerDay;

@@ -122,10 +122,12 @@ final readonly class CreateInAppNotificationOnMarginThresholdExceeded
         }
 
         foreach ($this->userRepository->findByRole('ROLE_MANAGER') as $manager) {
-            if (!in_array($manager->getId(), $seenIds, true)) {
-                $recipients[] = $manager;
-                $seenIds[] = $manager->getId();
+            if (in_array($manager->getId(), $seenIds, true)) {
+                continue;
             }
+
+            $recipients[] = $manager;
+            $seenIds[] = $manager->getId();
         }
 
         return $recipients;

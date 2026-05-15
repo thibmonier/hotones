@@ -37,11 +37,11 @@ class WorkloadPredictionServiceTest extends TestCase
         $result = $service->analyzePipeline();
 
         // Check structure
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('pipeline', $result);
-        $this->assertArrayHasKey('workloadByMonth', $result);
-        $this->assertArrayHasKey('alerts', $result);
-        $this->assertArrayHasKey('totalPotentialDays', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('pipeline', $result);
+        static::assertArrayHasKey('workloadByMonth', $result);
+        static::assertArrayHasKey('alerts', $result);
+        static::assertArrayHasKey('totalPotentialDays', $result);
     }
 
     public function testAnalyzePipelineAcceptsFilters(): void
@@ -57,8 +57,8 @@ class WorkloadPredictionServiceTest extends TestCase
         // Should accept profile and contributor filters without error
         $result = $service->analyzePipeline([1, 2], [5, 6]);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('pipeline', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('pipeline', $result);
     }
 
     public function testAnalyzePipelineWithOrdersContainingLines(): void
@@ -98,10 +98,10 @@ class WorkloadPredictionServiceTest extends TestCase
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline();
 
-        $this->assertNotEmpty($result['pipeline']);
-        $this->assertGreaterThan(0, $result['totalPotentialDays']);
+        static::assertNotEmpty($result['pipeline']);
+        static::assertGreaterThan(0, $result['totalPotentialDays']);
         // Note: actual calculation may include conversion probability adjustments
-        $this->assertGreaterThanOrEqual(10, $result['totalPotentialDays']);
+        static::assertGreaterThanOrEqual(10, $result['totalPotentialDays']);
     }
 
     public function testAnalyzePipelineFiltersOrdersByProfile(): void
@@ -150,8 +150,8 @@ class WorkloadPredictionServiceTest extends TestCase
         $result = $service->analyzePipeline([1], []);
 
         // Should only count days from profile 1 (with conversion probability)
-        $this->assertGreaterThan(5, $result['totalPotentialDays']);
-        $this->assertLessThan(11, $result['totalPotentialDays']);
+        static::assertGreaterThan(5, $result['totalPotentialDays']);
+        static::assertLessThan(11, $result['totalPotentialDays']);
     }
 
     public function testAnalyzePipelineGroupsWorkloadByMonth(): void
@@ -183,7 +183,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline();
 
-        $this->assertIsArray($result['workloadByMonth']);
+        static::assertIsArray($result['workloadByMonth']);
     }
 
     // -----------------------------------------------------------------
@@ -202,8 +202,8 @@ class WorkloadPredictionServiceTest extends TestCase
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline([], [], true);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('pipeline', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('pipeline', $result);
     }
 
     public function testAnalyzePipelineAppliesAgePenaltyOnOldOrder(): void
@@ -236,9 +236,9 @@ class WorkloadPredictionServiceTest extends TestCase
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline();
 
-        $this->assertNotEmpty($result['pipeline']);
+        static::assertNotEmpty($result['pipeline']);
         $entry = $result['pipeline'][0];
-        $this->assertLessThan(50, $entry['winProbability']);
+        static::assertLessThan(50, $entry['winProbability']);
     }
 
     public function testAnalyzePipelineHandlesEmptyContributorRepositoryForCapacity(): void
@@ -272,7 +272,7 @@ class WorkloadPredictionServiceTest extends TestCase
         $service = new WorkloadPredictionService($orderRepository, $contributorRepository, $entityManager);
         $result = $service->analyzePipeline();
 
-        $this->assertIsArray($result['workloadByMonth']);
-        $this->assertIsArray($result['alerts']);
+        static::assertIsArray($result['workloadByMonth']);
+        static::assertIsArray($result['alerts']);
     }
 }

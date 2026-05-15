@@ -50,7 +50,7 @@ final class RunningTimerRepositoryTest extends KernelTestCase
     {
         $contributor = ContributorFactory::createOne();
 
-        self::assertNull($this->repository->findActiveByContributor($contributor));
+        static::assertNull($this->repository->findActiveByContributor($contributor));
     }
 
     public function testFindActiveByContributorReturnsRunningTimer(): void
@@ -62,9 +62,9 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
         $found = $this->repository->findActiveByContributor($contributor);
 
-        self::assertNotNull($found);
-        self::assertSame($timer->getId(), $found->getId());
-        self::assertTrue($found->isActive());
+        static::assertNotNull($found);
+        static::assertSame($timer->getId(), $found->getId());
+        static::assertTrue($found->isActive());
     }
 
     public function testFindActiveByContributorIgnoresStoppedTimer(): void
@@ -79,8 +79,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
             stoppedAt: new DateTime('2026-04-30 09:00:00'),
         );
 
-        self::assertFalse($stopped->isActive());
-        self::assertNull($this->repository->findActiveByContributor($contributor));
+        static::assertFalse($stopped->isActive());
+        static::assertNull($this->repository->findActiveByContributor($contributor));
     }
 
     public function testFindActiveByContributorReturnsActiveAmongMixedHistory(): void
@@ -104,8 +104,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
         $found = $this->repository->findActiveByContributor($contributor);
 
-        self::assertNotNull($found);
-        self::assertSame($active->getId(), $found->getId());
+        static::assertNotNull($found);
+        static::assertSame($active->getId(), $found->getId());
     }
 
     public function testFindActiveByContributorIsolatesPerContributor(): void
@@ -116,8 +116,8 @@ final class RunningTimerRepositoryTest extends KernelTestCase
 
         $this->createTimer($alice, $project, startedAt: new DateTime('2026-04-30 09:00:00'));
 
-        self::assertNotNull($this->repository->findActiveByContributor($alice));
-        self::assertNull(
+        static::assertNotNull($this->repository->findActiveByContributor($alice));
+        static::assertNull(
             $this->repository->findActiveByContributor($bob),
             'A timer running for Alice must not be returned when querying Bob.',
         );

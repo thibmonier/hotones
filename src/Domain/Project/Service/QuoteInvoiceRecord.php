@@ -33,7 +33,7 @@ final readonly class QuoteInvoiceRecord
 
     public function leadTimeDays(): float
     {
-        $secondsPerDay = 86400;
+        $secondsPerDay = 86_400;
         $diff = $this->emittedAt->getTimestamp() - $this->signedAt->getTimestamp();
 
         return $diff / $secondsPerDay;

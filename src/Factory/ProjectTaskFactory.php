@@ -80,7 +80,7 @@ final class ProjectTaskFactory extends PersistentObjectFactory
     #[Override]
     public function initialize(): static
     {
-        return $this->afterInstantiate(function (ProjectTask $task): void {
+        return $this->afterInstantiate(static function (ProjectTask $task): void {
             $status = $task->getStatus();
             $progress = match ($status) {
                 'completed' => 100,

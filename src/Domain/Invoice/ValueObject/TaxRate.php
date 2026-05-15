@@ -23,7 +23,7 @@ final readonly class TaxRate implements Stringable
     private function __construct(
         private int $basisPoints,
     ) {
-        if ($basisPoints < 0 || $basisPoints > 10000) {
+        if ($basisPoints < 0 || $basisPoints > 10_000) {
             throw new InvalidArgumentException(sprintf('Tax rate must be between 0%% and 100%%, got: %.2f%%', $basisPoints / 100));
         }
     }
@@ -88,7 +88,7 @@ final readonly class TaxRate implements Stringable
 
     public function getMultiplier(): float
     {
-        return $this->basisPoints / 10000;
+        return $this->basisPoints / 10_000;
     }
 
     /**

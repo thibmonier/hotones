@@ -11,25 +11,25 @@ final class ProjectTypeTest extends TestCase
 {
     public function testCases(): void
     {
-        $this->assertSame('forfait', ProjectType::FORFAIT->value);
-        $this->assertSame('regie', ProjectType::REGIE->value);
+        static::assertSame('forfait', ProjectType::FORFAIT->value);
+        static::assertSame('regie', ProjectType::REGIE->value);
     }
 
     public function testIsFixedPrice(): void
     {
-        $this->assertTrue(ProjectType::FORFAIT->isFixedPrice());
-        $this->assertFalse(ProjectType::REGIE->isFixedPrice());
+        static::assertTrue(ProjectType::FORFAIT->isFixedPrice());
+        static::assertFalse(ProjectType::REGIE->isFixedPrice());
     }
 
     public function testIsTimeAndMaterials(): void
     {
-        $this->assertTrue(ProjectType::REGIE->isTimeAndMaterials());
-        $this->assertFalse(ProjectType::FORFAIT->isTimeAndMaterials());
+        static::assertTrue(ProjectType::REGIE->isTimeAndMaterials());
+        static::assertFalse(ProjectType::FORFAIT->isTimeAndMaterials());
     }
 
     public function testLabel(): void
     {
-        $this->assertSame('Forfait', ProjectType::FORFAIT->label());
-        $this->assertSame('Régie', ProjectType::REGIE->label());
+        static::assertSame('Forfait', ProjectType::FORFAIT->label());
+        static::assertSame('Régie', ProjectType::REGIE->label());
     }
 }

@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Security\CompanyContext;
 use DateTimeImmutable;
 use Doctrine\Persistence\ManagerRegistry;
+use SensitiveParameter;
 
 /**
  * @extends CompanyAwareRepository<AccountDeletionRequest>
@@ -75,7 +76,7 @@ class AccountDeletionRequestRepository extends CompanyAwareRepository
     /**
      * Trouve une demande par son token de confirmation.
      */
-    public function findByConfirmationToken(string $token): ?AccountDeletionRequest
+    public function findByConfirmationToken(#[SensitiveParameter] string $token): ?AccountDeletionRequest
     {
         return $this
             ->createCompanyQueryBuilder('adr')

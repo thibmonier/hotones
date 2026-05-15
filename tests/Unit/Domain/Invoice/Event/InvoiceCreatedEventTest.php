@@ -22,10 +22,10 @@ final class InvoiceCreatedEventTest extends TestCase
 
         $event = InvoiceCreatedEvent::create($invoiceId, $number, $companyId, $clientId);
 
-        $this->assertEquals($invoiceId, $event->getInvoiceId());
-        $this->assertEquals($number, $event->getInvoiceNumber());
-        $this->assertEquals($companyId, $event->getCompanyId());
-        $this->assertEquals($clientId, $event->getClientId());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertEquals($invoiceId, $event->getInvoiceId());
+        static::assertEquals($number, $event->getInvoiceNumber());
+        static::assertEquals($companyId, $event->getCompanyId());
+        static::assertEquals($clientId, $event->getClientId());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

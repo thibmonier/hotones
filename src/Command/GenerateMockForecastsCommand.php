@@ -48,7 +48,7 @@ class GenerateMockForecastsCommand extends Command
         $this->em->createQuery('DELETE FROM App\Entity\FactForecast')->execute();
 
         $forecasts = [];
-        $baseRevenue = 50000; // Base revenue of 50k€
+        $baseRevenue = 50_000; // Base revenue of 50k€
         $now = new DateTimeImmutable();
 
         for ($i = 1; $i <= $months; ++$i) {
@@ -100,7 +100,7 @@ class GenerateMockForecastsCommand extends Command
         // Display summary
         $io->section('Aperçu des prévisions (Scénario réaliste)');
         $tableData = [];
-        $realisticForecasts = array_filter($forecasts, fn ($f): bool => $f->getScenario() === 'realistic');
+        $realisticForecasts = array_filter($forecasts, static fn ($f): bool => $f->getScenario() === 'realistic');
 
         foreach ($realisticForecasts as $forecast) {
             $tableData[] = [

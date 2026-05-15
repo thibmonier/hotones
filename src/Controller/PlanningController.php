@@ -46,16 +46,16 @@ class PlanningController extends AbstractController
         // Filters (arrays)
         $selectedContributors = array_filter(
             $request->query->all('contributors'),
-            fn ($v): bool => $v !== null && $v !== '',
+            static fn ($v): bool => $v !== null && $v !== '',
         );
         $selectedManagers = array_filter(
             $request->query->all('project_managers'),
-            fn ($v): bool => $v !== null && $v !== '',
+            static fn ($v): bool => $v !== null && $v !== '',
         );
-        $selectedProjects = array_filter($request->query->all('projects'), fn ($v): bool => $v !== null && $v !== '');
+        $selectedProjects = array_filter($request->query->all('projects'), static fn ($v): bool => $v !== null && $v !== '');
         $selectedProjectTypes = array_filter(
             $request->query->all('project_types'),
-            fn ($v): bool => $v !== null && $v !== '',
+            static fn ($v): bool => $v !== null && $v !== '',
         );
 
         $today = new DateTime('today');
@@ -70,7 +70,7 @@ class PlanningController extends AbstractController
         // Base contributors list (optionally filtered)
         $contributors = $contributorRepo->findActiveContributors();
         if (!empty($selectedContributors)) {
-            $contributors = array_values(array_filter($contributors, fn ($c): bool => in_array(
+            $contributors = array_values(array_filter($contributors, static fn ($c): bool => in_array(
                 (string) $c->getId(),
                 $selectedContributors,
                 true,

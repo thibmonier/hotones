@@ -59,9 +59,9 @@ final class ProjectControllerDddTest extends WebTestCase
 
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $project = $em->getRepository(Project::class)->findOneBy(['name' => 'Internal R&D']);
-        self::assertNotNull($project);
-        self::assertSame('Internal R&D', $project->name);
-        self::assertSame('Created via promoted DDD route', $project->description);
+        static::assertNotNull($project);
+        static::assertSame('Internal R&D', $project->name);
+        static::assertSame('Created via promoted DDD route', $project->description);
     }
 
     public function testCreateProjectCreatesDefaultTasks(): void
@@ -79,11 +79,11 @@ final class ProjectControllerDddTest extends WebTestCase
 
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $project = $em->getRepository(Project::class)->findOneBy(['name' => 'Project With Tasks']);
-        self::assertNotNull($project);
+        static::assertNotNull($project);
 
         // Side-effect : tâches par défaut créées post-UC
         $tasks = $em->getRepository(ProjectTask::class)->findBy(['project' => $project]);
-        self::assertGreaterThanOrEqual(2, count($tasks), 'Default tasks (AVV + Non-vendu) must be created');
+        static::assertGreaterThanOrEqual(2, count($tasks), 'Default tasks (AVV + Non-vendu) must be created');
     }
 
     public function testCreateProjectRejectsInvalidProjectType(): void
@@ -102,7 +102,7 @@ final class ProjectControllerDddTest extends WebTestCase
 
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $project = $em->getRepository(Project::class)->findOneBy(['name' => 'Bad Type Project']);
-        self::assertNull($project);
+        static::assertNull($project);
     }
 
     public function testGetNewRendersForm(): void
@@ -127,6 +127,6 @@ final class ProjectControllerDddTest extends WebTestCase
         ]);
 
         // Route promoted/removed : Symfony match `/{id}` (GET) → 405 pour POST.
-        self::assertContains($this->client->getResponse()->getStatusCode(), [404, 405]);
+        static::assertContains($this->client->getResponse()->getStatusCode(), [404, 405]);
     }
 }

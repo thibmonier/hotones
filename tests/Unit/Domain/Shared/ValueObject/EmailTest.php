@@ -13,13 +13,13 @@ final class EmailTest extends TestCase
     public function testFromStringValid(): void
     {
         $email = Email::fromString('user@example.com');
-        $this->assertSame('user@example.com', $email->getValue());
+        static::assertSame('user@example.com', $email->getValue());
     }
 
     public function testNormalizesLowercaseAndTrim(): void
     {
         $email = Email::fromString('  USER@Example.COM  ');
-        $this->assertSame('user@example.com', $email->getValue());
+        static::assertSame('user@example.com', $email->getValue());
     }
 
     public function testRejectsInvalid(): void
@@ -34,17 +34,17 @@ final class EmailTest extends TestCase
         $a = Email::fromString('a@b.com');
         $b = Email::fromString('A@B.com');
         $c = Email::fromString('x@y.com');
-        $this->assertTrue($a->equals($b));
-        $this->assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testGetDomain(): void
     {
-        $this->assertSame('example.com', Email::fromString('foo@example.com')->getDomain());
+        static::assertSame('example.com', Email::fromString('foo@example.com')->getDomain());
     }
 
     public function testToString(): void
     {
-        $this->assertSame('foo@bar.io', (string) Email::fromString('foo@bar.io'));
+        static::assertSame('foo@bar.io', (string) Email::fromString('foo@bar.io'));
     }
 }

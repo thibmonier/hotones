@@ -54,7 +54,7 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
     {
         $records = $this->repository->findPaidInRollingWindow(30, $this->now);
 
-        self::assertSame([], $records);
+        static::assertSame([], $records);
     }
 
     public function testIncludesOnlyPaidInvoicesInsideWindow(): void
@@ -76,13 +76,13 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
         $records90 = $this->repository->findPaidInRollingWindow(90, $this->now);
         $records365 = $this->repository->findPaidInRollingWindow(365, $this->now);
 
-        self::assertCount(1, $records30);
-        self::assertCount(2, $records90);
-        self::assertCount(3, $records365);
+        static::assertCount(1, $records30);
+        static::assertCount(2, $records90);
+        static::assertCount(3, $records365);
 
         foreach ($records30 as $record) {
-            self::assertInstanceOf(InvoicePaymentRecord::class, $record);
-            self::assertTrue($record->isPaid());
+            static::assertInstanceOf(InvoicePaymentRecord::class, $record);
+            static::assertTrue($record->isPaid());
         }
     }
 
@@ -114,8 +114,8 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
         $records = $this->repository->findPaidInRollingWindow(30, $this->now);
 
         // Only own company invoice returned
-        self::assertCount(1, $records);
-        self::assertSame(50_000, $records[0]->amountPaidCents);
+        static::assertCount(1, $records);
+        static::assertSame(50_000, $records[0]->amountPaidCents);
     }
 
     public function testConvertsAmountTtcToCentsCorrectly(): void
@@ -125,8 +125,8 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
 
         $records = $this->repository->findPaidInRollingWindow(30, $this->now);
 
-        self::assertCount(1, $records);
-        self::assertSame(12_345, $records[0]->amountPaidCents);
+        static::assertCount(1, $records);
+        static::assertSame(12_345, $records[0]->amountPaidCents);
     }
 
     public function testRecordsAreConsumableByDsoCalculator(): void
@@ -145,7 +145,7 @@ final class DoctrineDsoReadModelRepositoryTest extends KernelTestCase
         );
 
         // Weighted DSO = (1000*10 + 500*20) / (1000 + 500) = 20000/1500 ≈ 13.3 (rounded to 1 decimal)
-        self::assertEqualsWithDelta(13.3, $dso->getDays(), 0.1);
+        static::assertEqualsWithDelta(13.3, $dso->getDays(), 0.1);
     }
 
     private function createPaidInvoice(object $client, int $daysAgoPaid, string $amountTtc, int $delayDays): void

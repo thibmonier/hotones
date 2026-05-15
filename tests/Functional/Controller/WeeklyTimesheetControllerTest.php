@@ -46,7 +46,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
         $client->request('GET', '/timesheet/week');
 
         // 200 OK = grille rendue OR redirect (depending on multitenant resolution)
-        self::assertContains($client->getResponse()->getStatusCode(), [200, 302]);
+        static::assertContains($client->getResponse()->getStatusCode(), [200, 302]);
     }
 
     public function testIndexAcceptsExplicitIsoWeek(): void
@@ -58,7 +58,7 @@ final class WeeklyTimesheetControllerTest extends WebTestCase
 
         $client->request('GET', '/timesheet/week/2026-W19');
 
-        self::assertContains($client->getResponse()->getStatusCode(), [200, 302]);
+        static::assertContains($client->getResponse()->getStatusCode(), [200, 302]);
     }
 
     public function testIndexRejectsInvalidIsoWeekFormat(): void

@@ -152,7 +152,7 @@ class HubSpotClient
             }
 
             $after = $data['paging']['next']['after'] ?? null;
-        } while ($after !== null && count($allDeals) < 10000); // Safety limit
+        } while ($after !== null && count($allDeals) < 10_000); // Safety limit
 
         $this->logger->info('HubSpot: Retrieved {count} deals', [
             'count' => count($allDeals),
@@ -243,7 +243,7 @@ class HubSpotClient
             $allCompanies = array_merge($allCompanies, $companies);
 
             $after = $data['paging']['next']['after'] ?? null;
-        } while ($after !== null && count($allCompanies) < 10000);
+        } while ($after !== null && count($allCompanies) < 10_000);
 
         $this->logger->info('HubSpot: Retrieved {count} companies', [
             'count' => count($allCompanies),
@@ -330,7 +330,7 @@ class HubSpotClient
             $allContacts = array_merge($allContacts, $contacts);
 
             $after = $data['paging']['next']['after'] ?? null;
-        } while ($after !== null && count($allContacts) < 10000);
+        } while ($after !== null && count($allContacts) < 10_000);
 
         $this->logger->info('HubSpot: Retrieved {count} contacts', [
             'count' => count($allContacts),
@@ -390,7 +390,7 @@ class HubSpotClient
             );
 
             $data = $response->toArray();
-            $contactIds = array_map(fn (array $assoc) => $assoc['id'], $data['results'] ?? []);
+            $contactIds = array_map(static fn (array $assoc) => $assoc['id'], $data['results'] ?? []);
 
             if (empty($contactIds)) {
                 return [];

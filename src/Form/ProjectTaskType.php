@@ -40,7 +40,7 @@ class ProjectTaskType extends AbstractType
                 'attr' => [
                     'class' => 'form-select',
                 ],
-                'choice_label' => function (?OrderLine $line) {
+                'choice_label' => static function (?OrderLine $line) {
                     if (!$line) {
                         return null;
                     }
@@ -148,13 +148,13 @@ class ProjectTaskType extends AbstractType
                 'attr' => [
                     'class' => 'form-select',
                 ],
-                'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er
+                'query_builder' => static fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er
                     ->createQueryBuilder('c')
                     ->where('c.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('c.lastName', 'ASC')
                     ->addOrderBy('c.firstName', 'ASC'),
-                'choice_label' => fn ($contributor): string => $contributor->getFirstName()
+                'choice_label' => static fn ($contributor): string => $contributor->getFirstName()
                 .' '
                 .$contributor->getLastName(),
                 'help' => 'Collaborateur responsable de cette tâche',

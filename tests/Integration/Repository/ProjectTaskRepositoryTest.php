@@ -47,10 +47,10 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findByProjectOrderedByPosition($project1);
 
-        $this->assertCount(3, $results);
-        $this->assertEquals(1, $results[0]->getPosition());
-        $this->assertEquals(2, $results[1]->getPosition());
-        $this->assertEquals(3, $results[2]->getPosition());
+        static::assertCount(3, $results);
+        static::assertSame(1, $results[0]->getPosition());
+        static::assertSame(2, $results[1]->getPosition());
+        static::assertSame(3, $results[2]->getPosition());
     }
 
     public function testFindMaxPositionForProject(): void
@@ -63,7 +63,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $maxPosition = $this->repository->findMaxPositionForProject($project);
 
-        $this->assertEquals(5, $maxPosition);
+        static::assertSame(5, $maxPosition);
     }
 
     public function testFindMaxPositionForProjectWithNoTasks(): void
@@ -72,7 +72,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $maxPosition = $this->repository->findMaxPositionForProject($project);
 
-        $this->assertEquals(0, $maxPosition);
+        static::assertSame(0, $maxPosition);
     }
 
     public function testGetMaxPosition(): void
@@ -83,7 +83,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $maxPosition = $this->repository->getMaxPosition($project);
 
-        $this->assertEquals(2, $maxPosition);
+        static::assertSame(2, $maxPosition);
     }
 
     public function testFindProfitableTasksByProject(): void
@@ -120,10 +120,10 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findProfitableTasksByProject($project);
 
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
         // Should be ordered by position ASC
-        $this->assertEquals(1, $results[0]->getPosition());
-        $this->assertEquals(2, $results[1]->getPosition());
+        static::assertSame(1, $results[0]->getPosition());
+        static::assertSame(2, $results[1]->getPosition());
     }
 
     public function testCountProfitableTasksByStatus(): void
@@ -163,8 +163,8 @@ class ProjectTaskRepositoryTest extends KernelTestCase
         $completedCount = $this->repository->countProfitableTasksByStatus($project, 'completed');
         $inProgressCount = $this->repository->countProfitableTasksByStatus($project, 'in_progress');
 
-        $this->assertEquals(2, $completedCount);
-        $this->assertEquals(1, $inProgressCount);
+        static::assertSame(2, $completedCount);
+        static::assertSame(1, $inProgressCount);
     }
 
     public function testCountProfitableTasks(): void
@@ -202,7 +202,7 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $count = $this->repository->countProfitableTasks($project);
 
-        $this->assertEquals(3, $count);
+        static::assertSame(3, $count);
     }
 
     public function testFindOverdueTasksByContributor(): void
@@ -244,10 +244,10 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findOverdueTasksByContributor($contributor);
 
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
         // Should be ordered by endDate ASC (oldest first)
-        $this->assertEquals('in_progress', $results[0]->getStatus());
-        $this->assertEquals('todo', $results[1]->getStatus());
+        static::assertSame('in_progress', $results[0]->getStatus());
+        static::assertSame('todo', $results[1]->getStatus());
     }
 
     public function testFindOverdueTasksByContributorReturnsEmpty(): void
@@ -256,6 +256,6 @@ class ProjectTaskRepositoryTest extends KernelTestCase
 
         $results = $this->repository->findOverdueTasksByContributor($contributor);
 
-        $this->assertEmpty($results);
+        static::assertEmpty($results);
     }
 }

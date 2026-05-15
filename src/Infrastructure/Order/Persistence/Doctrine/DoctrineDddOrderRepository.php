@@ -103,7 +103,7 @@ final readonly class DoctrineDddOrderRepository implements OrderRepositoryInterf
         $allFlats = $this->flatRepository->findAll();
         $actives = array_filter(
             $allFlats,
-            fn (FlatOrder $flat): bool => !in_array($flat->status, $terminalStates, true),
+            static fn (FlatOrder $flat): bool => !in_array($flat->status, $terminalStates, true),
         );
 
         return array_map($this->flatToDdd->translate(...), $actives);

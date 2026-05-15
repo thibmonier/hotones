@@ -27,14 +27,14 @@ final class CreateProjectUseCaseTest extends TestCase
 
         $id = $useCase->execute(new CreateProjectCommand(name: 'New Project', clientId: null, isInternal: true));
 
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(99, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(99, $id->toLegacyInt());
     }
 
     public function testProjectTypeForfait(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatProject $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -47,8 +47,8 @@ final class CreateProjectUseCaseTest extends TestCase
             isInternal: true,
         ));
 
-        $this->assertNotNull($persistedFlat);
-        $this->assertSame('P1', $persistedFlat->name);
+        static::assertNotNull($persistedFlat);
+        static::assertSame('P1', $persistedFlat->name);
     }
 
     public function testProjectTypeRegie(): void
@@ -62,7 +62,7 @@ final class CreateProjectUseCaseTest extends TestCase
             isInternal: true,
         ));
 
-        $this->assertSame(1, $id->toLegacyInt());
+        static::assertSame(1, $id->toLegacyInt());
     }
 
     public function testProjectTypeAlternativeSpellingsAccepted(): void
@@ -102,7 +102,7 @@ final class CreateProjectUseCaseTest extends TestCase
     public function testDescriptionApplied(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatProject $flat) use (
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatProject $flat) use (
             &$persistedFlat,
         ): void {
             $persistedFlat = clone $flat;
@@ -115,7 +115,7 @@ final class CreateProjectUseCaseTest extends TestCase
             description: 'Some details',
         ));
 
-        $this->assertSame('Some details', $persistedFlat->description);
+        static::assertSame('Some details', $persistedFlat->description);
     }
 
     public function testExternalProjectResolvesClient(): void
@@ -129,7 +129,7 @@ final class CreateProjectUseCaseTest extends TestCase
             && 42 === $id
                 ? $client
                 : null);
-        $em->method('persist')->willReturnCallback(function (FlatProject $flat): void {
+        $em->method('persist')->willReturnCallback(static function (FlatProject $flat): void {
             new ReflectionProperty(FlatProject::class, 'id')->setValue($flat, 7);
         });
         $em->method('flush');
@@ -141,7 +141,7 @@ final class CreateProjectUseCaseTest extends TestCase
 
         $id = $useCase->execute(new CreateProjectCommand(name: 'External', clientId: 42, isInternal: false));
 
-        $this->assertSame(7, $id->toLegacyInt());
+        static::assertSame(7, $id->toLegacyInt());
     }
 
     /**
@@ -150,7 +150,7 @@ final class CreateProjectUseCaseTest extends TestCase
     private function makeUseCase(int $persistedId, ?callable $persistCapture = null): CreateProjectUseCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatProject $flat) use (
+        $em->method('persist')->willReturnCallback(static function (FlatProject $flat) use (
             $persistedId,
             $persistCapture,
         ): void {

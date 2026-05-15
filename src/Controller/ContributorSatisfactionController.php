@@ -125,7 +125,7 @@ class ContributorSatisfactionController extends AbstractController
                     }
 
                     if (!empty($xpResult['badges_unlocked'])) {
-                        $badgeNames = array_map(fn ($badge): string => $badge->getName(), $xpResult['badges_unlocked']);
+                        $badgeNames = array_map(static fn ($badge): string => $badge->getName(), $xpResult['badges_unlocked']);
                         $this->addFlash('success', 'Nouveau badge débloqué : '.implode(', ', $badgeNames));
                     }
                 } catch (Exception) {

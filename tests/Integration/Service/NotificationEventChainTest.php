@@ -50,7 +50,7 @@ final class NotificationEventChainTest extends KernelTestCase
         // Pre-existing bug : `findUnreadByUser` retourne 0 même après persist + flush
         // (sans doute interaction TenantFilter avec authenticate manuel via TokenStorage).
         // À investiguer dans US-PERFORMANCE-NOTIFICATIONS séparée.
-        self::markTestSkipped(
+        static::markTestSkipped(
             'Pre-existing : NotificationEvent dispatch + queryBack issue, requires CompanyContext tenant filter investigation',
         );
 
@@ -78,8 +78,8 @@ final class NotificationEventChainTest extends KernelTestCase
         $aliceUnread = $this->notificationRepository->findUnreadByUser($alice);
         $bobUnread = $this->notificationRepository->findUnreadByUser($bob);
 
-        self::assertCount(1, $aliceUnread);
-        self::assertCount(1, $bobUnread);
+        static::assertCount(1, $aliceUnread);
+        static::assertCount(1, $bobUnread);
 
         $this->assertNotificationMatches($aliceUnread[0], $alice, $company);
         $this->assertNotificationMatches($bobUnread[0], $bob, $company);
@@ -103,7 +103,7 @@ final class NotificationEventChainTest extends KernelTestCase
 
         $this->eventDispatcher->dispatch($event);
 
-        self::assertCount(0, $this->notificationRepository->findUnreadByUser($alice));
+        static::assertCount(0, $this->notificationRepository->findUnreadByUser($alice));
     }
 
     private function authenticate(User $user): void

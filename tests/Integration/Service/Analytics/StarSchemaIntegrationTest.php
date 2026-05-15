@@ -51,10 +51,10 @@ class StarSchemaIntegrationTest extends KernelTestCase
         // Query it back
         $found = $this->entityManager->getRepository(DimTime::class)->find($dimTime1->getId());
 
-        $this->assertNotNull($found);
-        $this->assertEquals(2025, $found->getYear());
-        $this->assertEquals(1, $found->getMonth());
-        $this->assertEquals('Janvier 2025', $found->getMonthName());
+        static::assertNotNull($found);
+        static::assertSame(2025, $found->getYear());
+        static::assertSame(1, $found->getMonth());
+        static::assertSame('Janvier 2025', $found->getMonthName());
     }
 
     public function testFactProjectMetricsCanBeCreatedAndAggregated(): void
@@ -117,8 +117,8 @@ class StarSchemaIntegrationTest extends KernelTestCase
             ->getQuery()
             ->getSingleResult();
 
-        $this->assertEquals(22000.0, (float) $result['totalRevenue']);
-        $this->assertEquals(11, (int) $result['totalProjects']);
+        static::assertSame(22_000.0, (float) $result['totalRevenue']);
+        static::assertSame(11, (int) $result['totalProjects']);
     }
 
     public function testDashboardReadServiceReadsFromStarSchema(): void
@@ -160,17 +160,17 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $kpis = $this->dashboardReadService->getKPIs(new DateTime('2025-01-01'), new DateTime('2025-01-31'));
 
         // Verify the structure and values
-        $this->assertArrayHasKey('revenue', $kpis);
-        $this->assertArrayHasKey('projects', $kpis);
-        $this->assertArrayHasKey('orders', $kpis);
-        $this->assertArrayHasKey('time', $kpis);
+        static::assertArrayHasKey('revenue', $kpis);
+        static::assertArrayHasKey('projects', $kpis);
+        static::assertArrayHasKey('orders', $kpis);
+        static::assertArrayHasKey('time', $kpis);
 
-        $this->assertEquals(15000.0, $kpis['revenue']['total_revenue']);
-        $this->assertEquals(10000.0, $kpis['revenue']['total_cost']);
-        $this->assertEquals(5000.0, $kpis['revenue']['total_margin']);
-        $this->assertEquals(8, $kpis['projects']['total']);
-        $this->assertEquals(5, $kpis['projects']['active']);
-        $this->assertEquals(3, $kpis['projects']['completed']);
+        static::assertSame(15_000.0, $kpis['revenue']['total_revenue']);
+        static::assertSame(10_000.0, $kpis['revenue']['total_cost']);
+        static::assertSame(5000.0, $kpis['revenue']['total_margin']);
+        static::assertSame(8, $kpis['projects']['total']);
+        static::assertSame(5, $kpis['projects']['active']);
+        static::assertSame(3, $kpis['projects']['completed']);
     }
 
     public function testMonthlyEvolutionReturnsCorrectData(): void
@@ -198,7 +198,7 @@ class StarSchemaIntegrationTest extends KernelTestCase
                 ->setDimTime($dimTime)
                 ->setDimProjectType($dimProjectType)
                 ->setGranularity('monthly')
-                ->setTotalRevenue((string) ($multiplier * 10000))
+                ->setTotalRevenue((string) ($multiplier * 10_000))
                 ->setTotalCosts((string) ($multiplier * 7000))
                 ->setGrossMargin((string) ($multiplier * 3000));
 
@@ -212,11 +212,11 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $evolution = $this->dashboardReadService->getMonthlyEvolution(12);
 
         // Should return 3 months
-        $this->assertCount(3, $evolution);
-        $this->assertEquals($expectedMonths[0], $evolution[0]['month']);
-        $this->assertEquals(10000.0, $evolution[0]['revenue']);
-        $this->assertEquals(7000.0, $evolution[0]['costs']);
-        $this->assertEquals(3000.0, $evolution[0]['margin']);
+        static::assertCount(3, $evolution);
+        static::assertEquals($expectedMonths[0], $evolution[0]['month']);
+        static::assertSame(10_000.0, $evolution[0]['revenue']);
+        static::assertSame(7000.0, $evolution[0]['costs']);
+        static::assertSame(3000.0, $evolution[0]['margin']);
     }
 
     public function testQueryPerformanceWithLargeDataset(): void
@@ -256,8 +256,8 @@ class StarSchemaIntegrationTest extends KernelTestCase
         $duration = microtime(true) - $start;
 
         // Query should complete in less than 1 second
-        $this->assertLessThan(1.0, $duration, 'Query took too long: '.$duration.'s');
-        $this->assertEquals(100000.0, $kpis['revenue']['total_revenue']);
+        static::assertLessThan(1.0, $duration, 'Query took too long: '.$duration.'s');
+        static::assertSame(100_000.0, $kpis['revenue']['total_revenue']);
     }
 
     public function testDataIntegrityConstraints(): void

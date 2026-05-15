@@ -10,6 +10,7 @@ use App\Security\CompanyContext;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -56,7 +57,7 @@ class CompanyVoter extends Voter
     protected function voteOnAttribute(
         string $attribute,
         mixed $subject,
-        TokenInterface $token,
+        #[SensitiveParameter] TokenInterface $token,
         ?\Symfony\Component\Security\Core\Authorization\Voter\Vote $vote = null,
     ): bool {
         $user = $token->getUser();

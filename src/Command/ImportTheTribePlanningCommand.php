@@ -178,7 +178,7 @@ class ImportTheTribePlanningCommand extends Command
                 continue;
             }
 
-            if (is_numeric($cellValue) && (float) $cellValue > 40000) {
+            if (is_numeric($cellValue) && (float) $cellValue > 40_000) {
                 $date = ExcelDate::excelToDateTimeObject((int) $cellValue);
                 $weekDates[$col] = DateTime::createFromInterface($date);
             }
@@ -454,7 +454,7 @@ class ImportTheTribePlanningCommand extends Command
             return true;
         }
 
-        return array_any(self::SKIP_NAMES, fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
+        return array_any(self::SKIP_NAMES, static fn ($skipName): bool => mb_strtolower($name) === mb_strtolower((string) $skipName));
     }
 
     private function resolveContributor(string $rawName): ?Contributor

@@ -26,7 +26,7 @@ class NpsSurveyType extends AbstractType
             'choice_label' => 'name',
             'placeholder' => '-- Sélectionnez un projet --',
             'attr' => ['class' => 'form-select'],
-            'query_builder' => fn ($er) => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
+            'query_builder' => static fn ($er) => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
             'constraints' => [
                 new NotBlank(message: 'Le projet est obligatoire'),
             ],

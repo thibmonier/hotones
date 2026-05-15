@@ -150,7 +150,7 @@ class OrderControllerPreviewTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/pdf');
-        $this->assertStringContainsString('inline', $this->client->getResponse()->headers->get('Content-Disposition'));
+        static::assertStringContainsString('inline', $this->client->getResponse()->headers->get('Content-Disposition'));
     }
 
     public function testPdfDownloadReturnsAttachment(): void
@@ -162,7 +162,7 @@ class OrderControllerPreviewTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/pdf');
-        $this->assertStringContainsString(
+        static::assertStringContainsString(
             'attachment',
             $this->client->getResponse()->headers->get('Content-Disposition'),
         );
@@ -197,7 +197,7 @@ class OrderControllerPreviewTest extends WebTestCase
 
         // Without login, should redirect or return 401/403
         $response = $this->client->getResponse();
-        $this->assertTrue(
+        static::assertTrue(
             $response->isRedirection() || $response->getStatusCode() === 401 || $response->getStatusCode() === 403,
             'Expected redirect to login or 401/403 status',
         );

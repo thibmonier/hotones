@@ -446,11 +446,13 @@ class Order implements CompanyOwnedInterface
         $total = '0.00';
         foreach ($this->expenseReports as $expense) {
             if (
-                $expense->getStatus() === ExpenseReport::STATUS_VALIDATED
-                || $expense->getStatus() === ExpenseReport::STATUS_PAID
+                !($expense->getStatus() === ExpenseReport::STATUS_VALIDATED
+                || $expense->getStatus() === ExpenseReport::STATUS_PAID)
             ) {
-                $total = bcadd($total, (string) $expense->getAmountTTC(), 2);
+                continue;
             }
+
+            $total = bcadd($total, (string) $expense->getAmountTTC(), 2);
         }
 
         return $total;

@@ -84,7 +84,7 @@ class GdprDataExportService
             'recruitment_date' => $contributor->getRecruitmentDate()?->format('Y-m-d'),
             'departure_date' => $contributor->getDepartureDate()?->format('Y-m-d'),
             'is_active' => $contributor->isActive(),
-            'profiles' => array_map(fn ($profile): array => [
+            'profiles' => array_map(static fn ($profile): array => [
                 'id' => $profile->getId(),
                 'name' => $profile->getName(),
             ], $contributor->getProfiles()->toArray()),
@@ -95,14 +95,14 @@ class GdprDataExportService
     {
         $periods = $this->employmentPeriodRepository->findBy(['contributor' => $contributor], ['startDate' => 'ASC']);
 
-        return array_map(fn ($period): array => [
+        return array_map(static fn ($period): array => [
             'period_id' => $period->getId(),
             'start_date' => $period->getStartDate()->format('Y-m-d'),
             'end_date' => $period->getEndDate()?->format('Y-m-d'),
             'salary' => $period->getSalary(),
             'weekly_hours' => $period->getWeeklyHours(),
             'work_time_percentage' => $period->getWorkTimePercentage(),
-            'profiles' => array_map(fn ($profile): string => $profile->getName(), $period->getProfiles()->toArray()),
+            'profiles' => array_map(static fn ($profile): string => $profile->getName(), $period->getProfiles()->toArray()),
         ], $periods);
     }
 
@@ -110,7 +110,7 @@ class GdprDataExportService
     {
         $timesheets = $this->timesheetRepository->findBy(['contributor' => $contributor], ['date' => 'DESC']);
 
-        return array_map(fn ($timesheet): array => [
+        return array_map(static fn ($timesheet): array => [
             'timesheet_id' => $timesheet->getId(),
             'date' => $timesheet->getDate()->format('Y-m-d'),
             'hours' => $timesheet->getHours(),
@@ -148,7 +148,7 @@ class GdprDataExportService
             ->getQuery()
             ->getResult();
 
-        return array_map(fn ($consent): array => [
+        return array_map(static fn ($consent): array => [
             'consent_id' => $consent->getId(),
             'essential' => $consent->isEssential(),
             'functional' => $consent->isFunctional(),

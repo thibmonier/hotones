@@ -65,7 +65,7 @@ final class OrderVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_USER']);
         $order = $this->makeOrder($company);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::VIEW));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::VIEW));
     }
 
     public function testEditGrantedForCommercial(): void
@@ -74,7 +74,7 @@ final class OrderVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMMERCIAL']);
         $order = $this->makeOrder($company, OrderStatus::PENDING->value);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::EDIT));
     }
 
     public function testEditDeniedOnCompletedExceptSuperadmin(): void
@@ -83,10 +83,10 @@ final class OrderVoterTest extends TestCase
         $order = $this->makeOrder($company, OrderStatus::COMPLETED->value);
 
         $manager = $this->makeUser($company, ['ROLE_MANAGER']);
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($manager, $order, OrderVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($manager, $order, OrderVoter::EDIT));
 
         $superadmin = $this->makeUser($company, ['ROLE_SUPERADMIN']);
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($superadmin, $order, OrderVoter::EDIT));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($superadmin, $order, OrderVoter::EDIT));
     }
 
     public function testSignGrantedFromPendingForManager(): void
@@ -95,7 +95,7 @@ final class OrderVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_MANAGER']);
         $order = $this->makeOrder($company, OrderStatus::PENDING->value);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::SIGN));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($user, $order, OrderVoter::SIGN));
     }
 
     public function testSignDeniedFromLost(): void
@@ -104,7 +104,7 @@ final class OrderVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_ADMIN']);
         $order = $this->makeOrder($company, OrderStatus::LOST->value);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $order, OrderVoter::SIGN));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $order, OrderVoter::SIGN));
     }
 
     public function testSignDeniedForCommercial(): void
@@ -113,7 +113,7 @@ final class OrderVoterTest extends TestCase
         $user = $this->makeUser($company, ['ROLE_COMMERCIAL']);
         $order = $this->makeOrder($company, OrderStatus::PENDING->value);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $order, OrderVoter::SIGN));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($user, $order, OrderVoter::SIGN));
     }
 
     public function testDeleteAdminOnly(): void
@@ -122,9 +122,9 @@ final class OrderVoterTest extends TestCase
         $order = $this->makeOrder($company);
 
         $admin = $this->makeUser($company, ['ROLE_ADMIN']);
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $order, OrderVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($admin, $order, OrderVoter::DELETE));
 
         $cp = $this->makeUser($company, ['ROLE_CHEF_PROJET']);
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($cp, $order, OrderVoter::DELETE));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($cp, $order, OrderVoter::DELETE));
     }
 }

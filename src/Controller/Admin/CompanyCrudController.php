@@ -128,7 +128,7 @@ class CompanyCrudController extends AbstractCrudController
         yield AssociationField::new('owner', 'Propriétaire')->hideOnIndex();
 
         yield IntegerField::new('users.count', 'Nombre utilisateurs')->hideOnForm()->formatValue(
-            fn ($value, Company $entity) => $entity->getUsers()->count(),
+            static fn ($value, Company $entity) => $entity->getUsers()->count(),
         );
 
         // Timestamps

@@ -280,7 +280,7 @@ class ContributorController extends AbstractController
         $timesheetRepo = $this->entityManager->getRepository(\App\Entity\Timesheet::class);
         $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $startDate, $endDate);
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+        $totalHours = array_sum(array_map(static fn ($t) => $t->getHours(), $timesheets));
 
         return $this->render('contributor/timesheets.html.twig', [
             'contributor' => $contributor,

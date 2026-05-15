@@ -143,7 +143,7 @@ class Contributor implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public ?string $cjm = null {
-        get => $this->getRelevantEmploymentPeriod()?->cjm ?? $this->cjm;
+        get => $this->getRelevantEmploymentPeriod()->cjm ?? $this->cjm;
         set {
             $this->cjm = $value;
         }
@@ -151,7 +151,7 @@ class Contributor implements CompanyOwnedInterface
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public ?string $tjm = null {
-        get => $this->getRelevantEmploymentPeriod()?->tjm ?? $this->tjm;
+        get => $this->getRelevantEmploymentPeriod()->tjm ?? $this->tjm;
         set {
             $this->tjm = $value;
         }
@@ -387,7 +387,7 @@ class Contributor implements CompanyOwnedInterface
     // Méthode utilitaire pour obtenir les noms des profils
     public function getProfileNames(): array
     {
-        return $this->profiles->map(fn (Profile $profile): string => $profile->getName())->toArray();
+        return $this->profiles->map(static fn (Profile $profile): string => $profile->getName())->toArray();
     }
 
     /**
@@ -573,7 +573,7 @@ class Contributor implements CompanyOwnedInterface
      */
     public function getRecentTechnologies(): Collection
     {
-        return $this->contributorTechnologies->filter(fn (ContributorTechnology $ct): bool => $ct->isRecent());
+        return $this->contributorTechnologies->filter(static fn (ContributorTechnology $ct): bool => $ct->isRecent());
     }
 
     /**
@@ -584,7 +584,7 @@ class Contributor implements CompanyOwnedInterface
     public function getExpertTechnologies(): Collection
     {
         return $this->contributorTechnologies->filter(
-            fn (ContributorTechnology $ct): bool => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
+            static fn (ContributorTechnology $ct): bool => $ct->getEffectiveLevel() >= ContributorTechnology::LEVEL_EXPERT,
         );
     }
 

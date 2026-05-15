@@ -123,12 +123,14 @@ class EmployeeLevelRepository extends ServiceEntityRepository
         $minDiff = PHP_FLOAT_MAX;
 
         foreach ($levels as $level) {
-            if ($level->salaryTarget !== null) {
-                $diff = abs($annualSalary - (float) $level->salaryTarget);
-                if ($diff < $minDiff) {
-                    $minDiff = $diff;
-                    $bestMatch = $level;
-                }
+            if ($level->salaryTarget === null) {
+                continue;
+            }
+
+            $diff = abs($annualSalary - (float) $level->salaryTarget);
+            if ($diff < $minDiff) {
+                $minDiff = $diff;
+                $bestMatch = $level;
             }
         }
 

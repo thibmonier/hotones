@@ -46,21 +46,21 @@ final class DoctrineDddInvoiceRepositoryTest extends TestCase
     {
         $repo = $this->makeRepo();
 
-        $this->assertNull($repo->findByIdOrNull(InvoiceId::generate()));
+        static::assertNull($repo->findByIdOrNull(InvoiceId::generate()));
     }
 
     public function testFindByClientIdReturnsEmptyForUuid(): void
     {
         $repo = $this->makeRepo();
 
-        $this->assertSame([], $repo->findByClientId(ClientId::generate()));
+        static::assertSame([], $repo->findByClientId(ClientId::generate()));
     }
 
     public function testFindByCompanyIdReturnsEmptyForUuid(): void
     {
         $repo = $this->makeRepo();
 
-        $this->assertSame([], $repo->findByCompanyId(CompanyId::generate()));
+        static::assertSame([], $repo->findByCompanyId(CompanyId::generate()));
     }
 
     public function testSavePureUuidThrows(): void
@@ -115,7 +115,7 @@ final class DoctrineDddInvoiceRepositoryTest extends TestCase
 
         $number = $repo->nextNumber(2026, 5);
 
-        $this->assertSame('F202605001', $number->getValue());
+        static::assertSame('F202605001', $number->getValue());
     }
 
     public function testFindOverdueDelegatesToFindByStatus(): void
@@ -125,7 +125,7 @@ final class DoctrineDddInvoiceRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertSame([], $repo->findOverdue());
+        static::assertSame([], $repo->findOverdue());
     }
 
     public function testFindByStatusEmptyResult(): void
@@ -135,7 +135,7 @@ final class DoctrineDddInvoiceRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertSame([], $repo->findByStatus(InvoiceStatus::PAID));
+        static::assertSame([], $repo->findByStatus(InvoiceStatus::PAID));
     }
 
     public function testFindByNumberReturnsNullWhenNotFound(): void
@@ -145,7 +145,7 @@ final class DoctrineDddInvoiceRepositoryTest extends TestCase
 
         $repo = $this->makeRepo(flatRepo: $flatRepo);
 
-        $this->assertNull($repo->findByNumber(InvoiceNumber::fromString('F202601001')));
+        static::assertNull($repo->findByNumber(InvoiceNumber::fromString('F202601001')));
     }
 
     private function makeUuidInvoice(): DddInvoice

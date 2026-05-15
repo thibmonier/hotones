@@ -168,9 +168,7 @@ class PerformanceReview implements CompanyOwnedInterface
     {
         return
             null !== $this->selfEvaluation
-            && isset($this->selfEvaluation['achievements'])
-            && isset($this->selfEvaluation['strengths'])
-            && isset($this->selfEvaluation['improvements'])
+            && isset($this->selfEvaluation['achievements'], $this->selfEvaluation['strengths'], $this->selfEvaluation['improvements'])
         ;
     }
 
@@ -181,10 +179,7 @@ class PerformanceReview implements CompanyOwnedInterface
     {
         return
             null !== $this->managerEvaluation
-            && isset($this->managerEvaluation['achievements'])
-            && isset($this->managerEvaluation['strengths'])
-            && isset($this->managerEvaluation['improvements'])
-            && isset($this->managerEvaluation['feedback'])
+            && isset($this->managerEvaluation['achievements'], $this->managerEvaluation['strengths'], $this->managerEvaluation['improvements'], $this->managerEvaluation['feedback'])
         ;
     }
 

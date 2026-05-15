@@ -16,8 +16,8 @@ final class CompanyIdTest extends TestCase
     public function testGenerateProducesValidUuid(): void
     {
         $id = CompanyId::generate();
-        self::assertFalse($id->isLegacy());
-        self::assertMatchesRegularExpression(
+        static::assertFalse($id->isLegacy());
+        static::assertMatchesRegularExpression(
             '/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/',
             $id->getValue(),
         );
@@ -27,15 +27,15 @@ final class CompanyIdTest extends TestCase
     {
         $uuid = '12345678-1234-4321-8123-123456789abc';
         $id = CompanyId::fromString($uuid);
-        self::assertFalse($id->isLegacy());
-        self::assertSame($uuid, $id->getValue());
+        static::assertFalse($id->isLegacy());
+        static::assertSame($uuid, $id->getValue());
     }
 
     public function testFromStringLegacyPrefixAccepted(): void
     {
         $id = CompanyId::fromString('legacy:42');
-        self::assertTrue($id->isLegacy());
-        self::assertSame(42, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
     }
 
     public function testFromStringInvalidThrows(): void
@@ -48,9 +48,9 @@ final class CompanyIdTest extends TestCase
     public function testFromLegacyIntStoresPrefix(): void
     {
         $id = CompanyId::fromLegacyInt(7);
-        self::assertTrue($id->isLegacy());
-        self::assertSame(7, $id->toLegacyInt());
-        self::assertSame('legacy:7', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(7, $id->toLegacyInt());
+        static::assertSame('legacy:7', $id->getValue());
     }
 
     public function testFromLegacyIntZeroThrows(): void
@@ -78,13 +78,13 @@ final class CompanyIdTest extends TestCase
         $b = CompanyId::fromLegacyInt(42);
         $c = CompanyId::fromLegacyInt(43);
 
-        self::assertTrue($a->equals($b));
-        self::assertFalse($a->equals($c));
+        static::assertTrue($a->equals($b));
+        static::assertFalse($a->equals($c));
     }
 
     public function testToStringReturnsValue(): void
     {
         $id = CompanyId::fromLegacyInt(42);
-        self::assertSame('legacy:42', (string) $id);
+        static::assertSame('legacy:42', (string) $id);
     }
 }

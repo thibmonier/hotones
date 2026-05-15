@@ -22,10 +22,10 @@ final class ContributorCreatedEventTest extends TestCase
 
         $event = ContributorCreatedEvent::create($contributorId, $companyId, $name);
 
-        self::assertInstanceOf(DomainEventInterface::class, $event);
-        self::assertSame($contributorId, $event->contributorId);
-        self::assertSame($companyId, $event->companyId);
-        self::assertSame($name, $event->name);
+        static::assertInstanceOf(DomainEventInterface::class, $event);
+        static::assertSame($contributorId, $event->contributorId);
+        static::assertSame($companyId, $event->companyId);
+        static::assertSame($name, $event->name);
     }
 
     public function testGetOccurredOnReturnsConstructTime(): void
@@ -40,8 +40,8 @@ final class ContributorCreatedEventTest extends TestCase
 
         $after = new DateTimeImmutable();
 
-        self::assertGreaterThanOrEqual($before, $event->getOccurredOn());
-        self::assertLessThanOrEqual($after, $event->getOccurredOn());
+        static::assertGreaterThanOrEqual($before, $event->getOccurredOn());
+        static::assertLessThanOrEqual($after, $event->getOccurredOn());
     }
 
     public function testGetAggregateIdReturnsContributorId(): void
@@ -54,6 +54,6 @@ final class ContributorCreatedEventTest extends TestCase
             PersonName::fromParts('A', 'B'),
         );
 
-        self::assertSame($contributorId->getValue(), $event->getAggregateId());
+        static::assertSame($contributorId->getValue(), $event->getAggregateId());
     }
 }

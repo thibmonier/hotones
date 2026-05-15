@@ -276,7 +276,7 @@ class TimesheetController extends AbstractController
 
         // Calculer les totaux via repository
         $projectTotals = $timesheetRepo->getHoursGroupedByProjectForContributor($contributor, $startDate, $endDate);
-        $totalHours = array_sum(array_map(fn ($t) => $t->getHours(), $timesheets));
+        $totalHours = array_sum(array_map(static fn ($t) => $t->getHours(), $timesheets));
 
         return $this->render('timesheet/my_time.html.twig', [
             'timesheets' => $timesheets,
@@ -555,7 +555,7 @@ class TimesheetController extends AbstractController
                 $taskItems[] = [
                     'id' => $task->getId(),
                     'name' => $task->getName(),
-                    'subTasks' => array_map(fn ($st): array => [
+                    'subTasks' => array_map(static fn ($st): array => [
                         'id' => $st->getId(),
                         'title' => $st->getTitle(),
                     ], $subTasks),

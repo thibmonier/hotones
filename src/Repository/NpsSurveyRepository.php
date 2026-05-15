@@ -9,6 +9,7 @@ use App\Entity\Project;
 use App\Security\CompanyContext;
 use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
+use SensitiveParameter;
 
 /**
  * @extends CompanyAwareRepository<NpsSurvey>
@@ -37,7 +38,7 @@ class NpsSurveyRepository extends CompanyAwareRepository
     /**
      * Récupère une enquête par son token.
      */
-    public function findByToken(string $token): ?NpsSurvey
+    public function findByToken(#[SensitiveParameter] string $token): ?NpsSurvey
     {
         return $this->findOneBy(['token' => $token]);
     }

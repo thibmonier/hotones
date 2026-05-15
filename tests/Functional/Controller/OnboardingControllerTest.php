@@ -149,7 +149,7 @@ class OnboardingControllerTest extends WebTestCase
         $em = static::getContainer()->get('doctrine')->getManager();
         $em->clear();
         $updatedTask = $this->taskRepository->find($task->getId());
-        $this->assertEquals('termine', $updatedTask->getStatus());
+        static::assertSame('termine', $updatedTask->getStatus());
     }
 
     public function testTeamViewRequiresManagerRole(): void
@@ -209,7 +209,7 @@ class OnboardingControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertTrue($response['success']);
-        $this->assertEquals('en_cours', $response['status']);
+        static::assertTrue($response['success']);
+        static::assertSame('en_cours', $response['status']);
     }
 }

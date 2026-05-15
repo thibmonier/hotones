@@ -15,14 +15,14 @@ final class InvoicePaidEventTest extends TestCase
     public function testCreate(): void
     {
         $invoiceId = InvoiceId::generate();
-        $amount = Money::fromCents(10000);
+        $amount = Money::fromCents(10_000);
         $paidAt = new DateTimeImmutable('2026-05-07');
 
         $event = InvoicePaidEvent::create($invoiceId, $amount, $paidAt);
 
-        $this->assertEquals($invoiceId, $event->getInvoiceId());
-        $this->assertSame(10000, $event->getAmountPaid()->getAmountCents());
-        $this->assertEquals($paidAt, $event->getPaidAt());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertEquals($invoiceId, $event->getInvoiceId());
+        static::assertSame(10_000, $event->getAmountPaid()->getAmountCents());
+        static::assertEquals($paidAt, $event->getPaidAt());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

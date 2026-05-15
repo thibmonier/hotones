@@ -11,53 +11,53 @@ final class OrderStatusTest extends TestCase
 {
     public function testEightCases(): void
     {
-        $this->assertCount(8, OrderStatus::cases());
+        static::assertCount(8, OrderStatus::cases());
     }
 
     public function testActiveStatuses(): void
     {
-        $this->assertTrue(OrderStatus::DRAFT->isActive());
-        $this->assertTrue(OrderStatus::TO_SIGN->isActive());
-        $this->assertTrue(OrderStatus::WON->isActive());
-        $this->assertTrue(OrderStatus::SIGNED->isActive());
-        $this->assertTrue(OrderStatus::STANDBY->isActive());
-        $this->assertFalse(OrderStatus::LOST->isActive());
-        $this->assertFalse(OrderStatus::COMPLETED->isActive());
-        $this->assertFalse(OrderStatus::ABANDONED->isActive());
+        static::assertTrue(OrderStatus::DRAFT->isActive());
+        static::assertTrue(OrderStatus::TO_SIGN->isActive());
+        static::assertTrue(OrderStatus::WON->isActive());
+        static::assertTrue(OrderStatus::SIGNED->isActive());
+        static::assertTrue(OrderStatus::STANDBY->isActive());
+        static::assertFalse(OrderStatus::LOST->isActive());
+        static::assertFalse(OrderStatus::COMPLETED->isActive());
+        static::assertFalse(OrderStatus::ABANDONED->isActive());
     }
 
     public function testClosedStatuses(): void
     {
-        $this->assertTrue(OrderStatus::LOST->isClosed());
-        $this->assertTrue(OrderStatus::COMPLETED->isClosed());
-        $this->assertTrue(OrderStatus::ABANDONED->isClosed());
-        $this->assertFalse(OrderStatus::DRAFT->isClosed());
-        $this->assertFalse(OrderStatus::SIGNED->isClosed());
+        static::assertTrue(OrderStatus::LOST->isClosed());
+        static::assertTrue(OrderStatus::COMPLETED->isClosed());
+        static::assertTrue(OrderStatus::ABANDONED->isClosed());
+        static::assertFalse(OrderStatus::DRAFT->isClosed());
+        static::assertFalse(OrderStatus::SIGNED->isClosed());
     }
 
     public function testTransitionsFromDraft(): void
     {
-        $this->assertTrue(OrderStatus::DRAFT->canTransitionTo(OrderStatus::TO_SIGN));
-        $this->assertTrue(OrderStatus::DRAFT->canTransitionTo(OrderStatus::ABANDONED));
-        $this->assertFalse(OrderStatus::DRAFT->canTransitionTo(OrderStatus::WON));
-        $this->assertFalse(OrderStatus::DRAFT->canTransitionTo(OrderStatus::SIGNED));
+        static::assertTrue(OrderStatus::DRAFT->canTransitionTo(OrderStatus::TO_SIGN));
+        static::assertTrue(OrderStatus::DRAFT->canTransitionTo(OrderStatus::ABANDONED));
+        static::assertFalse(OrderStatus::DRAFT->canTransitionTo(OrderStatus::WON));
+        static::assertFalse(OrderStatus::DRAFT->canTransitionTo(OrderStatus::SIGNED));
     }
 
     public function testTransitionsFromToSign(): void
     {
-        $this->assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::WON));
-        $this->assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::LOST));
-        $this->assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::STANDBY));
-        $this->assertFalse(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::SIGNED));
+        static::assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::WON));
+        static::assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::LOST));
+        static::assertTrue(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::STANDBY));
+        static::assertFalse(OrderStatus::TO_SIGN->canTransitionTo(OrderStatus::SIGNED));
     }
 
     public function testClosedStatusesAreTerminal(): void
     {
         foreach ([OrderStatus::LOST, OrderStatus::COMPLETED, OrderStatus::ABANDONED] as $status) {
             foreach (OrderStatus::cases() as $target) {
-                $this->assertFalse(
+                static::assertFalse(
                     $status->canTransitionTo($target),
-                    "$status->name should not transition to $target->name",
+                    "{$status->name} should not transition to {$target->name}",
                 );
             }
         }
@@ -65,8 +65,8 @@ final class OrderStatusTest extends TestCase
 
     public function testGetLabel(): void
     {
-        $this->assertSame('Brouillon', OrderStatus::DRAFT->getLabel());
-        $this->assertSame('Signé', OrderStatus::SIGNED->getLabel());
-        $this->assertSame('Terminé', OrderStatus::COMPLETED->getLabel());
+        static::assertSame('Brouillon', OrderStatus::DRAFT->getLabel());
+        static::assertSame('Signé', OrderStatus::SIGNED->getLabel());
+        static::assertSame('Terminé', OrderStatus::COMPLETED->getLabel());
     }
 }

@@ -63,7 +63,7 @@ class SaasServiceCrudController extends AbstractCrudController
         yield AssociationField::new('provider', 'Fournisseur')
             ->setRequired(false)
             ->setQueryBuilder(
-                fn (\Doctrine\ORM\QueryBuilder $qb): \Doctrine\ORM\QueryBuilder => $qb
+                static fn (\Doctrine\ORM\QueryBuilder $qb): \Doctrine\ORM\QueryBuilder => $qb
                     ->andWhere('entity.active = :active')
                     ->setParameter('active', true)
                     ->orderBy('entity.name', 'ASC'),
@@ -97,7 +97,7 @@ class SaasServiceCrudController extends AbstractCrudController
         yield TextareaField::new('notes', 'Notes')->hideOnIndex();
 
         yield IntegerField::new('subscriptions.count', 'Abonnements')->hideOnForm()->formatValue(
-            fn ($value, SaasService $entity) => $entity->getSubscriptions()->count(),
+            static fn ($value, SaasService $entity) => $entity->getSubscriptions()->count(),
         );
 
         yield BooleanField::new('active', 'Actif')->renderAsSwitch(false);

@@ -79,8 +79,8 @@ final class BillRelatedWorkItemsOnInvoiceCreatedTest extends TestCase
 
         $listener($event);
 
-        self::assertSame(WorkItemStatus::BILLED, $workItem1->getStatus());
-        self::assertSame(WorkItemStatus::BILLED, $workItem2->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem1->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem2->getStatus());
     }
 
     public function testSkipsMissingWorkItemAndContinues(): void
@@ -96,7 +96,7 @@ final class BillRelatedWorkItemsOnInvoiceCreatedTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::atLeastOnce())
             ->method('warning')
-            ->with(self::stringContains('not found'));
+            ->with(static::stringContains('not found'));
 
         $eventBus = $this->createMock(MessageBusInterface::class);
         $eventBus->method('dispatch')
@@ -114,7 +114,7 @@ final class BillRelatedWorkItemsOnInvoiceCreatedTest extends TestCase
 
         $listener($event);
 
-        self::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem->getStatus());
     }
 
     private function makeValidated(): WorkItem

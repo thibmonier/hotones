@@ -106,7 +106,7 @@ class BillingController extends AbstractController
         $entries = array_merge($forfaitEntries, $regieEntries);
         usort(
             $entries,
-            fn ($a, $b): int => $a['date'] <=> $b['date'] ?: $a['project']->getName() <=> $b['project']->getName(),
+            static fn ($a, $b): int => $a['date'] <=> $b['date'] ?: $a['project']->getName() <=> $b['project']->getName(),
         );
 
         // Récupérer les marqueurs existants pour le mois

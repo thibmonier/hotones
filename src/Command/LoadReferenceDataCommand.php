@@ -157,9 +157,9 @@ class LoadReferenceDataCommand extends Command
                 $profile = new Profile();
                 $profile->setName($profileName);
                 $profile->setCompany($company);
-                $io->writeln("✓ Profil créé : $profileName");
+                $io->writeln("✓ Profil créé : {$profileName}");
             } else {
-                $io->writeln("• Profil existant : $profileName");
+                $io->writeln("• Profil existant : {$profileName}");
             }
 
             // Définir la description du profil
@@ -212,9 +212,9 @@ class LoadReferenceDataCommand extends Command
                 $technology = new Technology();
                 $technology->setName($techName);
                 $technology->setCompany($company);
-                $io->writeln("✓ Technologie créée : $techName ($techType)");
+                $io->writeln("✓ Technologie créée : {$techName} ({$techType})");
             } else {
-                $io->writeln("• Technologie existante : $techName");
+                $io->writeln("• Technologie existante : {$techName}");
             }
 
             // Mapper le type vers la catégorie

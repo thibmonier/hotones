@@ -59,7 +59,7 @@ class CreateUserCommandTest extends TestCase
         // stub class whose name is not stable.
         $this->entityManager
             ->method('getRepository')
-            ->willReturnCallback(fn ($entityClass): object => match ($entityClass) {
+            ->willReturnCallback(static fn ($entityClass): object => match ($entityClass) {
                 User::class => $userRepository,
                 Company::class => $companyRepository,
                 default => throw new Exception('Unexpected repository requested: '.$entityClass),
@@ -85,7 +85,7 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager
             ->expects($this->exactly(2))
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$persistedEntities): void {
+            ->willReturnCallback(static function ($entity) use (&$persistedEntities): void {
                 $persistedEntities[] = $entity;
             });
 
@@ -100,26 +100,26 @@ class CreateUserCommandTest extends TestCase
         ]);
 
         // Verify command succeeded
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         // Verify User was created correctly
-        $this->assertCount(2, $persistedEntities);
+        static::assertCount(2, $persistedEntities);
         $user = $persistedEntities[0];
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals($email, $user->getEmail());
-        $this->assertEquals($firstName, $user->getFirstName());
-        $this->assertEquals($lastName, $user->getLastName());
-        $this->assertEquals($hashedPassword, $user->getPassword());
-        $this->assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $user->getRoles());
+        static::assertInstanceOf(User::class, $user);
+        static::assertEquals($email, $user->getEmail());
+        static::assertEquals($firstName, $user->getFirstName());
+        static::assertEquals($lastName, $user->getLastName());
+        static::assertEquals($hashedPassword, $user->getPassword());
+        static::assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $user->getRoles());
 
         // Verify Contributor was created correctly
         $contributor = $persistedEntities[1];
-        $this->assertInstanceOf(Contributor::class, $contributor);
-        $this->assertEquals($firstName, $contributor->getFirstName());
-        $this->assertEquals($lastName, $contributor->getLastName());
-        $this->assertEquals($email, $contributor->getEmail());
-        $this->assertTrue($contributor->isActive());
-        $this->assertSame($user, $contributor->getUser());
+        static::assertInstanceOf(Contributor::class, $contributor);
+        static::assertEquals($firstName, $contributor->getFirstName());
+        static::assertEquals($lastName, $contributor->getLastName());
+        static::assertEquals($email, $contributor->getEmail());
+        static::assertTrue($contributor->isActive());
+        static::assertSame($user, $contributor->getUser());
     }
 
     public function testExecuteOutputsSuccessMessage(): void
@@ -133,7 +133,7 @@ class CreateUserCommandTest extends TestCase
         $contributorId = 42;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use ($contributorId): void {
+            ->willReturnCallback(static function ($entity) use ($contributorId): void {
                 if ($entity instanceof Contributor) {
                     // Simulate database assigning an ID after flush
                     $reflection = new ReflectionClass($entity);
@@ -152,9 +152,9 @@ class CreateUserCommandTest extends TestCase
 
         // Verify output contains email and contributor ID
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('User created:', $output);
-        $this->assertStringContainsString($email, $output);
-        $this->assertStringContainsString("Contributor ID: $contributorId", $output);
+        static::assertStringContainsString('User created:', $output);
+        static::assertStringContainsString($email, $output);
+        static::assertStringContainsString("Contributor ID: {$contributorId}", $output);
     }
 
     public function testExecuteHashesPassword(): void
@@ -167,7 +167,7 @@ class CreateUserCommandTest extends TestCase
             ->expects($this->once())
             ->method('hashPassword')
             ->with(
-                $this->callback(fn ($user): bool => $user instanceof User && $user->getEmail() === 'hash@test.com'),
+                static::callback(static fn ($user): bool => $user instanceof User && $user->getEmail() === 'hash@test.com'),
                 $plainPassword,
             )
             ->willReturn($hashedPassword);
@@ -180,7 +180,7 @@ class CreateUserCommandTest extends TestCase
         ]);
 
         // Success indicates password was hashed
-        $this->assertEquals(Command::SUCCESS, $this->commandTester->getStatusCode());
+        static::assertEquals(Command::SUCCESS, $this->commandTester->getStatusCode());
     }
 
     public function testExecutePersistsUserBeforeContributor(): void
@@ -190,7 +190,7 @@ class CreateUserCommandTest extends TestCase
         $persistOrder = [];
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$persistOrder): void {
+            ->willReturnCallback(static function ($entity) use (&$persistOrder): void {
                 $persistOrder[] = $entity::class;
             });
 
@@ -202,7 +202,7 @@ class CreateUserCommandTest extends TestCase
         ]);
 
         // Verify User is persisted before Contributor
-        $this->assertEquals([User::class, Contributor::class], $persistOrder);
+        static::assertEquals([User::class, Contributor::class], $persistOrder);
     }
 
     public function testExecuteFlushesAfterUserAndAfterContributor(): void
@@ -213,7 +213,7 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager
             ->expects($this->exactly(2))
             ->method('flush')
-            ->willReturnCallback(function () use (&$flushCount): void {
+            ->willReturnCallback(static function () use (&$flushCount): void {
                 ++$flushCount;
             });
 
@@ -225,7 +225,7 @@ class CreateUserCommandTest extends TestCase
         ]);
 
         // Verify flush was called twice (after user, after contributor)
-        $this->assertEquals(2, $flushCount);
+        static::assertSame(2, $flushCount);
     }
 
     public function testExecuteSetsDefaultRoleUser(): void
@@ -235,7 +235,7 @@ class CreateUserCommandTest extends TestCase
         $capturedUser = null;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedUser): void {
+            ->willReturnCallback(static function ($entity) use (&$capturedUser): void {
                 if ($entity instanceof User) {
                     $capturedUser = $entity;
                 }
@@ -248,8 +248,8 @@ class CreateUserCommandTest extends TestCase
             'lastName' => 'Test',
         ]);
 
-        $this->assertNotNull($capturedUser);
-        $this->assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $capturedUser->getRoles());
+        static::assertNotNull($capturedUser);
+        static::assertEquals(['ROLE_INTERVENANT', 'ROLE_USER'], $capturedUser->getRoles());
     }
 
     public function testExecuteLinksContributorToUser(): void
@@ -261,7 +261,7 @@ class CreateUserCommandTest extends TestCase
 
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedUser, &$capturedContributor): void {
+            ->willReturnCallback(static function ($entity) use (&$capturedUser, &$capturedContributor): void {
                 if ($entity instanceof User) {
                     $capturedUser = $entity;
                 }
@@ -277,9 +277,9 @@ class CreateUserCommandTest extends TestCase
             'lastName' => 'Test',
         ]);
 
-        $this->assertNotNull($capturedUser);
-        $this->assertNotNull($capturedContributor);
-        $this->assertSame($capturedUser, $capturedContributor->getUser());
+        static::assertNotNull($capturedUser);
+        static::assertNotNull($capturedContributor);
+        static::assertSame($capturedUser, $capturedContributor->getUser());
     }
 
     public function testExecuteSetsContributorAsActive(): void
@@ -289,7 +289,7 @@ class CreateUserCommandTest extends TestCase
         $capturedContributor = null;
         $this->entityManager
             ->method('persist')
-            ->willReturnCallback(function ($entity) use (&$capturedContributor): void {
+            ->willReturnCallback(static function ($entity) use (&$capturedContributor): void {
                 if ($entity instanceof Contributor) {
                     $capturedContributor = $entity;
                 }
@@ -302,8 +302,8 @@ class CreateUserCommandTest extends TestCase
             'lastName' => 'Test',
         ]);
 
-        $this->assertNotNull($capturedContributor);
-        $this->assertTrue($capturedContributor->isActive());
+        static::assertNotNull($capturedContributor);
+        static::assertTrue($capturedContributor->isActive());
     }
 
     public function testConfigureDefinesRequiredArguments(): void
@@ -311,15 +311,15 @@ class CreateUserCommandTest extends TestCase
         $definition = $this->command->getDefinition();
 
         // Verify all required arguments exist
-        $this->assertTrue($definition->hasArgument('email'));
-        $this->assertTrue($definition->hasArgument('password'));
-        $this->assertTrue($definition->hasArgument('firstName'));
-        $this->assertTrue($definition->hasArgument('lastName'));
+        static::assertTrue($definition->hasArgument('email'));
+        static::assertTrue($definition->hasArgument('password'));
+        static::assertTrue($definition->hasArgument('firstName'));
+        static::assertTrue($definition->hasArgument('lastName'));
 
         // Verify they are all required
-        $this->assertTrue($definition->getArgument('email')->isRequired());
-        $this->assertTrue($definition->getArgument('password')->isRequired());
-        $this->assertTrue($definition->getArgument('firstName')->isRequired());
-        $this->assertTrue($definition->getArgument('lastName')->isRequired());
+        static::assertTrue($definition->getArgument('email')->isRequired());
+        static::assertTrue($definition->getArgument('password')->isRequired());
+        static::assertTrue($definition->getArgument('firstName')->isRequired());
+        static::assertTrue($definition->getArgument('lastName')->isRequired());
     }
 }

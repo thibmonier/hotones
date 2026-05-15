@@ -70,22 +70,22 @@ final class DoctrineDddContributorRepositoryIntegrationTest extends KernelTestCa
 
         $ddd = $this->dddRepository->findById(ContributorId::fromLegacyInt($flat->getId()));
 
-        $this->assertSame($flat->getId(), $ddd->getId()->toLegacyInt());
-        $this->assertSame('Jean', $ddd->getName()->getFirstName());
-        $this->assertSame('Dupont', $ddd->getName()->getLastName());
-        $this->assertSame(ContractStatus::ACTIVE, $ddd->getStatus());
+        static::assertSame($flat->getId(), $ddd->getId()->toLegacyInt());
+        static::assertSame('Jean', $ddd->getName()->getFirstName());
+        static::assertSame('Dupont', $ddd->getName()->getLastName());
+        static::assertSame(ContractStatus::ACTIVE, $ddd->getStatus());
     }
 
     public function testFindByIdThrowsWhenNotFound(): void
     {
         $this->expectException(ContributorNotFoundException::class);
-        $this->dddRepository->findById(ContributorId::fromLegacyInt(99999));
+        $this->dddRepository->findById(ContributorId::fromLegacyInt(99_999));
     }
 
     public function testFindByIdOrNullReturnsNullForUuid(): void
     {
         $ddd = $this->dddRepository->findByIdOrNull(ContributorId::generate());
-        $this->assertNull($ddd);
+        static::assertNull($ddd);
     }
 
     public function testFindActiveExcludesInactive(): void
@@ -107,7 +107,7 @@ final class DoctrineDddContributorRepositoryIntegrationTest extends KernelTestCa
 
         // Tous les actifs doivent être ACTIVE
         foreach ($actives as $contributor) {
-            $this->assertSame(ContractStatus::ACTIVE, $contributor->getStatus());
+            static::assertSame(ContractStatus::ACTIVE, $contributor->getStatus());
         }
     }
 
@@ -130,8 +130,8 @@ final class DoctrineDddContributorRepositoryIntegrationTest extends KernelTestCa
 
         $managed = $this->dddRepository->findByManagerId(ContributorId::fromLegacyInt($manager->getId()));
 
-        $this->assertCount(1, $managed);
-        $this->assertSame('Subordinate', $managed[0]->getName()->getFirstName());
+        static::assertCount(1, $managed);
+        static::assertSame('Subordinate', $managed[0]->getName()->getFirstName());
     }
 
     public function testSaveAppliesDddChangesToFlat(): void
@@ -156,10 +156,10 @@ final class DoctrineDddContributorRepositoryIntegrationTest extends KernelTestCa
         $em->clear();
         $reloaded = $em->getRepository(\App\Entity\Contributor::class)->find($flat->getId());
 
-        $this->assertSame('Renamed', $reloaded->getFirstName());
-        $this->assertSame('NewLast', $reloaded->getLastName());
-        $this->assertSame('new@example.com', $reloaded->getEmail());
-        $this->assertFalse($reloaded->isActive());
+        static::assertSame('Renamed', $reloaded->getFirstName());
+        static::assertSame('NewLast', $reloaded->getLastName());
+        static::assertSame('new@example.com', $reloaded->getEmail());
+        static::assertFalse($reloaded->isActive());
     }
 
     public function testSavePureUuidThrows(): void

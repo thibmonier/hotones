@@ -178,7 +178,7 @@ class TimesheetExportService
         $timesheets = $timesheetRepo->findByContributorAndDateRange($contributor, $start, $end);
 
         if ($projectId) {
-            return array_filter($timesheets, fn ($t): bool => $t->getProject()->getId() === $projectId);
+            return array_filter($timesheets, static fn ($t): bool => $t->getProject()->getId() === $projectId);
         }
 
         return $timesheets;

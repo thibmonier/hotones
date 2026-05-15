@@ -28,9 +28,11 @@ class MenuBuilder
             if (isset($item['children'])) {
                 $visibleChildren = [];
                 foreach ($item['children'] as $child) {
-                    if (!isset($child['role']) || $this->security->isGranted($child['role'])) {
-                        $visibleChildren[] = $child;
+                    if (!(!isset($child['role']) || $this->security->isGranted($child['role']))) {
+                        continue;
                     }
+
+                    $visibleChildren[] = $child;
                 }
 
                 // Si, après filtrage, il n'y a plus d'enfants visibles, on ne montre pas le parent.

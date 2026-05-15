@@ -74,7 +74,7 @@ class AdminUserController extends AbstractController
             $roles = $request->request->all('roles');
             $roles = array_values(array_unique(array_filter(
                 $roles,
-                fn ($role): bool => $role !== null && $role !== '',
+                static fn ($role): bool => $role !== null && $role !== '',
             )));
             $user->setRoles($roles);
 

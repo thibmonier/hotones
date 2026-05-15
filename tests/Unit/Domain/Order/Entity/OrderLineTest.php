@@ -28,14 +28,14 @@ final class OrderLineTest extends TestCase
             position: 1,
         );
 
-        self::assertSame('Web design service', $line->getDescription());
-        self::assertSame(OrderLineType::SERVICE, $line->getType());
-        self::assertSame(2.0, $line->getQuantity());
-        self::assertSame(10000, $line->getUnitPriceHt()->getAmountCents());
-        self::assertSame(0.20, $line->getTaxRate());
-        self::assertSame(1, $line->getPosition());
-        self::assertNull($line->getUnit());
-        self::assertNull($line->getUpdatedAt());
+        static::assertSame('Web design service', $line->getDescription());
+        static::assertSame(OrderLineType::SERVICE, $line->getType());
+        static::assertSame(2.0, $line->getQuantity());
+        static::assertSame(10_000, $line->getUnitPriceHt()->getAmountCents());
+        static::assertSame(0.20, $line->getTaxRate());
+        static::assertSame(1, $line->getPosition());
+        static::assertNull($line->getUnit());
+        static::assertNull($line->getUpdatedAt());
     }
 
     public function testCreateEmptyDescriptionThrows(): void
@@ -123,29 +123,29 @@ final class OrderLineTest extends TestCase
             position: 1,
         );
 
-        self::assertSame(0.0, $line->getTaxRate());
-        self::assertSame(0, $line->getTaxAmount()->getAmountCents());
+        static::assertSame(0.0, $line->getTaxRate());
+        static::assertSame(0, $line->getTaxAmount()->getAmountCents());
     }
 
     public function testTotalHtCalculation(): void
     {
         // 2 × 100 = 200 EUR
         $line = $this->newServiceLine();
-        self::assertSame(20000, $line->getTotalHt()->getAmountCents());
+        static::assertSame(20_000, $line->getTotalHt()->getAmountCents());
     }
 
     public function testTaxAmountCalculation(): void
     {
         // 200 × 20 % = 40 EUR
         $line = $this->newServiceLine();
-        self::assertSame(4000, $line->getTaxAmount()->getAmountCents());
+        static::assertSame(4000, $line->getTaxAmount()->getAmountCents());
     }
 
     public function testTotalTtcCalculation(): void
     {
         // 200 + 40 = 240 EUR
         $line = $this->newServiceLine();
-        self::assertSame(24000, $line->getTotalTtc()->getAmountCents());
+        static::assertSame(24_000, $line->getTotalTtc()->getAmountCents());
     }
 
     public function testUpdateMutatesAndStampsUpdatedAt(): void
@@ -159,12 +159,12 @@ final class OrderLineTest extends TestCase
             taxRate: 0.10,
         );
 
-        self::assertSame('Updated description', $line->getDescription());
-        self::assertSame(OrderLineType::PURCHASE, $line->getType());
-        self::assertSame(5.0, $line->getQuantity());
-        self::assertSame(2000, $line->getUnitPriceHt()->getAmountCents());
-        self::assertSame(0.10, $line->getTaxRate());
-        self::assertNotNull($line->getUpdatedAt());
+        static::assertSame('Updated description', $line->getDescription());
+        static::assertSame(OrderLineType::PURCHASE, $line->getType());
+        static::assertSame(5.0, $line->getQuantity());
+        static::assertSame(2000, $line->getUnitPriceHt()->getAmountCents());
+        static::assertSame(0.10, $line->getTaxRate());
+        static::assertNotNull($line->getUpdatedAt());
     }
 
     public function testUpdateRejectsInvalidDescription(): void
@@ -180,8 +180,8 @@ final class OrderLineTest extends TestCase
         $line = $this->newServiceLine();
         $line->setUnit('hour');
 
-        self::assertSame('hour', $line->getUnit());
-        self::assertNotNull($line->getUpdatedAt());
+        static::assertSame('hour', $line->getUnit());
+        static::assertNotNull($line->getUpdatedAt());
     }
 
     public function testSetUnitToNull(): void
@@ -190,7 +190,7 @@ final class OrderLineTest extends TestCase
         $line->setUnit('day');
         $line->setUnit(null);
 
-        self::assertNull($line->getUnit());
+        static::assertNull($line->getUnit());
     }
 
     public function testUpdatePositionMutates(): void
@@ -198,8 +198,8 @@ final class OrderLineTest extends TestCase
         $line = $this->newServiceLine();
         $line->updatePosition(5);
 
-        self::assertSame(5, $line->getPosition());
-        self::assertNotNull($line->getUpdatedAt());
+        static::assertSame(5, $line->getPosition());
+        static::assertNotNull($line->getUpdatedAt());
     }
 
     private function newServiceLine(): OrderLine

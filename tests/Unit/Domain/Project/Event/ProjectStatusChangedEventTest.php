@@ -19,9 +19,9 @@ final class ProjectStatusChangedEventTest extends TestCase
             ProjectStatus::ACTIVE,
         );
 
-        $this->assertSame(7, $event->getProjectId()->toLegacyInt());
-        $this->assertSame(ProjectStatus::DRAFT, $event->getPreviousStatus());
-        $this->assertSame(ProjectStatus::ACTIVE, $event->getNewStatus());
-        $this->assertNotNull($event->getOccurredOn());
+        static::assertSame(7, $event->getProjectId()->toLegacyInt());
+        static::assertSame(ProjectStatus::DRAFT, $event->getPreviousStatus());
+        static::assertSame(ProjectStatus::ACTIVE, $event->getNewStatus());
+        static::assertNotNull($event->getOccurredOn());
     }
 }

@@ -19,5 +19,5 @@ $_SERVER['DATABASE_URL'] = $_ENV['DATABASE_URL'] = 'sqlite:///%kernel.project_di
 putenv('DATABASE_URL=sqlite:///%kernel.project_dir%/var/test.db');
 
 if (!empty($_SERVER['APP_DEBUG'])) {
-    umask(0000);
+    umask(0o000);
 }

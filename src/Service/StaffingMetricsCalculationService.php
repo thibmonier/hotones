@@ -67,9 +67,11 @@ class StaffingMetricsCalculationService
         // Index par contributor ID pour lookup O(1)
         $periodsByContributor = [];
         foreach ($employmentPeriods as $period) {
-            if ($period->getContributor()) {
-                $periodsByContributor[$period->getContributor()->getId()][] = $period;
+            if (!$period->getContributor()) {
+                continue;
             }
+
+            $periodsByContributor[$period->getContributor()->getId()][] = $period;
         }
 
         foreach ($periods as $period) {
@@ -393,7 +395,7 @@ class StaffingMetricsCalculationService
                 break;
 
             default:
-                throw new InvalidArgumentException("Granularity '$granularity' not supported");
+                throw new InvalidArgumentException("Granularity '{$granularity}' not supported");
         }
 
         return $end;
@@ -455,7 +457,7 @@ class StaffingMetricsCalculationService
                 break;
 
             default:
-                throw new InvalidArgumentException("Granularity '$granularity' not supported");
+                throw new InvalidArgumentException("Granularity '{$granularity}' not supported");
         }
 
         return $periods;

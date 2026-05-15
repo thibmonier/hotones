@@ -28,7 +28,7 @@ final class ProjectMarginPersistenceTest extends TestCase
         $ddd = $this->makeProject();
         $ddd->setMargeSnapshot(
             coutTotal: Money::fromAmount(8000.00),
-            factureTotal: Money::fromAmount(10000.00),
+            factureTotal: Money::fromAmount(10_000.00),
         );
 
         $flat = new FlatProject();
@@ -37,10 +37,10 @@ final class ProjectMarginPersistenceTest extends TestCase
         $translator->applyTo($ddd, $flat);
 
         // 8000 € = 800000 centimes
-        self::assertSame(800000, $flat->coutTotalCents);
-        self::assertSame(1000000, $flat->factureTotalCents);
-        self::assertNotNull($flat->margeCalculatedAt);
-        self::assertInstanceOf(DateTimeImmutable::class, $flat->margeCalculatedAt);
+        static::assertSame(800_000, $flat->coutTotalCents);
+        static::assertSame(1_000_000, $flat->factureTotalCents);
+        static::assertNotNull($flat->margeCalculatedAt);
+        static::assertInstanceOf(DateTimeImmutable::class, $flat->margeCalculatedAt);
     }
 
     public function testApplyToPersistsNullWhenSnapshotNotSet(): void
@@ -49,17 +49,17 @@ final class ProjectMarginPersistenceTest extends TestCase
         // No setMargeSnapshot call
 
         $flat = new FlatProject();
-        $flat->coutTotalCents = 999999; // Pre-existing stale value
-        $flat->factureTotalCents = 888888;
+        $flat->coutTotalCents = 999_999; // Pre-existing stale value
+        $flat->factureTotalCents = 888_888;
         $flat->margeCalculatedAt = new DateTimeImmutable('2020-01-01');
 
         $translator = new ProjectDddToFlatTranslator();
         $translator->applyTo($ddd, $flat);
 
         // Snapshot null → flat fields cleared
-        self::assertNull($flat->coutTotalCents);
-        self::assertNull($flat->factureTotalCents);
-        self::assertNull($flat->margeCalculatedAt);
+        static::assertNull($flat->coutTotalCents);
+        static::assertNull($flat->factureTotalCents);
+        static::assertNull($flat->margeCalculatedAt);
     }
 
     public function testApplyToOverwritesExistingFlatMargeValues(): void
@@ -71,14 +71,14 @@ final class ProjectMarginPersistenceTest extends TestCase
         );
 
         $flat = new FlatProject();
-        $flat->coutTotalCents = 999999;
-        $flat->factureTotalCents = 888888;
+        $flat->coutTotalCents = 999_999;
+        $flat->factureTotalCents = 888_888;
 
         $translator = new ProjectDddToFlatTranslator();
         $translator->applyTo($ddd, $flat);
 
-        self::assertSame(500000, $flat->coutTotalCents);
-        self::assertSame(700000, $flat->factureTotalCents);
+        static::assertSame(500_000, $flat->coutTotalCents);
+        static::assertSame(700_000, $flat->factureTotalCents);
     }
 
     private function makeProject(): DddProject

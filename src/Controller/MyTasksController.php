@@ -45,7 +45,7 @@ class MyTasksController extends AbstractController
             $project = $row['project'];
             $tasks = $row['tasks'];
 
-            $tasksForWeek = array_values(array_filter($tasks, function ($t) use ($startDate, $endDate) {
+            $tasksForWeek = array_values(array_filter($tasks, static function ($t) use ($startDate, $endDate) {
                 $ts = $t->getStartDate();
                 $te = $t->getEndDate();
                 if (!$ts && !$te) {

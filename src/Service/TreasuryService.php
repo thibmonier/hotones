@@ -153,7 +153,7 @@ class TreasuryService
         }
 
         // Trier par priorité puis par retard
-        usort($result, function ($a, $b) {
+        usort($result, static function ($a, $b) {
             $priorityOrder = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
             $priorityCompare = $priorityOrder[$a['priority']] <=> $priorityOrder[$b['priority']];
             if ($priorityCompare !== 0) {

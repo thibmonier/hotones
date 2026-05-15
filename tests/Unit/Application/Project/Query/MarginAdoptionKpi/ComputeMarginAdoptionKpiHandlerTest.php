@@ -22,10 +22,10 @@ final class ComputeMarginAdoptionKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertSame(0, $dto->stats->totalActive);
-        self::assertSame(0.0, $dto->stats->freshPercent);
-        self::assertFalse($dto->warningTriggered, 'no warning when 0 projets actifs');
-        self::assertSame(60.0, $dto->warningThresholdPercent);
+        static::assertSame(0, $dto->stats->totalActive);
+        static::assertSame(0.0, $dto->stats->freshPercent);
+        static::assertFalse($dto->warningTriggered, 'no warning when 0 projets actifs');
+        static::assertSame(60.0, $dto->warningThresholdPercent);
     }
 
     public function testFlagsWarningWhenFreshPercentBelowThreshold(): void
@@ -43,8 +43,8 @@ final class ComputeMarginAdoptionKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertTrue($dto->warningTriggered);
-        self::assertSame(50.0, $dto->stats->freshPercent);
+        static::assertTrue($dto->warningTriggered);
+        static::assertSame(50.0, $dto->stats->freshPercent);
     }
 
     public function testNoWarningWhenFreshPercentAtOrAboveThreshold(): void
@@ -52,10 +52,10 @@ final class ComputeMarginAdoptionKpiHandlerTest extends TestCase
         // 7 fresh + 3 critical → 70 % fresh (≥ 60 %)
         $records = [];
         for ($i = 1; $i <= 7; ++$i) {
-            $records[] = $this->record($i, "Fresh$i", daysAgo: 2);
+            $records[] = $this->record($i, "Fresh{$i}", daysAgo: 2);
         }
         for ($i = 8; $i <= 10; ++$i) {
-            $records[] = $this->record($i, "Stale$i", daysAgo: 60);
+            $records[] = $this->record($i, "Stale{$i}", daysAgo: 60);
         }
 
         $handler = new ComputeMarginAdoptionKpiHandler(
@@ -65,8 +65,8 @@ final class ComputeMarginAdoptionKpiHandlerTest extends TestCase
 
         $dto = $handler(new DateTimeImmutable('2026-05-12'));
 
-        self::assertFalse($dto->warningTriggered);
-        self::assertSame(70.0, $dto->stats->freshPercent);
+        static::assertFalse($dto->warningTriggered);
+        static::assertSame(70.0, $dto->stats->freshPercent);
     }
 
     /**

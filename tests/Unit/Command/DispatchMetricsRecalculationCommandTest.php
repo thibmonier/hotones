@@ -43,10 +43,10 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             '--year' => (string) $year,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Dispatched metrics recalculation for year 2024', $output);
+        static::assertStringContainsString('Dispatched metrics recalculation for year 2024', $output);
     }
 
     public function testExecuteWithYearDispatchesMonthlyMessages(): void
@@ -56,7 +56,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$dispatchedDates) {
+            ->willReturnCallback(static function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
                         'date' => $message->date,
@@ -70,8 +70,8 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 12 monthly messages
-        $monthlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'monthly');
-        $this->assertCount(12, $monthlyMessages);
+        $monthlyMessages = array_filter($dispatchedDates, static fn ($d): bool => $d['granularity'] === 'monthly');
+        static::assertCount(12, $monthlyMessages);
 
         // Verify dates are correct
         $expectedMonthlyDates = [];
@@ -83,7 +83,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         sort($actualMonthlyDates);
         sort($expectedMonthlyDates);
 
-        $this->assertEquals($expectedMonthlyDates, $actualMonthlyDates);
+        static::assertEquals($expectedMonthlyDates, $actualMonthlyDates);
     }
 
     public function testExecuteWithYearDispatchesQuarterlyMessages(): void
@@ -93,7 +93,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$dispatchedDates) {
+            ->willReturnCallback(static function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
                         'date' => $message->date,
@@ -107,15 +107,15 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 4 quarterly messages
-        $quarterlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'quarterly');
-        $this->assertCount(4, $quarterlyMessages);
+        $quarterlyMessages = array_filter($dispatchedDates, static fn ($d): bool => $d['granularity'] === 'quarterly');
+        static::assertCount(4, $quarterlyMessages);
 
         // Verify dates: Q1=01-01, Q2=04-01, Q3=07-01, Q4=10-01
         $expectedQuarterlyDates = ['2023-01-01', '2023-04-01', '2023-07-01', '2023-10-01'];
         $actualQuarterlyDates = array_column(array_values($quarterlyMessages), 'date');
         sort($actualQuarterlyDates);
 
-        $this->assertEquals($expectedQuarterlyDates, $actualQuarterlyDates);
+        static::assertEquals($expectedQuarterlyDates, $actualQuarterlyDates);
     }
 
     public function testExecuteWithYearDispatchesYearlyMessage(): void
@@ -125,7 +125,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$dispatchedDates) {
+            ->willReturnCallback(static function ($message) use (&$dispatchedDates) {
                 if ($message instanceof RecalculateMetricsMessage) {
                     $dispatchedDates[] = [
                         'date' => $message->date,
@@ -139,9 +139,9 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->commandTester->execute(['--year' => (string) $year]);
 
         // Verify 1 yearly message
-        $yearlyMessages = array_filter($dispatchedDates, fn ($d): bool => $d['granularity'] === 'yearly');
-        $this->assertCount(1, $yearlyMessages);
-        $this->assertEquals('2023-01-01', array_first($yearlyMessages)['date']);
+        $yearlyMessages = array_filter($dispatchedDates, static fn ($d): bool => $d['granularity'] === 'yearly');
+        static::assertCount(1, $yearlyMessages);
+        static::assertSame('2023-01-01', array_first($yearlyMessages)['date']);
     }
 
     public function testExecuteWithDateDefaultGranularity(): void
@@ -152,7 +152,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $this->messageBus
             ->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$capturedMessage) {
+            ->willReturnCallback(static function ($message) use (&$capturedMessage) {
                 $capturedMessage = $message;
 
                 return new Envelope($message);
@@ -162,13 +162,13 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             '--date' => $date,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertInstanceOf(RecalculateMetricsMessage::class, $capturedMessage);
-        $this->assertEquals($date, $capturedMessage->date);
-        $this->assertEquals('monthly', $capturedMessage->granularity);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertInstanceOf(RecalculateMetricsMessage::class, $capturedMessage);
+        static::assertEquals($date, $capturedMessage->date);
+        static::assertSame('monthly', $capturedMessage->granularity);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Dispatched monthly metrics for 2024-06-15', $output);
+        static::assertStringContainsString('Dispatched monthly metrics for 2024-06-15', $output);
     }
 
     public function testExecuteWithDateAndCustomGranularity(): void
@@ -179,7 +179,7 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
         $capturedMessage = null;
         $this->messageBus
             ->method('dispatch')
-            ->willReturnCallback(function ($message) use (&$capturedMessage) {
+            ->willReturnCallback(static function ($message) use (&$capturedMessage) {
                 $capturedMessage = $message;
 
                 return new Envelope($message);
@@ -190,13 +190,13 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
             '--granularity' => $granularity,
         ]);
 
-        $this->assertEquals(Command::SUCCESS, $exitCode);
-        $this->assertInstanceOf(RecalculateMetricsMessage::class, $capturedMessage);
-        $this->assertEquals($date, $capturedMessage->date);
-        $this->assertEquals($granularity, $capturedMessage->granularity);
+        static::assertEquals(Command::SUCCESS, $exitCode);
+        static::assertInstanceOf(RecalculateMetricsMessage::class, $capturedMessage);
+        static::assertEquals($date, $capturedMessage->date);
+        static::assertEquals($granularity, $capturedMessage->granularity);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Dispatched quarterly metrics for 2024-01-01', $output);
+        static::assertStringContainsString('Dispatched quarterly metrics for 2024-01-01', $output);
     }
 
     public function testExecuteWithoutOptionsReturnsInvalid(): void
@@ -205,10 +205,10 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         $exitCode = $this->commandTester->execute([]);
 
-        $this->assertEquals(Command::INVALID, $exitCode);
+        static::assertEquals(Command::INVALID, $exitCode);
 
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Provide either --year or --date [--granularity]', $output);
+        static::assertStringContainsString('Provide either --year or --date [--granularity]', $output);
     }
 
     public function testExecuteWithInvalidDateThrowsException(): void
@@ -224,15 +224,15 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
     {
         $definition = $this->command->getDefinition();
 
-        $this->assertTrue($definition->hasOption('year'));
-        $this->assertTrue($definition->hasOption('date'));
-        $this->assertTrue($definition->hasOption('granularity'));
+        static::assertTrue($definition->hasOption('year'));
+        static::assertTrue($definition->hasOption('date'));
+        static::assertTrue($definition->hasOption('granularity'));
 
         // Verify they are all optional (not required by Symfony, but VALUE_REQUIRED means value is needed if option is used)
-        $this->assertFalse(
+        static::assertFalse(
             $definition->getOption('year')->isValueRequired() && $definition->getOption('year')->isValueOptional(),
         );
-        $this->assertFalse(
+        static::assertFalse(
             $definition->getOption('date')->isValueRequired() && $definition->getOption('date')->isValueOptional(),
         );
     }
@@ -243,10 +243,10 @@ class DispatchMetricsRecalculationCommandTest extends TestCase
 
         // Test with year
         $exitCode = $this->commandTester->execute(['--year' => '2024']);
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
 
         // Test with date
         $exitCode = $this->commandTester->execute(['--date' => '2024-01-01']);
-        $this->assertEquals(Command::SUCCESS, $exitCode);
+        static::assertEquals(Command::SUCCESS, $exitCode);
     }
 }

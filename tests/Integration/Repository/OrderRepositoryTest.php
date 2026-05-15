@@ -55,11 +55,11 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithFilters();
 
         // Assert
-        $this->assertGreaterThanOrEqual(2, count($results));
+        static::assertGreaterThanOrEqual(2, count($results));
         // Just verify both orders exist in results
-        $ids = array_map(fn ($o) => $o->id, $results);
-        $this->assertContains($order1->id, $ids);
-        $this->assertContains($order2->id, $ids);
+        $ids = array_map(static fn ($o) => $o->id, $results);
+        static::assertContains($order1->id, $ids);
+        static::assertContains($order2->id, $ids);
     }
 
     public function testFindWithFiltersWithProject(): void
@@ -74,8 +74,8 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithFilters(project: $project1);
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals($order1->id, $results[0]->id);
+        static::assertCount(1, $results);
+        static::assertEquals($order1->id, $results[0]->id);
     }
 
     public function testFindWithFiltersWithStatus(): void
@@ -89,8 +89,8 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithFilters(status: 'signe');
 
         // Assert
-        $this->assertCount(1, $results);
-        $this->assertEquals($order2->id, $results[0]->id);
+        static::assertCount(1, $results);
+        static::assertEquals($order2->id, $results[0]->id);
     }
 
     public function testFindWithFiltersSorting(): void
@@ -104,15 +104,15 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findWithFilters(sortField: 'name', sortDir: 'ASC');
 
         // Assert
-        $this->assertEquals($order1->id, $results[0]->id);
-        $this->assertEquals($order2->id, $results[1]->id);
+        static::assertEquals($order1->id, $results[0]->id);
+        static::assertEquals($order2->id, $results[1]->id);
 
         // Act - Sort by total
         $results = $this->repository->findWithFilters(sortField: 'total', sortDir: 'DESC');
 
         // Assert
-        $this->assertEquals($order2->id, $results[0]->id);
-        $this->assertEquals($order1->id, $results[1]->id);
+        static::assertEquals($order2->id, $results[0]->id);
+        static::assertEquals($order1->id, $results[1]->id);
     }
 
     public function testFindWithFiltersPagination(): void
@@ -120,14 +120,14 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project = $this->createProject('Test Project');
         for ($i = 1; $i <= 5; ++$i) {
-            $this->createOrder($project, "Order $i");
+            $this->createOrder($project, "Order {$i}");
         }
 
         // Act
         $results = $this->repository->findWithFilters(limit: 2, offset: 1);
 
         // Assert
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testCountWithFilters(): void
@@ -144,9 +144,9 @@ class OrderRepositoryTest extends KernelTestCase
         $totalStatus = $this->repository->countWithFilters(status: 'signe');
 
         // Assert
-        $this->assertEquals(3, $total);
-        $this->assertEquals(3, $totalProject);
-        $this->assertEquals(2, $totalStatus);
+        static::assertSame(3, $total);
+        static::assertSame(3, $totalProject);
+        static::assertSame(2, $totalStatus);
     }
 
     public function testFindLastOrderNumberForMonth(): void
@@ -165,8 +165,8 @@ class OrderRepositoryTest extends KernelTestCase
         $result = $this->repository->findLastOrderNumberForMonth('2024', '01');
 
         // Assert
-        $this->assertNotNull($result);
-        $this->assertEquals('D202401-002', $result->getOrderNumber());
+        static::assertNotNull($result);
+        static::assertSame('D202401-002', $result->getOrderNumber());
     }
 
     public function testFindLastOrderNumberForMonthNoResults(): void
@@ -175,7 +175,7 @@ class OrderRepositoryTest extends KernelTestCase
         $result = $this->repository->findLastOrderNumberForMonth('2024', '01');
 
         // Assert
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testFindByProject(): void
@@ -191,7 +191,7 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findByProject($project1);
 
         // Assert
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testFindByStatus(): void
@@ -206,7 +206,7 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->findByStatus('signe');
 
         // Assert
-        $this->assertCount(2, $results);
+        static::assertCount(2, $results);
     }
 
     public function testFindOneWithRelations(): void
@@ -238,12 +238,12 @@ class OrderRepositoryTest extends KernelTestCase
         $result = $this->repository->findOneWithRelations($order->id);
 
         // Assert
-        $this->assertNotNull($result);
+        static::assertNotNull($result);
         $sections = $result->getSections();
-        $this->assertCount(1, $sections);
+        static::assertCount(1, $sections);
         $firstSection = $sections->first();
-        $this->assertNotNull($firstSection);
-        $this->assertCount(1, $firstSection->getLines());
+        static::assertNotNull($firstSection);
+        static::assertCount(1, $firstSection->getLines());
     }
 
     public function testPreloadForProjects(): void
@@ -258,7 +258,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->repository->preloadForProjects([$project1, $project2]);
 
         // Assert - Just verify it executes without error
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testPreloadForProjectsEmpty(): void
@@ -267,7 +267,7 @@ class OrderRepositoryTest extends KernelTestCase
         $this->repository->preloadForProjects([]);
 
         // Assert
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testCountByStatus(): void
@@ -284,9 +284,9 @@ class OrderRepositoryTest extends KernelTestCase
         $perdueCount = $this->repository->countByStatus('perdue');
 
         // Assert
-        $this->assertEquals(1, $draftCount);
-        $this->assertEquals(2, $signeCount);
-        $this->assertEquals(0, $perdueCount);
+        static::assertSame(1, $draftCount);
+        static::assertSame(2, $signeCount);
+        static::assertSame(0, $perdueCount);
     }
 
     public function testGetTotalAmountByStatus(): void
@@ -301,7 +301,7 @@ class OrderRepositoryTest extends KernelTestCase
         $total = $this->repository->getTotalAmountByStatus('signe');
 
         // Assert
-        $this->assertEquals(3000.0, $total);
+        static::assertSame(3000.0, $total);
     }
 
     public function testGetStatsByStatus(): void
@@ -316,12 +316,12 @@ class OrderRepositoryTest extends KernelTestCase
         $stats = $this->repository->getStatsByStatus();
 
         // Assert
-        $this->assertArrayHasKey('draft', $stats);
-        $this->assertArrayHasKey('signe', $stats);
-        $this->assertEquals(1, $stats['draft']['count']);
-        $this->assertEquals(1000.0, $stats['draft']['total']);
-        $this->assertEquals(2, $stats['signe']['count']);
-        $this->assertEquals(5000.0, $stats['signe']['total']);
+        static::assertArrayHasKey('draft', $stats);
+        static::assertArrayHasKey('signe', $stats);
+        static::assertSame(1, $stats['draft']['count']);
+        static::assertSame(1000.0, $stats['draft']['total']);
+        static::assertSame(2, $stats['signe']['count']);
+        static::assertSame(5000.0, $stats['signe']['total']);
     }
 
     public function testGetStatsByStatusWithDateRange(): void
@@ -340,8 +340,8 @@ class OrderRepositoryTest extends KernelTestCase
         $stats = $this->repository->getStatsByStatus(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         // Assert
-        $this->assertEquals(1, $stats['signe']['count']);
-        $this->assertEquals(1000.0, $stats['signe']['total']);
+        static::assertSame(1, $stats['signe']['count']);
+        static::assertSame(1000.0, $stats['signe']['total']);
     }
 
     public function testGetSignedRevenueForPeriod(): void
@@ -360,7 +360,7 @@ class OrderRepositoryTest extends KernelTestCase
         $revenue = $this->repository->getSignedRevenueForPeriod(new DateTime('2024-01-01'), new DateTime('2024-01-31'));
 
         // Assert
-        $this->assertEquals(3000.0, $revenue);
+        static::assertSame(3000.0, $revenue);
     }
 
     public function testGetRecentOrders(): void
@@ -368,14 +368,14 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project = $this->createProject('Test Project');
         for ($i = 1; $i <= 15; ++$i) {
-            $this->createOrder($project, "Order $i");
+            $this->createOrder($project, "Order {$i}");
         }
 
         // Act
         $results = $this->repository->getRecentOrders(10);
 
         // Assert
-        $this->assertCount(10, $results);
+        static::assertCount(10, $results);
     }
 
     public function testGetConversionRate(): void
@@ -391,7 +391,7 @@ class OrderRepositoryTest extends KernelTestCase
         $rate = $this->repository->getConversionRate(new DateTime('2020-01-01'), new DateTime('2030-12-31'));
 
         // Assert
-        $this->assertEquals(50.0, $rate);
+        static::assertSame(50.0, $rate);
     }
 
     public function testGetConversionRateNoOrders(): void
@@ -400,7 +400,7 @@ class OrderRepositoryTest extends KernelTestCase
         $rate = $this->repository->getConversionRate(new DateTime('2024-01-01'), new DateTime('2024-12-31'));
 
         // Assert
-        $this->assertEquals(0.0, $rate);
+        static::assertSame(0.0, $rate);
     }
 
     public function testGetYearComparison(): void
@@ -431,12 +431,12 @@ class OrderRepositoryTest extends KernelTestCase
         $comparison = $this->repository->getYearComparison(2024, 2023);
 
         // Assert
-        $this->assertEquals(2024, $comparison['current']['year']);
-        $this->assertEquals(2023, $comparison['previous']['year']);
-        $this->assertEquals(5000.0, $comparison['current']['revenue']);
-        $this->assertEquals(1000.0, $comparison['previous']['revenue']);
-        $this->assertEquals(2, $comparison['current']['count']);
-        $this->assertEquals(2, $comparison['previous']['count']);
+        static::assertSame(2024, $comparison['current']['year']);
+        static::assertSame(2023, $comparison['previous']['year']);
+        static::assertSame(5000.0, $comparison['current']['revenue']);
+        static::assertSame(1000.0, $comparison['previous']['revenue']);
+        static::assertSame(2, $comparison['current']['count']);
+        static::assertSame(2, $comparison['previous']['count']);
     }
 
     public function testCountOrdersInPeriod(): void
@@ -456,7 +456,7 @@ class OrderRepositoryTest extends KernelTestCase
         $count = $this->repository->countOrdersInPeriod(new DateTime('2024-01-01'), new DateTime('2024-02-28'));
 
         // Assert
-        $this->assertEquals(2, $count);
+        static::assertSame(2, $count);
     }
 
     public function testSearch(): void
@@ -480,13 +480,13 @@ class OrderRepositoryTest extends KernelTestCase
         $results3 = $this->repository->search('ACME');
 
         // Assert
-        $this->assertCount(1, $results1);
-        $this->assertEquals($order1->id, $results1[0]->id);
+        static::assertCount(1, $results1);
+        static::assertEquals($order1->id, $results1[0]->id);
 
-        $this->assertCount(1, $results2);
-        $this->assertEquals($order1->id, $results2[0]->id);
+        static::assertCount(1, $results2);
+        static::assertEquals($order1->id, $results2[0]->id);
 
-        $this->assertCount(2, $results3);
+        static::assertCount(2, $results3);
     }
 
     public function testSearchWithLimit(): void
@@ -494,7 +494,7 @@ class OrderRepositoryTest extends KernelTestCase
         // Arrange
         $project = $this->createProject('Test Project');
         for ($i = 1; $i <= 10; ++$i) {
-            $order = $this->createOrder($project, "Order $i");
+            $order = $this->createOrder($project, "Order {$i}");
             $order->setOrderNumber('D202401-'.str_pad((string) $i, 3, '0', STR_PAD_LEFT));
         }
         $this->entityManager->flush();
@@ -503,7 +503,7 @@ class OrderRepositoryTest extends KernelTestCase
         $results = $this->repository->search('D202401', 3);
 
         // Assert
-        $this->assertCount(3, $results);
+        static::assertCount(3, $results);
     }
 
     // Helper methods

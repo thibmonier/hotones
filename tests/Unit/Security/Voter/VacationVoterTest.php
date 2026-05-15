@@ -84,7 +84,7 @@ final class VacationVoterTest extends TestCase
         $owner = $this->makeUser($company, ['ROLE_INTERVENANT', 'ROLE_MANAGER'], id: 1);
         $vacation = $this->makeVacation($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $vacation, VacationVoter::APPROVE));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $vacation, VacationVoter::APPROVE));
     }
 
     public function testManagerCanApproveOthers(): void
@@ -94,7 +94,7 @@ final class VacationVoterTest extends TestCase
         $manager = $this->makeUser($company, ['ROLE_MANAGER'], id: 2);
         $vacation = $this->makeVacation($company, $owner);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $vacation, VacationVoter::APPROVE));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $vacation, VacationVoter::APPROVE));
     }
 
     public function testOwnerCanCancelBeforeApproval(): void
@@ -103,7 +103,7 @@ final class VacationVoterTest extends TestCase
         $owner = $this->makeUser($company, ['ROLE_INTERVENANT'], id: 1);
         $vacation = $this->makeVacation($company, $owner, VacationStatus::PENDING);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($owner, $vacation, VacationVoter::CANCEL));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($owner, $vacation, VacationVoter::CANCEL));
     }
 
     public function testOwnerCannotCancelAfterApproval(): void
@@ -112,7 +112,7 @@ final class VacationVoterTest extends TestCase
         $owner = $this->makeUser($company, ['ROLE_INTERVENANT'], id: 1);
         $vacation = $this->makeVacation($company, $owner, VacationStatus::APPROVED);
 
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $vacation, VacationVoter::CANCEL));
+        static::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($owner, $vacation, VacationVoter::CANCEL));
     }
 
     public function testManagerCanCancelEvenAfterApproval(): void
@@ -122,6 +122,6 @@ final class VacationVoterTest extends TestCase
         $manager = $this->makeUser($company, ['ROLE_MANAGER'], id: 2);
         $vacation = $this->makeVacation($company, $owner, VacationStatus::APPROVED);
 
-        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $vacation, VacationVoter::CANCEL));
+        static::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($manager, $vacation, VacationVoter::CANCEL));
     }
 }

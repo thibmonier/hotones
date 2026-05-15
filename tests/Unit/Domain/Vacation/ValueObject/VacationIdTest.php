@@ -16,9 +16,9 @@ final class VacationIdTest extends TestCase
     public function testGenerateProducesValidUuid(): void
     {
         $id = VacationId::generate();
-        self::assertNotEmpty($id->getValue());
+        static::assertNotEmpty($id->getValue());
         // RFC 4122 format : xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        self::assertMatchesRegularExpression(
+        static::assertMatchesRegularExpression(
             '/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/',
             $id->getValue(),
         );
@@ -28,7 +28,7 @@ final class VacationIdTest extends TestCase
     {
         $uuid = '12345678-1234-4321-8123-123456789abc';
         $id = VacationId::fromString($uuid);
-        self::assertSame($uuid, $id->getValue());
+        static::assertSame($uuid, $id->getValue());
     }
 
     public function testFromStringInvalidThrows(): void
@@ -50,7 +50,7 @@ final class VacationIdTest extends TestCase
         $a = VacationId::fromString($uuid);
         $b = VacationId::fromString($uuid);
 
-        self::assertTrue($a->equals($b));
+        static::assertTrue($a->equals($b));
     }
 
     public function testNotEqualsForDifferentUuids(): void
@@ -58,7 +58,7 @@ final class VacationIdTest extends TestCase
         $a = VacationId::fromString('12345678-1234-4321-8123-123456789abc');
         $b = VacationId::fromString('aaaaaaaa-bbbb-4ccc-9ddd-eeeeeeeeeeee');
 
-        self::assertFalse($a->equals($b));
+        static::assertFalse($a->equals($b));
     }
 
     public function testGenerateProducesUniqueIds(): void
@@ -66,13 +66,13 @@ final class VacationIdTest extends TestCase
         $a = VacationId::generate();
         $b = VacationId::generate();
 
-        self::assertFalse($a->equals($b));
+        static::assertFalse($a->equals($b));
     }
 
     public function testToStringReturnsValue(): void
     {
         $uuid = '12345678-1234-4321-8123-123456789abc';
         $id = VacationId::fromString($uuid);
-        self::assertSame($uuid, (string) $id);
+        static::assertSame($uuid, (string) $id);
     }
 }

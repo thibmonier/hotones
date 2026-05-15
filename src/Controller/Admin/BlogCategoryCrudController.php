@@ -66,7 +66,7 @@ class BlogCategoryCrudController extends AbstractCrudController
         );
 
         yield IntegerField::new('posts.count', 'Nombre d\'articles')->hideOnForm()->formatValue(
-            fn ($value, BlogCategory $entity) => $entity->getPosts()->count(),
+            static fn ($value, BlogCategory $entity) => $entity->getPosts()->count(),
         );
     }
 

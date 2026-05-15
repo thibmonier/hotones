@@ -24,11 +24,11 @@ final class MarginAdoptionCalculatorTest extends TestCase
     {
         $stats = $this->calculator->classify([], $this->now);
 
-        self::assertSame(0, $stats->totalActive);
-        self::assertSame(0, $stats->freshCount);
-        self::assertSame(0, $stats->staleWarningCount);
-        self::assertSame(0, $stats->staleCriticalCount);
-        self::assertSame(0.0, $stats->freshPercent);
+        static::assertSame(0, $stats->totalActive);
+        static::assertSame(0, $stats->freshCount);
+        static::assertSame(0, $stats->staleWarningCount);
+        static::assertSame(0, $stats->staleCriticalCount);
+        static::assertSame(0.0, $stats->freshPercent);
     }
 
     public function testClassifiesRecordsByAge(): void
@@ -48,11 +48,11 @@ final class MarginAdoptionCalculatorTest extends TestCase
 
         $stats = $this->calculator->classify($records, $this->now);
 
-        self::assertSame(6, $stats->totalActive);
-        self::assertSame(2, $stats->freshCount);
-        self::assertSame(2, $stats->staleWarningCount);
-        self::assertSame(2, $stats->staleCriticalCount);
-        self::assertEqualsWithDelta(33.3, $stats->freshPercent, 0.1);
+        static::assertSame(6, $stats->totalActive);
+        static::assertSame(2, $stats->freshCount);
+        static::assertSame(2, $stats->staleWarningCount);
+        static::assertSame(2, $stats->staleCriticalCount);
+        static::assertEqualsWithDelta(33.3, $stats->freshPercent, 0.1);
     }
 
     public function testBoundary7DaysGoesToStaleWarning(): void
@@ -61,8 +61,8 @@ final class MarginAdoptionCalculatorTest extends TestCase
 
         $stats = $this->calculator->classify($records, $this->now);
 
-        self::assertSame(0, $stats->freshCount);
-        self::assertSame(1, $stats->staleWarningCount);
+        static::assertSame(0, $stats->freshCount);
+        static::assertSame(1, $stats->staleWarningCount);
     }
 
     public function testBoundary30DaysGoesToStaleCritical(): void
@@ -71,8 +71,8 @@ final class MarginAdoptionCalculatorTest extends TestCase
 
         $stats = $this->calculator->classify($records, $this->now);
 
-        self::assertSame(0, $stats->staleWarningCount);
-        self::assertSame(1, $stats->staleCriticalCount);
+        static::assertSame(0, $stats->staleWarningCount);
+        static::assertSame(1, $stats->staleCriticalCount);
     }
 
     public function testNullMarginCalculatedAtAlwaysStaleCritical(): void
@@ -84,8 +84,8 @@ final class MarginAdoptionCalculatorTest extends TestCase
 
         $stats = $this->calculator->classify($records, $this->now);
 
-        self::assertSame(2, $stats->staleCriticalCount);
-        self::assertSame(0.0, $stats->freshPercent);
+        static::assertSame(2, $stats->staleCriticalCount);
+        static::assertSame(0.0, $stats->freshPercent);
     }
 
     public function testFreshPercentComputedCorrectly(): void
@@ -99,8 +99,8 @@ final class MarginAdoptionCalculatorTest extends TestCase
 
         $stats = $this->calculator->classify($records, $this->now);
 
-        self::assertSame(3, $stats->freshCount);
-        self::assertSame(75.0, $stats->freshPercent);
+        static::assertSame(3, $stats->freshCount);
+        static::assertSame(75.0, $stats->freshPercent);
     }
 
     private function record(int $projectId, string $name, ?int $daysAgo): ProjectMarginSnapshotRecord

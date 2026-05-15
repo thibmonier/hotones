@@ -30,17 +30,17 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             projectId: null,
             reference: 'D202601-001',
             contractType: 'forfait',
-            amount: 10000.0,
+            amount: 10_000.0,
         ));
 
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(55, $id->toLegacyInt());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(55, $id->toLegacyInt());
     }
 
     public function testContractTypeForfait(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat): void {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatOrder $flat) use (&$persistedFlat): void {
             $persistedFlat = clone $flat;
         });
 
@@ -52,7 +52,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             amount: 5000.0,
         ));
 
-        $this->assertNotNull($persistedFlat);
+        static::assertNotNull($persistedFlat);
     }
 
     public function testContractTypeRegie(): void
@@ -67,7 +67,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             amount: 5000.0,
         ));
 
-        $this->assertSame(1, $id->toLegacyInt());
+        static::assertSame(1, $id->toLegacyInt());
     }
 
     public function testContractTypeAlternativeSpellings(): void
@@ -109,7 +109,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     public function testTitleAndDescriptionApplied(): void
     {
         $persistedFlat = null;
-        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: function (FlatOrder $flat) use (&$persistedFlat): void {
+        $useCase = $this->makeUseCase(persistedId: 1, persistCapture: static function (FlatOrder $flat) use (&$persistedFlat): void {
             $persistedFlat = clone $flat;
         });
 
@@ -123,8 +123,8 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             description: 'Detailed scope',
         ));
 
-        $this->assertSame('Custom title', $persistedFlat->name);
-        $this->assertSame('Detailed scope', $persistedFlat->description);
+        static::assertSame('Custom title', $persistedFlat->name);
+        static::assertSame('Detailed scope', $persistedFlat->description);
     }
 
     public function testProjectAttached(): void
@@ -138,7 +138,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             && 33 === $id
                 ? $project
                 : null);
-        $em->method('persist')->willReturnCallback(function (FlatOrder $flat): void {
+        $em->method('persist')->willReturnCallback(static function (FlatOrder $flat): void {
             new ReflectionProperty(FlatOrder::class, 'id')->setValue($flat, 9);
         });
         $em->method('flush');
@@ -156,7 +156,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
             amount: 1000.0,
         ));
 
-        $this->assertSame(9, $id->toLegacyInt());
+        static::assertSame(9, $id->toLegacyInt());
     }
 
     /**
@@ -165,7 +165,7 @@ final class CreateOrderQuoteUseCaseTest extends TestCase
     private function makeUseCase(int $persistedId, ?callable $persistCapture = null): CreateOrderQuoteUseCase
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (FlatOrder $flat) use (
+        $em->method('persist')->willReturnCallback(static function (FlatOrder $flat) use (
             $persistedId,
             $persistCapture,
         ): void {

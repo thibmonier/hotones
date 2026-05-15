@@ -22,8 +22,8 @@ final class WeeklyTimesheetControllerTest extends TestCase
         $reflection = new ReflectionClass(WeeklyTimesheetController::class);
         $attrs = $reflection->getAttributes(IsGranted::class);
 
-        self::assertNotEmpty($attrs, 'Controller must require ROLE_INTERVENANT');
-        self::assertSame('ROLE_INTERVENANT', $attrs[0]->getArguments()[0]);
+        static::assertNotEmpty($attrs, 'Controller must require ROLE_INTERVENANT');
+        static::assertSame('ROLE_INTERVENANT', $attrs[0]->getArguments()[0]);
     }
 
     public function testControllerRoutePrefix(): void
@@ -31,9 +31,9 @@ final class WeeklyTimesheetControllerTest extends TestCase
         $reflection = new ReflectionClass(WeeklyTimesheetController::class);
         $attrs = $reflection->getAttributes(Route::class);
 
-        self::assertNotEmpty($attrs);
+        static::assertNotEmpty($attrs);
         $route = $attrs[0]->newInstance();
-        self::assertSame('/timesheet/week', $route->path);
+        static::assertSame('/timesheet/week', $route->path);
     }
 
     public function testIndexRouteAcceptsIsoWeekFormat(): void
@@ -42,10 +42,10 @@ final class WeeklyTimesheetControllerTest extends TestCase
         $method = $reflection->getMethod('index');
         $attrs = $method->getAttributes(Route::class);
 
-        self::assertNotEmpty($attrs);
+        static::assertNotEmpty($attrs);
         $route = $attrs[0]->newInstance();
-        self::assertSame('weekly_timesheet_index', $route->name);
-        self::assertSame(['GET'], $route->methods);
+        static::assertSame('weekly_timesheet_index', $route->name);
+        static::assertSame(['GET'], $route->methods);
     }
 
     public function testSaveRouteAcceptsPost(): void
@@ -54,11 +54,11 @@ final class WeeklyTimesheetControllerTest extends TestCase
         $method = $reflection->getMethod('save');
         $attrs = $method->getAttributes(Route::class);
 
-        self::assertNotEmpty($attrs);
+        static::assertNotEmpty($attrs);
         $route = $attrs[0]->newInstance();
-        self::assertSame('weekly_timesheet_save', $route->name);
-        self::assertSame(['POST'], $route->methods);
-        self::assertSame('/save', $route->path);
+        static::assertSame('weekly_timesheet_save', $route->name);
+        static::assertSame(['POST'], $route->methods);
+        static::assertSame('/save', $route->path);
     }
 
     public function testIsoWeekParserMethodSignature(): void
@@ -66,8 +66,8 @@ final class WeeklyTimesheetControllerTest extends TestCase
         $reflection = new ReflectionClass(WeeklyTimesheetController::class);
         $method = $reflection->getMethod('parseIsoWeek');
 
-        self::assertCount(1, $method->getParameters());
-        self::assertSame('week', $method->getParameters()[0]->getName());
-        self::assertTrue($method->isPrivate());
+        static::assertCount(1, $method->getParameters());
+        static::assertSame('week', $method->getParameters()[0]->getName());
+        static::assertTrue($method->isPrivate());
     }
 }

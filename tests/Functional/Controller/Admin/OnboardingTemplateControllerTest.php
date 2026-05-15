@@ -149,9 +149,9 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         // Verify template was created
         $template = $this->templateRepository->findOneBy(['name' => 'New Template']);
-        $this->assertNotNull($template);
-        $this->assertEquals('A new onboarding template', $template->getDescription());
-        $this->assertCount(1, $template->getTasks());
+        static::assertNotNull($template);
+        static::assertSame('A new onboarding template', $template->getDescription());
+        static::assertCount(1, $template->getTasks());
     }
 
     public function testCreateRequiresName(): void
@@ -247,9 +247,9 @@ class OnboardingTemplateControllerTest extends WebTestCase
         $em->clear();
 
         $updatedTemplate = $this->templateRepository->find($template->getId());
-        $this->assertEquals('Updated Name', $updatedTemplate->getName());
-        $this->assertEquals('Updated description', $updatedTemplate->getDescription());
-        $this->assertTrue($updatedTemplate->isActive());
+        static::assertSame('Updated Name', $updatedTemplate->getName());
+        static::assertSame('Updated description', $updatedTemplate->getDescription());
+        static::assertTrue($updatedTemplate->isActive());
     }
 
     public function testDuplicateCreatesNewTemplate(): void
@@ -271,10 +271,10 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         // Verify duplicate was created
         $duplicate = $this->templateRepository->findOneBy(['name' => 'Duplicated Template']);
-        $this->assertNotNull($duplicate);
-        $this->assertNotEquals($template->getId(), $duplicate->getId());
-        $this->assertEquals($template->getDescription(), $duplicate->getDescription());
-        $this->assertTrue($duplicate->isActive()); // Duplicates are active by default
+        static::assertNotNull($duplicate);
+        static::assertNotEquals($template->getId(), $duplicate->getId());
+        static::assertEquals($template->getDescription(), $duplicate->getDescription());
+        static::assertTrue($duplicate->isActive()); // Duplicates are active by default
     }
 
     public function testToggleChangesActiveStatus(): void
@@ -304,7 +304,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
         // Verify status changed
         $em->clear();
         $toggledTemplate = $this->templateRepository->find($template->getId());
-        $this->assertFalse($toggledTemplate->isActive());
+        static::assertFalse($toggledTemplate->isActive());
     }
 
     public function testDeleteRemovesTemplate(): void
@@ -330,7 +330,7 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         // Verify template was deleted
         $deletedTemplate = $this->templateRepository->find($templateId);
-        $this->assertNull($deletedTemplate);
+        static::assertNull($deletedTemplate);
     }
 
     public function testCreateWithProfile(): void
@@ -364,8 +364,8 @@ class OnboardingTemplateControllerTest extends WebTestCase
 
         // Verify template has profile
         $template = $this->templateRepository->findOneBy(['name' => 'Developer Template']);
-        $this->assertNotNull($template);
-        $this->assertNotNull($template->getProfile());
-        $this->assertEquals('Developer', $template->getProfile()->getName());
+        static::assertNotNull($template);
+        static::assertNotNull($template->getProfile());
+        static::assertSame('Developer', $template->getProfile()->getName());
     }
 }

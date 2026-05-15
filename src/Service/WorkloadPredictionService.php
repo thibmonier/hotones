@@ -83,7 +83,7 @@ class WorkloadPredictionService
         }
 
         // Trier le pipeline par probabilité décroissante
-        usort($pipeline, fn ($a, $b): int => $b['winProbability'] <=> $a['winProbability']);
+        usort($pipeline, static fn ($a, $b): int => $b['winProbability'] <=> $a['winProbability']);
 
         // Trier les mois chronologiquement
         ksort($workloadByMonth);
@@ -139,11 +139,11 @@ class WorkloadPredictionService
 
         // Facteur 4 : Montant du devis (les gros montants ont moins de chance)
         $amount = (float) $order->getTotalAmount();
-        if ($amount > 100000) {
+        if ($amount > 100_000) {
             $probability -= 15;
-        } elseif ($amount > 50000) {
+        } elseif ($amount > 50_000) {
             $probability -= 5;
-        } elseif ($amount < 10000) {
+        } elseif ($amount < 10_000) {
             $probability += 10; // Petits montants plus faciles à signer
         }
 
@@ -176,9 +176,11 @@ class WorkloadPredictionService
 
         $signedCount = 0;
         foreach ($allOrders as $order) {
-            if (in_array($order->getStatus(), ['signe', 'gagne', 'termine'], true)) {
-                ++$signedCount;
+            if (!in_array($order->getStatus(), ['signe', 'gagne', 'termine'], true)) {
+                continue;
             }
+
+            ++$signedCount;
         }
 
         return ($signedCount / count($allOrders)) * 100;
@@ -204,9 +206,11 @@ class WorkloadPredictionService
 
         $signedCount = 0;
         foreach ($orders as $order) {
-            if (in_array($order->getStatus(), ['signe', 'gagne', 'termine'], true)) {
-                ++$signedCount;
+            if (!in_array($order->getStatus(), ['signe', 'gagne', 'termine'], true)) {
+                continue;
             }
+
+            ++$signedCount;
         }
 
         return ($signedCount / count($orders)) * 100;

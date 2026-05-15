@@ -54,7 +54,7 @@ final class ApproveVacationHandlerTest extends KernelTestCase
         ($this->approveHandler)(new ApproveVacationCommand($vacationId->getValue(), $manager->getId()));
 
         $vacation = $this->repository->findById($vacationId);
-        self::assertSame(VacationStatus::APPROVED, $vacation->getStatus());
+        static::assertSame(VacationStatus::APPROVED, $vacation->getStatus());
     }
 
     public function testHandlerRejectsApprovalOfAlreadyApprovedVacation(): void

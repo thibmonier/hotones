@@ -61,12 +61,12 @@ final class MarginAdoptionFlowTest extends KernelTestCase
 
         $kpi = ($this->computeKpi)($this->today);
 
-        self::assertSame(5, $kpi->stats->totalActive);
-        self::assertSame(2, $kpi->stats->freshCount);
-        self::assertSame(1, $kpi->stats->staleWarningCount);
-        self::assertSame(2, $kpi->stats->staleCriticalCount);
-        self::assertEqualsWithDelta(40.0, $kpi->stats->freshPercent, 0.5);
-        self::assertTrue($kpi->warningTriggered, 'freshPercent 40 % < seuil warning 60 %');
+        static::assertSame(5, $kpi->stats->totalActive);
+        static::assertSame(2, $kpi->stats->freshCount);
+        static::assertSame(1, $kpi->stats->staleWarningCount);
+        static::assertSame(2, $kpi->stats->staleCriticalCount);
+        static::assertEqualsWithDelta(40.0, $kpi->stats->freshPercent, 0.5);
+        static::assertTrue($kpi->warningTriggered, 'freshPercent 40 % < seuil warning 60 %');
     }
 
     public function testSlackAlertFiredAfter7ConsecutiveRedDays(): void
@@ -81,14 +81,14 @@ final class MarginAdoptionFlowTest extends KernelTestCase
         for ($i = 6; $i >= 1; --$i) {
             $checker($this->today->modify(sprintf('-%d days', $i)));
         }
-        self::assertSame(0, $slackSpy->callCount, 'no alert before day 7');
+        static::assertSame(0, $slackSpy->callCount, 'no alert before day 7');
 
         // Day 7 : alert fires
         $checker($this->today);
 
-        self::assertSame(1, $slackSpy->callCount);
-        self::assertStringContainsString('7 jours', $slackSpy->lastTitle);
-        self::assertSame(AlertSeverity::CRITICAL, $slackSpy->lastSeverity);
+        static::assertSame(1, $slackSpy->callCount);
+        static::assertStringContainsString('7 jours', $slackSpy->lastTitle);
+        static::assertSame(AlertSeverity::CRITICAL, $slackSpy->lastSeverity);
     }
 
     public function testGreenDayResetsStreak(): void
@@ -117,7 +117,7 @@ final class MarginAdoptionFlowTest extends KernelTestCase
             $checker($this->today->modify(sprintf('-%d days', $i)));
         }
 
-        self::assertSame(0, $slackSpy->callCount, 'green day reset streak prevents alert');
+        static::assertSame(0, $slackSpy->callCount, 'green day reset streak prevents alert');
     }
 
     public function testNoAlertWhenNoActiveProjects(): void
@@ -129,7 +129,7 @@ final class MarginAdoptionFlowTest extends KernelTestCase
             $checker($this->today->modify(sprintf('-%d days', $i)));
         }
 
-        self::assertSame(0, $slackSpy->callCount);
+        static::assertSame(0, $slackSpy->callCount);
     }
 
     public function testRepositoryFiltersActiveOnly(): void
@@ -150,8 +150,8 @@ final class MarginAdoptionFlowTest extends KernelTestCase
 
         $records = $this->repository->findActiveWithMarginSnapshot();
 
-        self::assertCount(1, $records);
-        self::assertSame('Active', $records[0]->projectName);
+        static::assertCount(1, $records);
+        static::assertSame('Active', $records[0]->projectName);
     }
 
     private function buildChecker(SlackAlertingInterface $slack): CheckMarginAdoptionRedThresholdHandler

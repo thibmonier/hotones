@@ -13,13 +13,13 @@ final class ContributorIdTest extends TestCase
 {
     public function testGenerate(): void
     {
-        $this->assertTrue(Uuid::isValid(ContributorId::generate()->getValue()));
+        static::assertTrue(Uuid::isValid(ContributorId::generate()->getValue()));
     }
 
     public function testFromString(): void
     {
         $uuid = Uuid::v4()->toRfc4122();
-        $this->assertSame($uuid, ContributorId::fromString($uuid)->getValue());
+        static::assertSame($uuid, ContributorId::fromString($uuid)->getValue());
     }
 
     public function testFromStringRejectsInvalidUuid(): void
@@ -31,9 +31,9 @@ final class ContributorIdTest extends TestCase
     public function testFromLegacyInt(): void
     {
         $id = ContributorId::fromLegacyInt(42);
-        $this->assertTrue($id->isLegacy());
-        $this->assertSame(42, $id->toLegacyInt());
-        $this->assertSame('legacy:42', $id->getValue());
+        static::assertTrue($id->isLegacy());
+        static::assertSame(42, $id->toLegacyInt());
+        static::assertSame('legacy:42', $id->getValue());
     }
 
     public function testFromLegacyIntRejectsZero(): void
@@ -50,17 +50,17 @@ final class ContributorIdTest extends TestCase
 
     public function testIsLegacyFalseForUuid(): void
     {
-        $this->assertFalse(ContributorId::generate()->isLegacy());
+        static::assertFalse(ContributorId::generate()->isLegacy());
     }
 
     public function testEquals(): void
     {
-        $this->assertTrue(ContributorId::fromLegacyInt(7)->equals(ContributorId::fromLegacyInt(7)));
-        $this->assertFalse(ContributorId::fromLegacyInt(7)->equals(ContributorId::fromLegacyInt(8)));
+        static::assertTrue(ContributorId::fromLegacyInt(7)->equals(ContributorId::fromLegacyInt(7)));
+        static::assertFalse(ContributorId::fromLegacyInt(7)->equals(ContributorId::fromLegacyInt(8)));
     }
 
     public function testToString(): void
     {
-        $this->assertSame('legacy:5', (string) ContributorId::fromLegacyInt(5));
+        static::assertSame('legacy:5', (string) ContributorId::fromLegacyInt(5));
     }
 }

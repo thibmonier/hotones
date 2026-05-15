@@ -98,7 +98,7 @@ final class WorkItemBillingCrossAggregateTest extends TestCase
         $eventBus = $this->createMock(\Symfony\Component\Messenger\MessageBusInterface::class);
         $dispatched = [];
         $eventBus->method('dispatch')
-            ->willReturnCallback(function (object $event) use (&$dispatched): Envelope {
+            ->willReturnCallback(static function (object $event) use (&$dispatched): Envelope {
                 $dispatched[] = $event;
 
                 return new Envelope($event);
@@ -118,11 +118,11 @@ final class WorkItemBillingCrossAggregateTest extends TestCase
         $listener($invoiceCreated);
 
         // Assert : both WorkItems billed + WorkItemBilledEvent dispatched per item
-        self::assertSame(WorkItemStatus::BILLED, $workItem1->getStatus());
-        self::assertSame(WorkItemStatus::BILLED, $workItem2->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem1->getStatus());
+        static::assertSame(WorkItemStatus::BILLED, $workItem2->getStatus());
 
         $billedEvents = array_filter($dispatched, static fn ($e) => $e instanceof \App\Domain\WorkItem\Event\WorkItemBilledEvent);
-        self::assertCount(2, $billedEvents);
+        static::assertCount(2, $billedEvents);
     }
 
     public function testInvoiceCreatedEventEmptyWorkItemIdsIsNoOp(): void

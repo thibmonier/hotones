@@ -38,10 +38,10 @@ class RiskController extends AbstractController
             'atRisk' => count($atRiskProjects),
             'critical' => count(array_filter(
                 $atRiskProjects,
-                fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
+                static fn ($p): bool => $p['analysis']['riskLevel'] === 'critical',
             )),
-            'high' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
-            'medium' => count(array_filter($atRiskProjects, fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
+            'high' => count(array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['riskLevel'] === 'high')),
+            'medium' => count(array_filter($atRiskProjects, static fn ($p): bool => $p['analysis']['riskLevel'] === 'medium')),
         ];
 
         return $this->render('risk/projects_dashboard.html.twig', [
