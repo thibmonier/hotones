@@ -41,6 +41,28 @@ final readonly class CachingDsoReadModelRepository implements DsoReadModelReposi
         );
     }
 
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+    {
+        $cacheKey = $this->buildClientsCacheKey($windowDays, $now);
+
+        return $this->kpiCache->get(
+            $cacheKey,
+            fn (ItemInterface $item): array => $this->inner->findAllClientsAggregated($windowDays, $now),
+        );
+    }
+
+    private function buildClientsCacheKey(int $windowDays, DateTimeImmutable $now): string
+    {
+        $companyId = $this->companyContext->getCurrentCompany()->getId() ?? 0;
+
+        return sprintf(
+            'dso.clients_aggregated.company_%d.window_%d.day_%s',
+            $companyId,
+            $windowDays,
+            $now->format('Y-m-d'),
+        );
+    }
+
     private function buildCacheKey(int $windowDays, DateTimeImmutable $now): string
     {
         $companyId = $this->companyContext->getCurrentCompany()->getId() ?? 0;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Project\Repository;
 
+use App\Domain\Project\Service\ClientDsoAggregate;
 use App\Domain\Project\Service\InvoicePaymentRecord;
 use DateTimeImmutable;
 
@@ -27,4 +28,15 @@ interface DsoReadModelRepositoryInterface
      * @return list<InvoicePaymentRecord>
      */
     public function findPaidInRollingWindow(int $windowDays, DateTimeImmutable $now): array;
+
+    /**
+     * Find DSO aggregated by client within the rolling window (US-116 drill-down).
+     *
+     * SQL `GROUP BY client_id` : retourne pour chaque client le DSO moyen
+     * (delay paiement pondéré par montant) + le nombre de factures payées
+     * sur la fenêtre. Tri valeur décroissante (clients lents en tête).
+     *
+     * @return list<ClientDsoAggregate>
+     */
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array;
 }
