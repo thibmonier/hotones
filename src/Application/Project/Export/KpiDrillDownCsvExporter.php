@@ -7,8 +7,8 @@ namespace App\Application\Project\Export;
 use App\Domain\Project\Service\ClientBillingLeadTimeAggregate;
 use App\Domain\Project\Service\ClientDsoAggregate;
 use DateTimeImmutable;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Streamed CSV exporter pour drill-down KPI dashboard (US-116 T-116-03).
@@ -30,34 +30,10 @@ final readonly class KpiDrillDownCsvExporter
             new DateTimeImmutable()->format('Y-m-d-His'),
         );
 
-        $response = new StreamedResponse(function () use ($window, $aggregates): void {
-            $handle = fopen('php://output', 'wb');
-            if ($handle === false) {
-                return;
-            }
-
-            fputcsv($handle, ['client_name', 'valeur_kpi', 'sample_count', 'window'], escape: '');
-
-            foreach ($aggregates as $agg) {
-                $value = $agg instanceof ClientDsoAggregate
-                    ? $agg->dsoAverageDays
-                    : $agg->leadTimeAverageDays;
-
-                fputcsv(
-                    $handle,
-                    [
-                        $agg->clientName,
-                        sprintf('%.1f', $value),
-                        $agg->sampleCount,
-                        sprintf('%dj', $window),
-                    ],
-                    escape: '',
-                );
-            }
-
-            fclose($handle);
-        });
-
+        // Réponse non-streamée pour testabilité (StreamedResponse callback ne
+        // s'exécute pas dans BrowserKit sans terminate()). Volume max attendu
+        // ~quelques centaines de lignes — pas besoin de streaming.
+        $response = new Response($this->buildCsvString($window, $aggregates));
         $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
         $response->headers->set(
             'Content-Disposition',
@@ -65,5 +41,41 @@ final readonly class KpiDrillDownCsvExporter
         );
 
         return $response;
+    }
+
+    /**
+     * @param list<ClientDsoAggregate>|list<ClientBillingLeadTimeAggregate> $aggregates
+     */
+    public function buildCsvString(int $window, array $aggregates): string
+    {
+        $handle = fopen('php://temp', 'r+b');
+        if ($handle === false) {
+            throw new RuntimeException('Cannot open temp stream for CSV');
+        }
+
+        fputcsv($handle, ['client_name', 'valeur_kpi', 'sample_count', 'window'], escape: '');
+
+        foreach ($aggregates as $agg) {
+            $value = $agg instanceof ClientDsoAggregate
+                ? $agg->dsoAverageDays
+                : $agg->leadTimeAverageDays;
+
+            fputcsv(
+                $handle,
+                [
+                    $agg->clientName,
+                    sprintf('%.1f', $value),
+                    $agg->sampleCount,
+                    sprintf('%dj', $window),
+                ],
+                escape: '',
+            );
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return $csv === false ? '' : $csv;
     }
 }
