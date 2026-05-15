@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Project\UseCase\CalculateProjectMargin;
 
 use App\Domain\Project\Event\MarginThresholdExceededEvent;
+use App\Domain\Project\Event\ProjectMarginRecalculatedEvent;
 use App\Domain\Project\Repository\ProjectRepositoryInterface;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Shared\ValueObject\Money;
@@ -64,6 +65,16 @@ final readonly class CalculateProjectMarginUseCase
 
         $project->setMargeSnapshot($coutTotal, $factureTotal);
         $this->projectRepository->save($project);
+
+        // EPIC-003 Phase 5 (sprint-026 US-117 T-117-03) — dispatch systématique
+        // pour invalidation des caches portefeuille à chaque snapshot recalculé.
+        $this->eventBus->dispatch(ProjectMarginRecalculatedEvent::create(
+            projectId: $projectId,
+            projectName: $project->getName(),
+            costTotal: $coutTotal,
+            invoicedPaidTotal: $factureTotal,
+            marginPercent: $project->getMargePercent(),
+        ));
 
         // EPIC-003 Phase 3 (sprint-023 US-108 ADR-0016 Q5.1 D) — resolution
         // hiérarchique seuil marge : Project override → Client override →

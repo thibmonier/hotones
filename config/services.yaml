@@ -128,11 +128,22 @@ services:
         alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineMarginAdoptionReadModelRepository
         public: true
 
-    # Portfolio Margin Read-Model Repository (EPIC-003 Phase 5 sprint-026 US-117 T-117-02)
-    # public: true tant que pas de consumer downstream (T-117-04 Widget). Decorator caching ajouté T-117-03.
+    # Portfolio Margin Read-Model Repository (EPIC-003 Phase 5 sprint-026 US-117 T-117-02/03)
+    # public: true tant que pas de consumer downstream (T-117-04 Widget).
+    # T-117-03 caching decorator (cache.kpi 1h TTL) — invalidé event-driven
+    # ProjectMarginRecalculatedEvent + rotation journalière filet sécurité.
     App\Domain\Project\Repository\PortfolioMarginReadModelRepositoryInterface:
-        alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrinePortfolioMarginReadModelRepository
+        alias: App\Infrastructure\Project\Persistence\Doctrine\CachingPortfolioMarginReadModelRepository
         public: true
+
+    App\Infrastructure\Project\Persistence\Doctrine\CachingPortfolioMarginReadModelRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Project\Persistence\Doctrine\DoctrinePortfolioMarginReadModelRepository'
+            $kpiCache: '@cache.kpi'
+
+    App\Application\Project\EventListener\InvalidatePortfolioMarginCacheOnProjectMarginRecalculated:
+        arguments:
+            $kpiCache: '@cache.kpi'
 
     # T-112-04 Margin adoption red threshold checker (Slack persistent 7j)
     App\Application\Project\Alerting\CheckMarginAdoptionRedThresholdHandler:

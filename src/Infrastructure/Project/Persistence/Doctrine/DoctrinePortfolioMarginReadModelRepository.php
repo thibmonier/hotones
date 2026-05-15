@@ -33,8 +33,11 @@ final readonly class DoctrinePortfolioMarginReadModelRepository implements Portf
     ) {
     }
 
-    public function findActiveProjectsWithSnapshot(): array
+    public function findActiveProjectsWithSnapshot(DateTimeImmutable $now): array
     {
+        // $now ignoré : query time-agnostic (snapshot état courant). Utilisé par le cache decorator.
+        unset($now);
+
         $company = $this->companyContext->getCurrentCompany();
 
         $rows = $this->entityManager->createQueryBuilder()
