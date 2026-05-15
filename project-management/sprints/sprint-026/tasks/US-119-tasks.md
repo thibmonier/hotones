@@ -19,10 +19,10 @@
 
 | ID | Type | Tâche | Estimation | Dépend de | Statut |
 |----|------|-------|-----------:|-----------|--------|
-| T-119-01 | [BE]   | Étendre read-models Conversion + Margin : `findAllClientsAggregated` | 1.5h | — | 🔲 |
-| T-119-02 | [FE-WEB] | Étendre controller drill-down + route regex + Twig adapt 4 KPIs | 2h | T-119-01 | 🔲 |
-| T-119-03 | [BE]   | Export CSV générique (extension `KpiDrillDownCsvExporter`) | 1h | T-119-01 | 🔲 |
-| T-119-04 | [TEST] | Tests Integration drill-down + Functional CSV | 1.5h | T-119-02, T-119-03 | 🔲 |
+| T-119-01 | [BE]   | Étendre read-models Conversion + Margin : `findAllClientsAggregated` | 1.5h | — | ✅ |
+| T-119-02 | [FE-WEB] | Étendre controller drill-down + route regex + Twig adapt 4 KPIs | 2h | T-119-01 | ✅ |
+| T-119-03 | [BE]   | Export CSV générique (extension `KpiDrillDownCsvExporter`) | 1h | T-119-01 | ✅ |
+| T-119-04 | [TEST] | Tests Integration drill-down + Functional CSV | 1.5h | T-119-02, T-119-03 | ✅ |
 
 **Total estimé** : 6h (≈ 2 pts)
 

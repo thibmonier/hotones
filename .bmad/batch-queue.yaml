@@ -3,49 +3,45 @@ execution:
   resume_on_failure: true
   checkpoint_interval: 1
   sprint: "sprint-026"
-  reset_at: "2026-05-15T17:30:00Z"
-  reset_reason: "Sprint-025 clôturé 12/12 pts. Sprint-026 décomposition prête (19 tâches, 12 pts) — EPIC-003 Phase 5 continuation (US-117 + US-119, 5 pts) + Sub-epic D dette résiduelle (6 pts) + Migration prod (1 pt)."
+  reset_at: "2026-05-15T20:30:00Z"
+  reset_reason: "Sprint-026 EPIC-003 Phase 5 continuation + dette + migration prod (19 tâches, 12 pts). US-117 PR #298 ouverte. US-119 sur feat/us-119-drill-down-conversion-margin."
 
 queue:
   US-117:
     title: "KPI Marge moyenne portefeuille"
     points: 3
     priority: 1
-    status: "completed"
+    status: "in_review"
     tasks_done: ["T-117-01", "T-117-02", "T-117-03", "T-117-04", "T-117-05", "T-117-06"]
+    pr: 298
     depends_on: []
     nature: "feature"
     epic: "EPIC-003 Phase 5"
     branch: "feat/us-117-portfolio-margin"
-    tasks:
-      - id: "T-117-01"
-        title: "Domain Service PortfolioMarginCalculator + VO + tests Unit"
-        estimate_hours: 3
-      - id: "T-117-02"
-        title: "Repository read-model port + Doctrine adapter"
-        estimate_hours: 2
-      - id: "T-117-03"
-        title: "Cache decorator + subscriber ProjectMarginRecalculatedEvent"
-        estimate_hours: 2
-      - id: "T-117-04"
-        title: "Widget Twig dashboard + handler CQRS"
-        estimate_hours: 2
-      - id: "T-117-05"
-        title: "Alerte Slack seuil rouge marge portefeuille"
-        estimate_hours: 1
-      - id: "T-117-06"
-        title: "Tests Integration E2E flow"
-        estimate_hours: 2
 
   US-119:
     title: "Extension drill-down Conversion + Margin"
     points: 2
     priority: 2
-    status: "pending"
+    status: "in_progress"
+    tasks_done: ["T-119-01", "T-119-02", "T-119-03", "T-119-04"]
     depends_on: ["US-117"]
     nature: "feature"
     epic: "EPIC-003 Phase 5"
     branch: "feat/us-119-drill-down-conversion-margin"
+    tasks:
+      - id: "T-119-01"
+        title: "Read-models Conversion + Margin findAllClientsAggregated"
+        estimate_hours: 1.5
+      - id: "T-119-02"
+        title: "Controller drill-down + route regex + Twig"
+        estimate_hours: 2
+      - id: "T-119-03"
+        title: "CSV exporter générique (4 types aggregate)"
+        estimate_hours: 1
+      - id: "T-119-04"
+        title: "Tests Integration + Functional (4 ajoutés)"
+        estimate_hours: 1.5
 
   MAGO-LINT-BATCH-002:
     title: "Cleanup Mago résiduel (200-300 erreurs ciblées)"
@@ -88,15 +84,17 @@ queue:
     branch: "ops/t-113-07-dry-run-prod"
 
 checkpoints:
-  last_completed: "US-117"
-  last_task_completed: "T-117-06"
+  last_completed: "US-119"
+  last_task_completed: "T-119-04"
   current_story: null
-  next_story: "US-119"
+  next_story: "MAGO-LINT-BATCH-002"
   next_task: null
-  timestamp: "2026-05-15T19:30:00Z"
-  stories_completed: 1
+  timestamp: "2026-05-15T20:30:00Z"
+  stories_completed: 2
   stories_failed: 0
-  tasks_completed: 6
+  tasks_completed: 10
   tasks_total: 19
-  branch_current: "feat/us-117-portfolio-margin"
-  branch_completed: "feat/us-117-portfolio-margin"
+  branch_current: "feat/us-119-drill-down-conversion-margin"
+  branches_completed:
+    - "feat/us-117-portfolio-margin"
+    - "feat/us-119-drill-down-conversion-margin"
