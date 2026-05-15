@@ -174,6 +174,11 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Revenue Forecast Domain Service (sprint-025 US-114 T-114-01) — Domain pure, autowire explicite
+    App\Domain\Project\Service\RevenueForecastCalculator:
+        autowire: true
+        autoconfigure: true
+
     # SlackAlertingInterface binding (sprint-021 US-103) — extracted interface
     # pour mockabilité tests Application Layer
     App\Service\Alerting\SlackAlertingInterface:

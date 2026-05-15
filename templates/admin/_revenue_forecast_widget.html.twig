@@ -1,0 +1,66 @@
+{# US-114 T-114-04 — Revenue forecast widget (prévision CA glissante) #}
+{# Renders 30/90 forecast horizons + breakdown confirmé/pondéré + warning threshold flag. #}
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        💰 Revenue forecast
+                        <small class="text-muted">prévision CA glissante (devis pondérés + commandes confirmées)</small>
+                    </h5>
+                    {% if revenue_forecast.warningTriggered %}
+                        <span class="badge bg-warning text-dark"
+                              title="Forecast 30j ({{ revenue_forecast.forecast30Euros|number_format(0, ',', ' ') }} €) sous seuil plancher {{ revenue_forecast.warningThresholdEuros|number_format(0, ',', ' ') }} €">
+                            ⚠ Sous seuil plancher (&lt; {{ revenue_forecast.warningThresholdEuros|number_format(0, ',', ' ') }} €)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100 {{ revenue_forecast.warningTriggered ? 'border-warning' : '' }}">
+                            <div class="text-muted small">Forecast 30 jours</div>
+                            <div class="fs-2 fw-bold">
+                                {{ revenue_forecast.forecast30Euros|number_format(0, ',', ' ') }} €
+                            </div>
+                            <small class="text-muted">horizon échéance courte</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">Forecast 90 jours</div>
+                            <div class="fs-2 fw-bold">{{ revenue_forecast.forecast90Euros|number_format(0, ',', ' ') }} €</div>
+                            <small class="text-muted">horizon trimestriel</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-2">
+                            <small class="text-muted">✅ Commandes confirmées (signe / gagne)</small>
+                            <div class="fw-bold">{{ revenue_forecast.confirmedEuros|number_format(0, ',', ' ') }} €</div>
+                            <small class="text-muted">comptées à 100 %</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light rounded p-2">
+                            <small class="text-muted">📝 Devis pondérés (a_signer)</small>
+                            <div class="fw-bold">{{ revenue_forecast.weightedQuotesEuros|number_format(0, ',', ' ') }} €</div>
+                            <small class="text-muted">coefficient probabilité {{ (revenue_forecast.probabilityCoefficient * 100)|number_format(0) }} %</small>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-muted small mt-3 mb-0">
+                    Formule : Σ(commandes confirmées) + Σ(devis × {{ revenue_forecast.probabilityCoefficient }}).
+                    Horizon : échéance ∈ [now, now + N jours]. Statuts perdu / abandonne / standby exclus.
+                    Cache 1 h (invalidé sur changement statut Order ou création Invoice).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
