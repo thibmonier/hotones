@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Infrastructure\Project\Persistence\Doctrine;
 
 use App\Domain\Project\Repository\ConversionRateReadModelRepositoryInterface;
+use App\Domain\Project\Service\ClientConversionAggregate;
 use App\Domain\Project\Service\OrderConversionRecord;
+use App\Entity\Client;
 use App\Entity\Order;
+use App\Entity\Project;
 use App\Security\CompanyContext;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 
 /**
  * Doctrine adapter for {@see ConversionRateReadModelRepositoryInterface} (US-115 T-115-02).
@@ -61,6 +65,72 @@ final readonly class DoctrineConversionRateReadModelRepository implements Conver
             ),
             $rows,
         );
+    }
+
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+    {
+        if ($windowDays < 1) {
+            throw new InvalidArgumentException('Window days must be >= 1');
+        }
+
+        $company = $this->companyContext->getCurrentCompany();
+        $windowStart = $now->modify(sprintf('-%d days', $windowDays));
+
+        // Order → Project → Client. Statuts contribuant uniquement.
+        $rows = $this->entityManager->createQueryBuilder()
+            ->select('c.name AS clientName', 'o.status')
+            ->from(Order::class, 'o')
+            ->innerJoin(Project::class, 'p', 'WITH', 'p.id = o.project')
+            ->innerJoin(Client::class, 'c', 'WITH', 'c.id = p.client')
+            ->where('o.company = :company')
+            ->andWhere('o.status IN (:statuses)')
+            ->andWhere('o.createdAt >= :windowStart')
+            ->setParameter('company', $company)
+            ->setParameter('statuses', [
+                OrderConversionRecord::STATUS_CONVERTED_SIGNED,
+                OrderConversionRecord::STATUS_CONVERTED_WON,
+                OrderConversionRecord::STATUS_FAILED_LOST,
+                OrderConversionRecord::STATUS_FAILED_ABANDONED,
+            ])
+            ->setParameter('windowStart', $windowStart)
+            ->getQuery()
+            ->getArrayResult();
+
+        $perClient = [];
+        foreach ($rows as $row) {
+            $name = (string) $row['clientName'];
+            $status = (string) $row['status'];
+
+            if (!isset($perClient[$name])) {
+                $perClient[$name] = ['emitted' => 0, 'converted' => 0];
+            }
+
+            ++$perClient[$name]['emitted'];
+            if ($status === OrderConversionRecord::STATUS_CONVERTED_SIGNED
+                || $status === OrderConversionRecord::STATUS_CONVERTED_WON) {
+                ++$perClient[$name]['converted'];
+            }
+        }
+
+        $aggregates = [];
+        foreach ($perClient as $name => $stats) {
+            // emitted >= 1 par construction (entrée créée uniquement si row matchée).
+            $rate = $stats['converted'] * 100.0 / $stats['emitted'];
+            $aggregates[] = new ClientConversionAggregate(
+                clientName: $name,
+                ratePercent: round($rate, 1),
+                emittedCount: $stats['emitted'],
+                convertedCount: $stats['converted'],
+            );
+        }
+
+        // Tri par taux décroissant (top performers en tête)
+        usort(
+            $aggregates,
+            static fn (ClientConversionAggregate $a, ClientConversionAggregate $b): int => $b->ratePercent <=> $a->ratePercent,
+        );
+
+        return $aggregates;
     }
 
     private static function toImmutable(DateTimeInterface $date): DateTimeImmutable
