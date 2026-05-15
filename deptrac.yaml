@@ -257,8 +257,10 @@ deptrac:
       - App\Repository\SubscriptionRepository
     App\Entity\Timesheet:
       - App\Repository\TimesheetRepository
-    App\Entity\Vacation:
-      - App\Repository\VacationRepository
+    # VACATION-REPO-AUDIT (sprint-025) : entry retirée — Vacation migrée
+    # vers App\Domain\Vacation\Entity\Vacation + DoctrineVacationRepository
+    # dans Infrastructure (architecture Clean/DDD propre, plus de violation
+    # à skipper). Deptrac signalait "Skipped violation was not matched".
     App\Entity\Vendor:
       - App\Repository\VendorRepository
     App\Entity\XpHistory:
