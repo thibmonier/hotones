@@ -1,0 +1,62 @@
+{# US-115 T-115-04 — Conversion rate widget (taux conversion devis → commande) #}
+{# Renders 30/90/365 rolling windows + trend + warning threshold flag. #}
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        🎯 Taux de conversion devis → commande
+                        <small class="text-muted">ratio signés / émis (hors standby)</small>
+                    </h5>
+                    {% if conversion_rate.warningTriggered %}
+                        <span class="badge bg-warning text-dark"
+                              title="Taux 30j ({{ conversion_rate.rate30Percent|number_format(1, ',', ' ') }} %) sous seuil {{ conversion_rate.warningThresholdPercent|number_format(0, ',', ' ') }} %">
+                            ⚠ Sous seuil (&lt; {{ conversion_rate.warningThresholdPercent|number_format(0, ',', ' ') }} %)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100 {{ conversion_rate.warningTriggered ? 'border-warning' : '' }}">
+                            <div class="text-muted small">30 jours rolling</div>
+                            <div class="fs-2 fw-bold">
+                                {{ conversion_rate.rate30Percent|number_format(1, ',', ' ') }} %
+                                <span class="fs-5 text-muted" title="{{ conversion_rate.trend30.label }}">
+                                    {{ conversion_rate.trend30.symbol }}
+                                </span>
+                            </div>
+                            <small class="text-muted">
+                                {{ conversion_rate.converted30Count }} / {{ conversion_rate.emitted30Count }} devis
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">90 jours rolling</div>
+                            <div class="fs-2 fw-bold">{{ conversion_rate.rate90Percent|number_format(1, ',', ' ') }} %</div>
+                            <small class="text-muted">trimestre glissant</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">365 jours rolling</div>
+                            <div class="fs-2 fw-bold">{{ conversion_rate.rate365Percent|number_format(1, ',', ' ') }} %</div>
+                            <small class="text-muted">tendance annuelle</small>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-muted small mt-3 mb-0">
+                    Formule : count(signe + gagne) / count(signe + gagne + perdu + abandonne).
+                    Statuts standby / termine / a_signer exclus du dénominateur.
+                    Cache 1 h (invalidé sur changement statut Order).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

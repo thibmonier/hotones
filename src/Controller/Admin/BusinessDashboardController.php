@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Application\Project\Query\BillingLeadTimeKpi\ComputeBillingLeadTimeKpiHandler;
+use App\Application\Project\Query\ConversionRateKpi\ComputeConversionRateKpiHandler;
 use App\Application\Project\Query\DsoKpi\ComputeDsoKpiHandler;
 use App\Application\Project\Query\MarginAdoptionKpi\ComputeMarginAdoptionKpiHandler;
 use App\Application\Project\Query\RevenueForecastKpi\ComputeRevenueForecastKpiHandler;
@@ -34,6 +35,7 @@ final class BusinessDashboardController extends AbstractController
         private readonly ComputeDsoKpiHandler $computeDsoKpi,
         private readonly ComputeMarginAdoptionKpiHandler $computeMarginAdoptionKpi,
         private readonly ComputeRevenueForecastKpiHandler $computeRevenueForecastKpi,
+        private readonly ComputeConversionRateKpiHandler $computeConversionRateKpi,
     ) {
     }
 
@@ -46,6 +48,7 @@ final class BusinessDashboardController extends AbstractController
             'dso' => ($this->computeDsoKpi)(),
             'margin_adoption' => ($this->computeMarginAdoptionKpi)(),
             'revenue_forecast' => ($this->computeRevenueForecastKpi)(),
+            'conversion_rate' => ($this->computeConversionRateKpi)(),
         ]);
     }
 }
