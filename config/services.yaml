@@ -106,6 +106,22 @@ services:
         arguments:
             $kpiCache: '@cache.kpi'
 
+    # Conversion Rate Read-Model Repository (EPIC-003 Phase 5 sprint-025 US-115)
+    # T-115-02 Doctrine adapter + T-115-03 caching decorator (cache.kpi 1h TTL)
+    # Invalidation event-driven : OrderStatusChangedEvent
+    App\Domain\Project\Repository\ConversionRateReadModelRepositoryInterface:
+        alias: App\Infrastructure\Project\Persistence\Doctrine\CachingConversionRateReadModelRepository
+        public: true
+
+    App\Infrastructure\Project\Persistence\Doctrine\CachingConversionRateReadModelRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Project\Persistence\Doctrine\DoctrineConversionRateReadModelRepository'
+            $kpiCache: '@cache.kpi'
+
+    App\Application\Project\EventListener\InvalidateConversionRateCacheOnOrderStatusChanged:
+        arguments:
+            $kpiCache: '@cache.kpi'
+
     # Margin Adoption Read-Model Repository (EPIC-003 Phase 4 sprint-024 US-112 T-112-02)
     # public: true tant que pas de consumer downstream (T-112-03 Widget)
     App\Domain\Project\Repository\MarginAdoptionReadModelRepositoryInterface:
@@ -176,6 +192,11 @@ services:
 
     # Revenue Forecast Domain Service (sprint-025 US-114 T-114-01) — Domain pure, autowire explicite
     App\Domain\Project\Service\RevenueForecastCalculator:
+        autowire: true
+        autoconfigure: true
+
+    # Conversion Rate Domain Service (sprint-025 US-115 T-115-01) — Domain pure, autowire explicite
+    App\Domain\Project\Service\ConversionRateCalculator:
         autowire: true
         autoconfigure: true
 
