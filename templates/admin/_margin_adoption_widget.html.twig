@@ -73,6 +73,11 @@
                 <p class="text-muted small mt-3 mb-0">
                     Indicateur trigger abandon ADR-0013 cas 2. Seuil warning : {{ margin_adoption.warningThresholdPercent|number_format(0, ',', ' ') }} %.
                 </p>
+
+                <a href="{{ path('admin_business_dashboard_drill_down', {kpi: 'margin', window: 30}) }}"
+                   class="btn btn-sm btn-outline-primary mt-2">
+                    📊 Drill-down par client →
+                </a>
             </div>
         </div>
     </div>

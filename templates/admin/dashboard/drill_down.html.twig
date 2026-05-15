@@ -49,13 +49,26 @@
                 </thead>
                 <tbody>
                     {% for agg in aggregates %}
-                        {% set value = kpi == 'dso' ? agg.dsoAverageDays : agg.leadTimeAverageDays %}
+                        {% set value = (
+                            kpi == 'dso' ? agg.dsoAverageDays :
+                            kpi == 'lead-time' ? agg.leadTimeAverageDays :
+                            kpi == 'conversion' ? agg.ratePercent :
+                            agg.freshPercent
+                        ) %}
+                        {% set sample = (
+                            kpi in ['conversion'] ? agg.emittedCount :
+                            kpi == 'margin' ? agg.totalActive :
+                            agg.sampleCount
+                        ) %}
                         <tr>
                             <td>{{ loop.index }}</td>
                             <td><strong>{{ agg.clientName }}</strong></td>
-                            <td class="text-end">{{ value|number_format(1, ',', ' ') }} j</td>
                             <td class="text-end">
-                                <span class="badge bg-secondary">{{ agg.sampleCount }}</span>
+                                {{ value|number_format(1, ',', ' ') }}
+                                {{ value_unit == 'jours' ? 'j' : value_unit }}
+                            </td>
+                            <td class="text-end">
+                                <span class="badge bg-secondary">{{ sample }}</span>
                             </td>
                         </tr>
                     {% endfor %}
@@ -64,7 +77,12 @@
         </div>
 
         <p class="text-muted small mt-3">
-            Tri par valeur décroissante (clients lents en tête).
+            {% if kpi == 'margin' %}
+                Tri par adoption croissante (clients en retard en tête).
+                Snapshot temporel (fenêtre ignorée).
+            {% else %}
+                Tri par valeur {{ kpi == 'conversion' ? 'décroissante (top performers en tête)' : 'décroissante (clients lents en tête)' }}.
+            {% endif %}
             Multi-tenant (société courante uniquement). Cache 1 h.
         </p>
     {% endif %}

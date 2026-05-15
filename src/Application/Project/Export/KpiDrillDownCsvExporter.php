@@ -5,21 +5,25 @@ declare(strict_types=1);
 namespace App\Application\Project\Export;
 
 use App\Domain\Project\Service\ClientBillingLeadTimeAggregate;
+use App\Domain\Project\Service\ClientConversionAggregate;
 use App\Domain\Project\Service\ClientDsoAggregate;
+use App\Domain\Project\Service\ClientMarginAdoptionAggregate;
 use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Streamed CSV exporter pour drill-down KPI dashboard (US-116 T-116-03).
+ * Streamed CSV exporter pour drill-down KPI dashboard (US-116 T-116-03,
+ * étendu US-119 T-119-03 pour Conversion + Margin).
  *
  * Colonnes : `client_name, valeur_kpi, sample_count, window`.
+ * Unité valeur_kpi adaptée par kpi (`jours` / `%`).
  * Réutilise le pattern `DriftReportCsvExporter` (US-113 T-113-04).
  */
 final readonly class KpiDrillDownCsvExporter
 {
     /**
-     * @param list<ClientDsoAggregate>|list<ClientBillingLeadTimeAggregate> $aggregates
+     * @param list<ClientDsoAggregate>|list<ClientBillingLeadTimeAggregate>|list<ClientConversionAggregate>|list<ClientMarginAdoptionAggregate> $aggregates
      */
     public function createResponse(string $kpi, int $window, array $aggregates): Response
     {
@@ -44,7 +48,7 @@ final readonly class KpiDrillDownCsvExporter
     }
 
     /**
-     * @param list<ClientDsoAggregate>|list<ClientBillingLeadTimeAggregate> $aggregates
+     * @param list<ClientDsoAggregate>|list<ClientBillingLeadTimeAggregate>|list<ClientConversionAggregate>|list<ClientMarginAdoptionAggregate> $aggregates
      */
     public function buildCsvString(int $window, array $aggregates): string
     {
@@ -56,16 +60,19 @@ final readonly class KpiDrillDownCsvExporter
         fputcsv($handle, ['client_name', 'valeur_kpi', 'sample_count', 'window'], escape: '');
 
         foreach ($aggregates as $agg) {
-            $value = $agg instanceof ClientDsoAggregate
-                ? $agg->dsoAverageDays
-                : $agg->leadTimeAverageDays;
+            [$value, $sample] = match (true) {
+                $agg instanceof ClientDsoAggregate => [$agg->dsoAverageDays, $agg->sampleCount],
+                $agg instanceof ClientBillingLeadTimeAggregate => [$agg->leadTimeAverageDays, $agg->sampleCount],
+                $agg instanceof ClientConversionAggregate => [$agg->ratePercent, $agg->emittedCount],
+                $agg instanceof ClientMarginAdoptionAggregate => [$agg->freshPercent, $agg->totalActive],
+            };
 
             fputcsv(
                 $handle,
                 [
                     $agg->clientName,
                     sprintf('%.1f', $value),
-                    $agg->sampleCount,
+                    $sample,
                     sprintf('%dj', $window),
                 ],
                 escape: '',
