@@ -71,6 +71,11 @@ final class ComputeDsoKpiHandlerTest extends TestCase
                     ),
                 ];
             }
+
+            public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+            {
+                return [];
+            }
         };
 
         $handler = new ComputeDsoKpiHandler($repo, new DsoCalculator());
@@ -110,6 +115,11 @@ final class ComputeDsoKpiHandlerTest extends TestCase
             public function findPaidInRollingWindow(int $windowDays, DateTimeImmutable $now): array
             {
                 return $this->records;
+            }
+
+            public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+            {
+                return [];
             }
         };
     }

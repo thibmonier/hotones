@@ -100,6 +100,11 @@ final class SendDsoRedAlertOnInvoicePaidTest extends TestCase
                     ),
                 ];
             }
+
+            public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+            {
+                return [];
+            }
         };
 
         return new ComputeDsoKpiHandler($repo, new DsoCalculator());
