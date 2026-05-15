@@ -11,9 +11,8 @@ queue:
     title: "KPI Revenue forecast (prévision CA glissante)"
     points: 3
     priority: 1
-    status: "in-progress"
-    tasks_done: ["T-114-01", "T-114-02"]
-    next_task: "T-114-03"
+    status: "completed"
+    tasks_done: ["T-114-01", "T-114-02", "T-114-03", "T-114-04", "T-114-05", "T-114-06"]
     depends_on: []
     nature: "feature"
     epic: "EPIC-003 Phase 5"
@@ -145,13 +144,13 @@ queue:
         estimate_hours: 3
 
 checkpoints:
-  last_completed: null
-  last_task_completed: "T-114-02"
-  current_story: "US-114"
-  next_task: "T-114-03"
-  timestamp: "2026-05-14T12:00:00Z"
-  stories_completed: 0
+  last_completed: "US-114"
+  last_task_completed: "T-114-06"
+  current_story: null
+  next_story: "US-115"
+  timestamp: "2026-05-15T12:00:00Z"
+  stories_completed: 1
   stories_failed: 0
-  tasks_completed: 2
+  tasks_completed: 6
   tasks_total: 23
-  branch: "feat/us-114-revenue-forecast"
+  branch_completed: "feat/us-114-revenue-forecast"
