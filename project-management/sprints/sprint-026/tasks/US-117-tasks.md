@@ -22,7 +22,7 @@
 | T-117-01 | [BE]   | Domain Service `PortfolioMarginCalculator` + VO + tests Unit | 3h | — | ✅ |
 | T-117-02 | [BE]   | Repository read-model port + Doctrine adapter | 2h | T-117-01 | ✅ |
 | T-117-03 | [BE]   | Cache decorator + subscriber `ProjectMarginRecalculatedEvent` | 2h | T-117-02 | ✅ |
-| T-117-04 | [FE-WEB] | Widget Twig dashboard + handler CQRS | 2h | T-117-02 | 🔲 |
+| T-117-04 | [FE-WEB] | Widget Twig dashboard + handler CQRS | 2h | T-117-02 | ✅ |
 | T-117-05 | [BE]   | Alerte Slack seuil rouge marge portefeuille | 1h | T-117-02 | 🔲 |
 | T-117-06 | [TEST] | Tests Integration E2E flow | 2h | T-117-03 | 🔲 |
 
