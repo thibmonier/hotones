@@ -1,25 +1,23 @@
 metadata:
-  sprint_id: "sprint-025"
-  name: "Sprint 025 — Scope à définir Planning P1"
-  start_date: "2026-06-10"
-  end_date: "2026-06-24"
+  sprint_id: "sprint-026"
+  name: "Sprint 026 — Scope à définir Planning P1"
+  start_date: "2026-06-24"
+  end_date: "2026-07-08"
   goal: |
-    À définir Sprint Planning P1 2026-05-27. Candidats sub-epics :
-      - EPIC-003 Phase 5 (post-MVP KPIs business) — extensions DSO/lead time
-        ou nouveau KPI revenue forecast (pattern KpiCalculator réutilisé sp-024)
-      - Dette technique : Mago lint cleanup batch (sp-022 retro #3, sp-023 retro A-6),
-        VacationRepository Deptrac violation audit (sp-023 retro L-4),
-        TEST-COVERAGE-013 push 70 → 72 %
-      - T-113-07 dry-run prod user-tracked (sp-024 retro A-5 — High priority)
-      - PRE-6 cap libre 1-2 pts (sp-024 retro A-2)
-      - 7 actions héritées sp-024 retro (A-1..A-7)
+    À définir Sprint Planning P1. Candidats issus retro sp-025 + backlog :
+      - US-117 KPI Marge moyenne portefeuille (3 pts, reporté sp-025)
+      - Continuation EPIC-003 Phase 5 (extensions / nouveaux KPIs)
+      - Dette technique résiduelle (Mago cleanup progressif sur 1307 issues,
+        Coverage push sp-026+ via 5 services legacy identifiés)
+      - T-113-07 dry-run prod migration WorkItem.cost (héritage 2 sprints)
+      - 8 actions héritées sp-025 retro (A-1..A-8)
   capacity_points: 12
   capacity_free_points: 2
   committed_points: null
   velocity_target: "12-14"
   status: "kickoff_pending"
-  last_sync: "2026-05-13T10:00:00Z"
-  current_day: "J-14 pre-kickoff"
+  last_sync: "2026-05-15T13:00:00Z"
+  current_day: "J-40 pre-kickoff"
   rebuild_from_scratch: true
   rebuild_note: |
     Yaml rebuild 2026-05-11. Backup yaml legacy sprint-011 conservée :
@@ -226,13 +224,135 @@ sprint_history:
       ROI estimation parfaite : 42.5 h estimé = 42.5 h livré.
       Exec accélérée agentic J-16 anticipé (3 jours J0..J+1 compactés).
 
+  sprint-025:
+    name: "EPIC-003 Phase 5 KPIs business + Sub-epic D dette technique"
+    points_planned: 12
+    points_delivered: 12
+    velocity: 12
+    engagement_ratio: 1.00
+    closed_at: "2026-05-15"
+    review: "project-management/sprints/sprint-025/sprint-review.md"
+    retro: "project-management/sprints/sprint-025/sprint-retro.md"
+    notes: |
+      100 % engagement ferme (5ᵉ confirmation baseline 12 pts).
+      EPIC-003 Phase 5 : 2 nouveaux KPIs (Revenue forecast + Conversion rate)
+      + drill-down/CSV widgets. Sub-epic D dette soldée (Mago -4110 issues +
+      Deptrac errors 0 + 24 tests Domain).
+      Pattern KpiCalculator 6ᵉ application consécutive (sp-024 4× + sp-025 2×).
+      5ᵉ sprint consécutif 0 holdover OPS + 0 commit --no-verify.
+      ROI -14 % vs estimation (43h estimé / 37h livré — dette technique plus
+      rapide que prévu via Mago auto-fix + audit Vacation déjà migré).
+
 # =========================================================================
-# Current Sprint — sprint-025 (kickoff pending)
+# Current Sprint — sprint-026 (kickoff pending)
 # =========================================================================
 
 current_sprint:
-  id: "sprint-025"
+  id: "sprint-026"
   status: "kickoff_pending"
+  capacity_breakdown:
+    firm: 12
+    free: 2
+    velocity_avg_16_sprints: 11.13
+  committed_points: null
+  committed_breakdown: null
+  predecessor: "sprint-025 (closed 2026-05-15, 12/12 pts)"
+  notes: |
+    Scope à définir Sprint Planning P1. Candidats issus retro sp-025 +
+    backlog Phase 5. Pattern KpiCalculator établi 6× consécutifs réutilisable.
+
+  inherited_actions_sp_025_retro:
+    A-1:
+      action: "Cap libre PRE-5 — story concrète J0 (4ᵉ fois TBD inacceptable)"
+      owner: "PO"
+      priority: "HIGH"
+      deadline: "Sprint-026 Planning P1"
+      note: "Re-héritage 4ᵉ fois consécutive (sp-023 ST-1 → sp-024 PRE-6 → sp-025 PRE-5 → sp-026 A-1)"
+    A-2:
+      action: "Décision US-117 KPI Marge moyenne portefeuille (3 pts, reporté sp-025)"
+      owner: "PO"
+      priority: "High"
+      deadline: "Sprint-026 Planning P1"
+    A-3:
+      action: "Helper KpiTestSupport trait (Multi-tenant + cache.kpi + ProjectFactory setUp)"
+      owner: "Tech Lead"
+      priority: "Medium"
+      deadline: "Sprint-026 refactor 1h"
+    A-4:
+      action: "Hook pre-commit : ajouter make mago step"
+      owner: "Tech Lead"
+      priority: "Medium"
+      deadline: "Sprint-026 OPS"
+    A-5:
+      action: "ADR pattern timestamping testabilité listeners (event.occurredOn)"
+      owner: "Tech Lead"
+      priority: "Low"
+      deadline: "Sprint-026 doc-only"
+    A-6:
+      action: "Procédure Mago segmentée par règle (CONTRIBUTING.md)"
+      owner: "Tech Lead"
+      priority: "Medium"
+      deadline: "Sprint-026 doc"
+    A-7:
+      action: "Décision Slack channel #kpi-alerts-prod (héritage 2 sprints)"
+      owner: "PO + Tech Lead"
+      priority: "Low"
+      deadline: "Sprint-026 OPS-PREP"
+    A-8:
+      action: "Pagination drill-down US-116 — décision volume seuil"
+      owner: "PO"
+      priority: "Low"
+      deadline: "Sprint-026 Planning P1"
+
+  carry_over_actions_sp_024:
+    A-1_sp_024:
+      action: "Activer enablePullRequestAutoMerge repo settings"
+      status: "❌ non fait sp-025 — re-héritage 2ᵉ fois"
+    A-7_sp_024:
+      action: "Décision Slack channel #kpi-alerts-prod"
+      status: "❌ non fait sp-025 — re-héritage (cf A-7 sp-025)"
+    A-5_sp_024:
+      action: "T-113-07 dry-run prod migration WorkItem.cost"
+      status: "🟡 fenêtre maintenance à planifier sp-026"
+
+  pre_requis:
+    PRE-1:
+      action: "Atelier OPS-PREP-J0 (minimal si pas de nouvelles stories OPS-tagged)"
+      owner: "PO + Tech Lead"
+      deadline: "Sprint-026 J-2"
+      status: "pending"
+    PRE-2:
+      action: "Mesurer coverage actuel post sprint-025"
+      owner: "Tech Lead"
+      deadline: "Sprint-026 J-1"
+      status: "pending"
+      note: "Sprint-025 a ajouté 24 tests Domain — measurer impact réel"
+    PRE-3:
+      action: "Décision PO scope sprint-026 (US-117 ? Phase 5 continuation ? nouveau EPIC ?)"
+      owner: "PO"
+      deadline: "Sprint-026 Planning P1"
+      status: "pending"
+    PRE-4:
+      action: "Stories sprint-026 spécifiées 3C + Gherkin"
+      owner: "PO"
+      deadline: "Sprint-026 J0 fin"
+      status: "pending"
+      depends_on: "PRE-3 scope décidé"
+    PRE-5:
+      action: "Cap libre 1-2 pts pré-allocation explicite (A-1 priorité HIGH)"
+      owner: "PO"
+      deadline: "Sprint-026 Planning P1"
+      status: "pending"
+      note: "4ᵉ sprint consécutif TBD si non fixé — bloqueur"
+
+# =========================================================================
+# Sprint-025 closure — archived for traceability
+# =========================================================================
+
+sprint_025_closure:
+  id: "sprint-025"
+  status: "closed"
+  closed_at: "2026-05-15"
   capacity_breakdown:
     firm: 12
     free: 2
@@ -536,18 +656,20 @@ epics:
 
   EPIC-003:
     name: "WorkItem & Profitability"
-    status: "done"
-    phase: "Phase 4 complete (sprint-024 done)"
-    sprints: ["sprint-019", "sprint-020", "sprint-021", "sprint-022", "sprint-023", "sprint-024"]
-    sprints_completed: 6
-    sprints_estimated: 6
-    completion: "100%"
-    stories_delivered: ["US-097", "US-098", "US-099", "US-100", "US-101", "US-102", "US-103", "US-104", "US-105", "US-106", "US-107", "US-108", "US-110", "US-111", "US-112", "US-113"]
+    status: "in_progress"
+    phase: "Phase 5 partial (sprint-025 — 2 KPIs livrés / 3 prévus)"
+    sprints: ["sprint-019", "sprint-020", "sprint-021", "sprint-022", "sprint-023", "sprint-024", "sprint-025"]
+    sprints_completed: 7
+    sprints_estimated: "7+ (Phase 5 extension)"
+    completion: "~95% (Phase 4 done, Phase 5 partial)"
+    stories_delivered: ["US-097", "US-098", "US-099", "US-100", "US-101", "US-102", "US-103", "US-104", "US-105", "US-106", "US-107", "US-108", "US-110", "US-111", "US-112", "US-113", "US-114", "US-115", "US-116"]
+    stories_backlog_phase5: ["US-117 (Marge moyenne portefeuille, 3 pts reporté sp-025)"]
     adrs: ["ADR-0013", "ADR-0015", "ADR-0016", "ADR-0017", "ADR-0018"]
     mvp_delivered: "sprint-022 (US-103 + US-104)"
     phase3_completion: "sprint-023 (strangler fig complet, persistence margin, configurabilité hiérarchique)"
     phase4_completion: "sprint-024 (KPIs business DSO+lead time+adoption marge + Migration WorkItem.cost legacy + ADR-0018 Render redeploy)"
-    pattern_kpi_calculator_established: "4× consécutifs (DSO + Billing lead time + Margin adoption + WorkItem migrator) — réplicable sprints futurs"
+    phase5_progress: "sprint-025 (US-114 Revenue forecast + US-115 Conversion rate + US-116 Drill-down/CSV)"
+    pattern_kpi_calculator_established: "6× consécutifs (sp-024 4× + sp-025 2×) — réplicable sprints futurs"
 
 # =========================================================================
 # Backlog roll-up
@@ -638,3 +760,26 @@ migration_log:
       VacationRepo audit Deptrac / TEST-COVERAGE-013), PRE-6 cap libre 1-2 pts
       à décider Sprint Planning P1. 7 actions héritées retro sp-024 (A-1..A-7).
     path: "project-management/sprints/sprint-025/ (TBD)"
+  - date: "2026-05-15"
+    action: "Sprint-025 closure"
+    detail: |
+      12/12 pts delivered (100 %). EPIC-003 Phase 5 démarrée : US-114
+      Revenue forecast + US-115 Conversion rate + US-116 drill-down/CSV.
+      Sub-epic D dette soldée : MAGO −4110 issues + Deptrac errors 0 +
+      24 tests Domain. 6 PRs mergées (#282, #284, #285, #286, #287, #288).
+      Pattern KpiCalculator 6ᵉ application consécutive (sp-024 4× + sp-025 2×).
+      5ᵉ sprint 0 holdover OPS + 0 commit --no-verify. ROI -14 % vs estim.
+      US-117 KPI Marge portefeuille reporté backlog Phase 5 sp-026+.
+    artifacts:
+      - "project-management/sprints/sprint-025/sprint-review.md"
+      - "project-management/sprints/sprint-025/sprint-retro.md"
+      - "docs/coverage-audit-sprint-025.md"
+      - "mago-baseline.json"
+  - date: "2026-05-15"
+    action: "Sprint-026 kickoff stub"
+    detail: |
+      8 actions héritées sp-025 retro (A-1..A-8) — A-1 (cap libre) HIGH 4ᵉ
+      fois consécutive. Scope candidates : US-117 KPI Marge portefeuille
+      (3 pts reporté sp-025), continuation Phase 5, dette résiduelle
+      (Mago 1307 issues progressif + Coverage 5 services legacy).
+    path: "project-management/sprints/sprint-026/ (TBD — création post-Planning P1)"
