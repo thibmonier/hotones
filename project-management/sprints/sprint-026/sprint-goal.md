@@ -1,4 +1,4 @@
-# Sprint 026 — Kickoff (scope à définir Planning P1)
+# Sprint 026 — EPIC-003 Phase 5 continuation + Dette résiduelle + Migration prod
 
 | Champ | Valeur |
 |---|---|
@@ -6,55 +6,47 @@
 | Début | 2026-06-24 |
 | Fin | 2026-07-08 |
 | Durée | 10 jours ouvrés |
-| Capacité | **12 pts ferme + 1-2 pts libre** (6ᵉ confirmation recalibrage durable) |
-| Engagement ferme | **TBD** — décision PO Sprint Planning P1 (2026-06-23) |
-| Statut backlog | **kickoff_pending** — atelier OPS-PREP-J0 à conduire J-2 (2026-06-22) |
+| Capacité | **12 pts ferme** (6ᵉ confirmation recalibrage durable visée) |
+| Engagement ferme | **12 pts** — Phase 5 (5 pts) + Dette résiduelle (6 pts) + Migration prod (1 pt) |
+| Statut backlog | **kickoff_pending** — scope décidé, décomposition prête ; formalisation Planning P1 (2026-06-23) |
 | Prédécesseur | sprint-025 (clôturé 2026-05-15, 12/12 pts, EPIC-003 Phase 5 partial) |
 
 ---
 
 ## 🎯 Sprint Goal (provisoire — à figer Planning P1)
 
-> « À définir Sprint Planning P1. Candidats : continuation EPIC-003 Phase 5
-> (US-117 KPI Marge moyenne portefeuille reporté sp-025), dette résiduelle
-> (Mago 1307 issues progressif + Coverage push 5 services legacy), T-113-07
-> dry-run prod migration WorkItem.cost (héritage 2 sprints). »
-
-**Contexte** : EPIC-003 Phase 5 démarrée sp-025 avec 2 KPIs livrés (Revenue
-forecast + Conversion rate) + drill-down/CSV widgets. US-117 (Marge moyenne
-portefeuille, 3 pts) reporté backlog Phase 5. Pattern KpiCalculator établi
-6× consécutifs — réplicable sans réinvention.
+> « EPIC-003 Phase 5 continuation : KPI Marge moyenne portefeuille (US-117
+> reporté sp-025) + extension drill-down sur 2 widgets restants (Conversion,
+> Margin adoption). Solde dette résiduelle Sub-epic D (Mago cleanup ciblé,
+> Coverage push 72→74 %, audit `skip-pre-push` markers). Exécution dry-run
+> prod migration WorkItem.cost legacy (héritage sp-024 A-5 HIGH). »
 
 ---
 
-## 📦 Candidats scope (décision PRE-3)
+## 📦 Engagement ferme (12 pts)
 
-### Option A — Continuation EPIC-003 Phase 5
+### EPIC-003 Phase 5 continuation (5 pts)
+
+| ID | Titre | Pts | MoSCoW | Tâches |
+|----|-------|----:|--------|-------:|
+| US-117 | KPI Marge moyenne portefeuille | 3 | Must | 6 |
+| US-119 | Extension drill-down Conversion + Margin | 2 | Should | 4 |
+
+### Sub-epic D — Dette résiduelle (6 pts)
 
 | ID | Titre | Pts | Source |
-|---|---|---:|---|
-| US-117 | KPI Marge moyenne portefeuille | 3 | reporté sp-025 (spec créée) |
-| US-118 | KPI nouveau (à définir PO) | 3 | extension Phase 5 |
-| US-119 | Extension drill-down conversion / margin | 2 | post-feedback sp-025 |
+|----|-------|----:|--------|
+| MAGO-LINT-BATCH-002 | Cleanup Mago résiduel (200-300 erreurs ciblées) | 2 | héritage sp-025 |
+| COVERAGE-014 | Push coverage 72 → 74 % (services legacy) | 2 | héritage sp-025 backlog |
+| TEST-FUNCTIONAL-FIXES-003 | Audit 6 `skip-pre-push` markers restants | 2 | héritage sp-006 |
 
-### Option B — Dette résiduelle Sub-epic D
+### Migration prod (1 pt)
 
 | ID | Titre | Pts | Source |
-|---|---|---:|---|
-| MAGO-LINT-BATCH-002 | Cleanup résiduel Mago (200-300 erreurs ciblées) | 2 | héritage sp-025 |
-| COVERAGE-014 | Push 72 → 74 % (services legacy) | 2 | héritage sp-025 backlog |
-| TEST-FUNCTIONAL-FIXES-003 | Audit `skip-pre-push` markers restants | 2 | héritage sp-006 sub-epic D |
+|----|-------|----:|--------|
+| T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1 | sp-024 retro A-5 HIGH (2 sprints reportés) — **PRE-5 cap libre satisfait** |
 
-### Option C — Migration prod (T-113-07)
-
-| T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1-2 | héritage sp-024 retro A-5 |
-
-### Option D — Nouvel EPIC
-
-Décision PO selon priorités produit post-Phase 5.
-
-> **Reco Tech Lead** : Option A (3-8 pts continuation Phase 5) + Option B
-> (2-4 pts dette résiduelle) = 12 pts ferme. Pattern viable sp-025.
+**Total : 12 pts ferme · 19 tâches · ~35h**
 
 ---
 
@@ -63,7 +55,7 @@ Décision PO selon priorités produit post-Phase 5.
 - [ ] PHPStan niveau max — 0 erreur
 - [ ] PHP-CS-Fixer / Rector / Deptrac — 0 violation
 - [ ] Mago lint — 0 nouvelle issue (baseline activé)
-- [ ] Tests : couverture ≥ 80 % (cible CI globale 72 %, push 74 %)
+- [ ] Tests : couverture ≥ 80 % (cible CI globale 74 %)
 - [ ] Architecture Clean/DDD respectée
 - [ ] Code review approuvée
 - [ ] 0 commit `--no-verify`
@@ -73,25 +65,25 @@ Décision PO selon priorités produit post-Phase 5.
 
 ## 🔁 Actions héritées rétro sprint-025 (A-1 → A-8)
 
-| ID | Action | Owner | Priorité | Deadline |
+| ID | Action | Owner | Priorité | Intégration sprint-026 |
 |---|---|---|---|---|
-| **A-1** | **Cap libre PRE-5 — story concrète J0 (4ᵉ fois TBD inacceptable)** | PO | **HIGH** | Planning P1 |
-| A-2 | Décision US-117 KPI Marge portefeuille — sp-026 ou backlog ? | PO | High | Planning P1 |
-| A-3 | Helper `KpiTestSupport` trait (Multi-tenant + cache.kpi + ProjectFactory setUp) | Tech Lead | Medium | refactor 1h |
-| A-4 | Hook pre-commit : ajouter `make mago` step | Tech Lead | Medium | OPS |
-| A-5 | ADR pattern timestamping testabilité listeners (event.occurredOn) | Tech Lead | Low | doc-only |
-| A-6 | Procédure Mago segmentée par règle (CONTRIBUTING.md) | Tech Lead | Medium | doc |
-| A-7 | Décision Slack channel `#kpi-alerts-prod` (héritage 2 sprints) | PO + Tech Lead | Low | OPS-PREP |
-| A-8 | Pagination drill-down US-116 — décision volume seuil | PO | Low | Planning P1 |
+| A-1 | **Cap libre PRE-5 — story concrète J0** | PO | **HIGH** | ✅ **T-113-07 explicit (1 pt ferme)** |
+| A-2 | Décision US-117 — sprint-026 ou backlog ? | PO | High | ✅ scopée sprint-026 (3 pts) |
+| A-3 | Helper `KpiTestSupport` trait | Tech Lead | Medium | groupé T-119-04 |
+| A-4 | Hook pre-commit `make mago` step | Tech Lead | Medium | groupé T-MAGO2-03 |
+| A-5 | ADR pattern timestamping listeners | Tech Lead | Low | groupé T-117-03 |
+| A-6 | Procédure Mago segmentée par règle (doc) | Tech Lead | Medium | groupé T-MAGO2-03 |
+| A-7 | Décision Slack channel `#kpi-alerts-prod` | PO + Tech Lead | Low | atelier OPS-PREP J-2 |
+| A-8 | Pagination drill-down volume seuil | PO | Low | groupé T-119-02 si seuil décidé |
 
-### Carry-over actions sprint-024 retro
+### Carry-over actions sp-024 retro
 
-| ID | Action | Statut sp-025 |
+| ID | Action | Statut sp-025 → sp-026 |
 |---|---|---|
-| A-1 sp-024 | `enablePullRequestAutoMerge` repo settings | ❌ Non fait — re-héritage 2ᵉ fois |
-| A-5 sp-024 | T-113-07 dry-run prod migration WorkItem.cost | 🟡 Fenêtre maintenance à planifier sp-026 |
-| A-6 sp-024 | Doc cache.kpi pool partagé ADR | 🟡 Implicite via comments — formaliser sp-026 |
-| A-7 sp-024 | Décision Slack channel `#kpi-alerts-prod` | ❌ Non fait — re-héritage (cf A-7 sp-025) |
+| A-1 sp-024 | `enablePullRequestAutoMerge` settings | ❌ re-héritage 3ᵉ fois |
+| A-5 sp-024 | T-113-07 dry-run prod | ✅ **scopé sprint-026 (1 pt)** |
+| A-6 sp-024 | Doc cache.kpi pool ADR | 🟡 groupé T-117-03 |
+| A-7 sp-024 | Slack channel `#kpi-alerts-prod` | ❌ re-héritage (cf A-7 sp-025) |
 
 ---
 
@@ -99,16 +91,11 @@ Décision PO selon priorités produit post-Phase 5.
 
 | ID | Action | Owner | Deadline | Statut |
 |---|---|---|---|---|
-| PRE-1 | Atelier OPS-PREP-J0 (minimal si pas de nouvelles stories OPS-tagged) | PO + Tech Lead | J-2 (2026-06-22) | pending |
-| PRE-2 | Mesurer coverage actuel post sp-025 (cible 72 %, +24 tests Domain sp-025) | Tech Lead | J-1 | pending |
-| PRE-3 | Décision PO scope sprint-026 (Option A/B/C/D) | PO | Planning P1 (2026-06-23) | pending |
-| PRE-4 | Stories sprint-026 spécifiées 3C + Gherkin | PO | J0 fin | pending (dépend PRE-3) |
-| PRE-5 | **Cap libre 1-2 pts pré-allocation explicite (A-1 priorité HIGH)** | PO | Planning P1 | **pending — 4ᵉ sprint TBD si non fixé** |
-
-> ⚠️ **PRE-5 / A-1** : 4ᵉ sprint consécutif cap libre TBD (sp-023 ST-1 →
-> sp-024 PRE-6 → sp-025 PRE-5 → sp-026 PRE-5). Priorité **HIGH** — figer
-> assignement story concrète AVANT kickoff. Pas de slot reserved vide
-> acceptable.
+| PRE-1 | Atelier OPS-PREP-J0 (minimal si pas de nouvelles stories OPS-tagged ; T-113-07 = OPS) | PO + Tech Lead | J-2 (2026-06-22) | pending |
+| PRE-2 | Mesurer coverage post sp-025 (cible 72 % atteinte → push 74 %) | Tech Lead | J-1 | pending (→ T-COV14-01) |
+| PRE-3 | Décision PO scope sprint-026 | PO | Planning P1 | ✅ **décidé** : Phase 5 continuation + Dette + T-113-07 |
+| PRE-4 | Stories sprint-026 spécifiées 3C + Gherkin | PO | J0 fin | ✅ **fait** : US-117 (sp-025) + US-119 (sp-026) |
+| PRE-5 | **Cap libre 1-2 pts pré-allocation explicite (A-1 HIGH)** | PO | Planning P1 | ✅ **fait** : T-113-07 (1 pt ferme), satisfait A-1 sp-025 |
 
 ---
 
@@ -116,7 +103,7 @@ Décision PO selon priorités produit post-Phase 5.
 
 | Cérémonie | Date | Durée |
 |---|---|---|
-| Atelier OPS-PREP-J0 | 2026-06-22 (J-2) | 1h |
+| Atelier OPS-PREP-J0 (T-113-07 + #kpi-alerts-prod) | 2026-06-22 (J-2) | 1h |
 | Sprint Planning P1 (QUOI) | 2026-06-23 | 2h |
 | Sprint Planning P2 (COMMENT) | 2026-06-24 (J0) | 2h |
 | Daily Scrum | quotidien | 15 min |
@@ -136,9 +123,8 @@ Décision PO selon priorités produit post-Phase 5.
 | sprint-025 | 12 | 12 | 1.00 |
 
 - **Vélocité moyenne 16 sprints** : 11.13 pts
-- **Baseline ferme** : 12 pts (confirmé 5× consécutifs sp-021→025 ; sp-026 = 6ᵉ confirmation visée)
-- **Capacité sprint-026** : 12 pts ferme + 1-2 pts libre
-- **ROI sp-025** : −14 % vs estim (dette plus rapide que prévu)
+- **Baseline ferme** : 12 pts (5× confirmés ; sp-026 = 6ᵉ visée)
+- **Capacité sprint-026** : 12 pts ferme (cap libre intégré via T-113-07)
 
 ---
 
@@ -146,16 +132,16 @@ Décision PO selon priorités produit post-Phase 5.
 
 | Risque | Probabilité | Impact | Mitigation |
 |---|---|---|---|
-| Cap libre TBD 4ᵉ fois consécutive | Élevée | Faible | A-1 priorité HIGH, figer Planning P1 |
-| T-113-07 dry-run prod toujours en attente | Moyenne | Moyen | Fenêtre maintenance J0 dédiée |
-| Scope PRE-3 non décidé à temps | Moyenne | Élevé | Reco Tech Lead pré-câblée (Option A + B) |
-| Mago résiduel 1307 issues — nouvelles issues sneak in | Faible | Faible | A-4 hook pre-commit Mago bloquera |
+| T-113-07 dry-run drift > 5 % → trigger abandon ADR-0013 cas 3 | Faible | Élevé | Runbook §5 + décision PO obligatoire |
+| Régression dashboard sur extension drill-down 4 KPIs | Moyenne | Moyen | T-119-04 tests no-régression dédiés |
+| Coef proba forecast US-114 / seuils US-117 arbitraires | Moyenne | Faible | Configurable hiérarchique US-108 |
+| Mago `--rule X` segmenté + tests intermédiaires plus lent | Faible | Faible | Procédure documentée sp-025 retro S-1 |
 
 ---
 
 ## 📝 Notes
 
-- EPIC-003 Phase 5 partial (US-114/115/116 sp-025 done, US-117 backlog).
-- Pattern `KpiCalculator` 6× consécutifs — documenter ADR si extension Phase 5.
-- `sprint-status.yaml` stub sprint-026 : PR #290 mergée.
-- Renommer le dossier `sprint-026` → `sprint-026-<scope>` après décision PRE-3.
+- 6ᵉ confirmation baseline 12 pts visée (sp-021..025 = 5×).
+- Pattern KpiCalculator 7ᵉ application via US-117 (réutilise `MarginAdoptionCalculator` US-112 partiel).
+- A-1 HIGH cap libre TBD résolu : T-113-07 dans le ferme (pas de slot reserved vide).
+- Renommer dossier `sprint-026` → `sprint-026-epic-003-phase-5-continuation` après Planning P1.

@@ -1,45 +1,49 @@
 # Sprint 026 — Sprint Backlog
 
-> **Statut** : `kickoff_pending` — backlog à figer Sprint Planning P1 (2026-06-23).
-> Scope PRE-3 non décidé. Ce fichier est un stub.
+> **Statut** : scope décidé (PRE-3 ✅), décomposition prête. Formalisation Sprint Planning P1 (2026-06-23).
+> Engagement ferme **12 pts** — Phase 5 (5 pts) + Dette résiduelle (6 pts) + Migration prod (1 pt).
 
-## Engagement (à compléter Planning P1)
+## Engagement ferme — 12 pts
 
-| Priorité | ID | Titre | Points | Assigné | Statut |
-|---|---|---|---:|---|---|
-| TBD | TBD | _Décision PO PRE-3_ | — | — | 🔵 To Do |
+| Priorité | ID | Titre | Points | Tâches | Statut |
+|---|---|---|---:|---:|---|
+| 🔴 Must | US-117 | KPI Marge moyenne portefeuille | 3 | 6 | 🔲 To Do |
+| 🟡 Should | US-119 | Extension drill-down Conversion + Margin | 2 | 4 | 🔲 To Do |
+| 🔴 Must | MAGO-LINT-BATCH-002 | Cleanup Mago résiduel (200-300 ciblées) | 2 | 3 | 🔲 To Do |
+| 🟡 Should | COVERAGE-014 | Push coverage 72 → 74 % | 2 | 2 | 🔲 To Do |
+| 🟡 Should | TEST-FUNCTIONAL-FIXES-003 | Audit `skip-pre-push` markers restants | 2 | 2 | 🔲 To Do |
+| 🔴 Must | T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1 | 2 | 🔲 To Do |
 
-**Total engagé : TBD / 12 pts ferme**
+**Total engagé : 12 / 12 pts ferme · 19 tâches · ~35h**
 
-## Candidats Option A — Continuation EPIC-003 Phase 5
+> **Cap libre PRE-5** : intégré au ferme via T-113-07 — A-1 HIGH sp-025 retro satisfait, pas de slot reserved vide (4ᵉ fois TBD évité).
 
-| ID | Titre | Points | Source |
-|---|---|---:|---|
-| US-117 | KPI Marge moyenne portefeuille | 3 | reporté sp-025 (spec créée) |
-| US-118 | KPI nouveau à définir PO | 3 | extension |
-| US-119 | Drill-down conversion / margin | 2 | post-feedback sp-025 |
+## Répartition par couche
 
-## Candidats Option B — Dette résiduelle Sub-epic D
-
-| ID | Titre | Points | Source |
-|---|---|---:|---|
-| MAGO-LINT-BATCH-002 | Cleanup résiduel Mago (200-300 erreurs) | 2 | héritage sp-025 |
-| COVERAGE-014 | Push 72 → 74 % (services legacy) | 2 | héritage sp-025 |
-| TEST-FUNCTIONAL-FIXES-003 | Audit `skip-pre-push` markers | 2 | héritage sp-006 |
-
-## Candidat Option C — Migration prod
-
-| T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1-2 | héritage sp-024 A-5 |
-
-## Cap libre (PRE-5 / A-1)
-
-| Slot | Story | Points | Statut |
-|---|---|---:|---|
-| Libre | _**À assigner Planning P1 — 4ᵉ fois TBD inacceptable**_ | 1-2 | **HIGH priority** |
+| Couche | Tâches | Heures |
+|---|---:|---:|
+| [BE] | 8 | 16h |
+| [FE-WEB] | 2 | 3h |
+| [TEST] | 5 | 11h |
+| [OPS] | 4 | 5h |
+| **TOTAL** | **19** | **35h** |
 
 ## Dépendances
 
 | Item | Dépend de | Statut |
 |---|---|---|
-| Backlog complet | PRE-3 décision scope | ⏳ pending |
-| Stories specs | PRE-4 (dépend PRE-3) | ⏳ pending |
+| US-117 | US-107 (Project.margin snapshot) + US-112 (MarginAdoptionCalculator partiel réutilisé) | ✅ livré sp-023/024 |
+| US-119 | US-115/US-112 read-models + US-116 controller drill-down | ✅ livré sp-024/025 |
+| Sub-epic D items | Indépendants | ✅ |
+| T-113-07 | US-113 (WorkItemMigrator + commande migrate-legacy-cost) | ✅ livré sp-024 |
+| Stories entre elles | Largement indépendantes — parallélisables | ✅ |
+
+## Sprint Planning P1 — points à acter
+
+- [ ] Sprint Goal figé (1 phrase)
+- [ ] Engagement 12 pts confirmé par l'équipe
+- [ ] PRE-5 cap libre : ✅ acté (T-113-07 dans le ferme)
+- [ ] A-1 sp-024 : `enablePullRequestAutoMerge` settings — 3ᵉ fois héritée, traiter
+- [ ] A-7 : décision Slack channel `#kpi-alerts-prod` (atelier OPS-PREP)
+- [ ] T-113-07 : fenêtre maintenance prod planifiée
+- [ ] Dossier `sprint-026` renommé `sprint-026-epic-003-phase-5-continuation`
