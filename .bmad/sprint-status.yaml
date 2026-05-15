@@ -254,12 +254,82 @@ current_sprint:
     firm: 12
     free: 2
     velocity_avg_16_sprints: 11.13
-  committed_points: null
-  committed_breakdown: null
+  committed_points: 12
+  committed_breakdown:
+    US-117: 3
+    US-119: 2
+    MAGO-LINT-BATCH-002: 2
+    COVERAGE-014: 2
+    TEST-FUNCTIONAL-FIXES-003: 2
+    T-113-07: 1
   predecessor: "sprint-025 (closed 2026-05-15, 12/12 pts)"
   notes: |
-    Scope à définir Sprint Planning P1. Candidats issus retro sp-025 +
-    backlog Phase 5. Pattern KpiCalculator établi 6× consécutifs réutilisable.
+    Scope décidé (PRE-3 ✅) : EPIC-003 Phase 5 continuation (5 pts) +
+    Sub-epic D dette résiduelle (6 pts) + Migration prod T-113-07 (1 pt).
+    Décomposition prête : 19 tâches ~35h (project-management/sprints/sprint-026/).
+    Cap libre PRE-5 satisfait via T-113-07 intégré au ferme (A-1 HIGH résolu).
+
+  stories:
+    US-117:
+      title: "KPI Marge moyenne portefeuille"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 3
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 6
+      notes: "Reporté sp-025. Pattern KpiCalculator 7ᵉ application — réutilise MarginAdoptionCalculator US-112 partiel + snapshot Project.margin US-107."
+    US-119:
+      title: "Extension drill-down Conversion + Margin"
+      epic: "EPIC-003"
+      phase: "Phase 5"
+      points: 2
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 4
+      notes: "Étend pattern US-116 sp-025 (DSO + lead time) aux 2 widgets restants. Réutilise BusinessDashboardDrillDownController + KpiDrillDownCsvExporter."
+    MAGO-LINT-BATCH-002:
+      title: "Cleanup Mago résiduel (200-300 erreurs ciblées)"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 2
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 3
+      notes: "Héritage sp-025. Baseline 1307 issues post-sp-025. Procédure segmentée --rule (sp-025 retro S-1)."
+    COVERAGE-014:
+      title: "Push coverage 72 → 74 % (services legacy)"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 2
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 2
+      notes: "Héritage sp-025 backlog. 5 candidats audit sp-025 (WorkloadPrediction 8%, CronExtension 25%, etc.)."
+    TEST-FUNCTIONAL-FIXES-003:
+      title: "Audit `skip-pre-push` markers restants (6 classes)"
+      epic: "TECH"
+      sub_epic: "D"
+      points: 2
+      priority: "Should"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 2
+      notes: "Héritage sp-006 audit (3 markers ADR-0003 conservés, 6 à auditer)."
+    T-113-07:
+      title: "Dry-run prod migration WorkItem.cost legacy"
+      epic: "EPIC-003"
+      phase: "Phase 4 migration prod"
+      points: 1
+      priority: "Must"
+      status: "ready-for-dev"
+      sprint: "sprint-026"
+      tasks: 2
+      notes: "Héritage sp-024 retro A-5 HIGH (2 sprints reportés). Cap libre PRE-5 satisfait. Runbook docs/runbooks/workitem-cost-migration.md."
 
   inherited_actions_sp_025_retro:
     A-1:
@@ -328,22 +398,23 @@ current_sprint:
       status: "pending"
       note: "Sprint-025 a ajouté 24 tests Domain — measurer impact réel"
     PRE-3:
-      action: "Décision PO scope sprint-026 (US-117 ? Phase 5 continuation ? nouveau EPIC ?)"
+      action: "Décision PO scope sprint-026"
       owner: "PO"
       deadline: "Sprint-026 Planning P1"
-      status: "pending"
+      status: "✅ done"
+      decision: "Option A (Phase 5 continuation US-117+US-119 = 5 pts) + Option B (Sub-epic D dette MAGO/COV/TFF3 = 6 pts) + Option C (T-113-07 dry-run prod = 1 pt) = 12 pts ferme"
     PRE-4:
       action: "Stories sprint-026 spécifiées 3C + Gherkin"
       owner: "PO"
       deadline: "Sprint-026 J0 fin"
-      status: "pending"
-      depends_on: "PRE-3 scope décidé"
+      status: "✅ done"
+      detail: "US-117 spec créée sp-025 + US-119 spec créée sp-026. Décomposition 19 tâches dans sprint-026/tasks/."
     PRE-5:
       action: "Cap libre 1-2 pts pré-allocation explicite (A-1 priorité HIGH)"
       owner: "PO"
       deadline: "Sprint-026 Planning P1"
-      status: "pending"
-      note: "4ᵉ sprint consécutif TBD si non fixé — bloqueur"
+      status: "✅ done"
+      decision: "T-113-07 dry-run prod migration WorkItem.cost (1 pt ferme) — A-1 HIGH sp-025 retro satisfait. Pas de slot reserved vide (4ᵉ fois TBD évité)."
 
 # =========================================================================
 # Sprint-025 closure — archived for traceability
