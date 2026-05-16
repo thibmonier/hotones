@@ -901,8 +901,20 @@ Cf. `.snyk` policy pour la stratégie Snyk (US-088).
 ## 🔧 Mago lint — cleanup progressif
 
 Mago est l'analyseur principal qualité code (config `mago.toml`).
-Baseline résiduel : `mago-baseline.json` (1307 issues — résultats du cleanup
-batch initial sprint-025, MAGO-LINT-BATCH-001).
+Baseline résiduel : `mago-baseline.json` (1431 issues — cleanup batch initial
+sprint-025 MAGO-LINT-BATCH-001 + batch résiduel sprint-026 MAGO-LINT-BATCH-002).
+
+### Décomposition baseline résiduelle (sprint-026)
+
+| Catégorie | Count | Stratégie |
+|---|---:|---|
+| `assertion-style` (`self::assert*` → `static::`) | 113 | Mass fix `--unsafe` — déféré sprint-027 (approval explicit requise) |
+| `excessive-parameter-list` (DTOs KPI multi-champs) | 5 | Légitime — DTOs read-only avec 7-9 champs propres |
+| `too-many-methods` (test classes 13-14 méthodes) | 2 | Légitime — coverage scénarios calculator |
+| `single-class-per-file` (Spy co-localisée tests Integration) | 2 | Pattern volontaire — Spy simple proche de son consumer |
+| `no-isset` (pattern array aggregation `if (!isset($x[$k]))`) | 2 | Idiomatique — values jamais null par construction |
+| **Total résiduel sprint-026** | **128** | Absorbé baseline, plan reprise sprint-027 |
+| Baseline antérieure sprint-025 | 1303 | Cleanup en cours par lots progressifs |
 
 ### Workflow contributeur
 

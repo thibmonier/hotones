@@ -186,7 +186,7 @@ final class ConversionRateCalculatorTest extends TestCase
     public function testGeneratorInputIsConsumedOnceForMultipleWindows(): void
     {
         $now = $this->now;
-        $generator = (function () use ($now) {
+        $generator = (static function () use ($now) {
             yield new OrderConversionRecord('signe', $now->modify('-5 days'));
         })();
 

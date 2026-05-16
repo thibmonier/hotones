@@ -55,7 +55,19 @@ message = "Use of the `isset` construct."
 count = 1
 
 [[issues]]
+file = "src/Application/Project/Query/ConversionRateKpi/ConversionRateKpiDto.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
 file = "src/Application/Project/Query/DsoKpi/DsoKpiDto.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
+
+[[issues]]
+file = "src/Application/Project/Query/RevenueForecastKpi/RevenueForecastKpiDto.php"
 code = "excessive-parameter-list"
 message = "Parameter list is too long."
 count = 1
@@ -965,6 +977,12 @@ file = "src/Controller/Admin/BoondManagerSettingsController.php"
 code = "no-else-clause"
 message = "Avoid `else` clauses."
 count = 3
+
+[[issues]]
+file = "src/Controller/Admin/BusinessDashboardController.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 1
 
 [[issues]]
 file = "src/Controller/Admin/CompanyCrudController.php"
@@ -2323,6 +2341,12 @@ message = "Interface has too many methods."
 count = 1
 
 [[issues]]
+file = "src/Domain/Project/ValueObject/ConversionRate.php"
+code = "excessive-parameter-list"
+message = "Parameter list is too long."
+count = 2
+
+[[issues]]
 file = "src/Domain/Shared/ValueObject/Money.php"
 code = "no-empty"
 message = "Use of the `empty` construct."
@@ -3283,9 +3307,21 @@ message = "Class has too many methods."
 count = 1
 
 [[issues]]
+file = "src/Infrastructure/Project/Persistence/Doctrine/DoctrineBillingLeadTimeReadModelRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
 file = "src/Infrastructure/Project/Persistence/Doctrine/DoctrineDddProjectRepository.php"
 code = "too-many-methods"
 message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "src/Infrastructure/Project/Persistence/Doctrine/DoctrineDsoReadModelRepository.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
 count = 1
 
 [[issues]]
@@ -4729,6 +4765,12 @@ message = "Literal passwords or sensitive data should not be stored in code."
 count = 8
 
 [[issues]]
+file = "tests/Functional/Controller/Admin/BusinessDashboardDrillDownControllerTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 7
+
+[[issues]]
 file = "tests/Functional/Controller/Admin/OnboardingTemplateControllerTest.php"
 code = "too-many-methods"
 message = "Class has too many methods."
@@ -4792,6 +4834,30 @@ count = 1
 file = "tests/Integration/Application/Project/MarginAdoptionFlowTest.php"
 code = "single-class-per-file"
 message = "File contains multiple class-like definitions; found class `MarginAdoptionSlackAlertingSpy` but class `MarginAdoptionFlowTest` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/Project/OrderStatusChangedEventConversionRateFlowTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 10
+
+[[issues]]
+file = "tests/Integration/Application/Project/OrderStatusChangedEventConversionRateFlowTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `ConversionRateSlackAlertingSpy` but class `OrderStatusChangedEventConversionRateFlowTest` is already defined in this file."
+count = 1
+
+[[issues]]
+file = "tests/Integration/Application/Project/OrderStatusChangedEventRevenueForecastFlowTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 9
+
+[[issues]]
+file = "tests/Integration/Application/Project/OrderStatusChangedEventRevenueForecastFlowTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `RevenueForecastSlackAlertingSpy` but class `OrderStatusChangedEventRevenueForecastFlowTest` is already defined in this file."
 count = 1
 
 [[issues]]
@@ -5035,6 +5101,42 @@ message = "Class has too many methods."
 count = 1
 
 [[issues]]
+file = "tests/Unit/Domain/Project/Service/BillingLeadTimeStatsTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 8
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Service/ConversionRateCalculatorTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 30
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Service/ConversionRateCalculatorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Service/MarginAdoptionStatsTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 10
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Service/RevenueForecastCalculatorTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 26
+
+[[issues]]
+file = "tests/Unit/Domain/Project/Service/RevenueForecastCalculatorTest.php"
+code = "too-many-methods"
+message = "Class has too many methods."
+count = 1
+
+[[issues]]
 file = "tests/Unit/Domain/Shared/ValueObject/MoneyTest.php"
 code = "too-many-methods"
 message = "Class has too many methods."
@@ -5069,6 +5171,18 @@ file = "tests/Unit/Domain/WorkItem/Entity/WorkItemTransitionsTest.php"
 code = "too-many-methods"
 message = "Class has too many methods."
 count = 1
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/Migration/MigrationDriftDetailTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 6
+
+[[issues]]
+file = "tests/Unit/Domain/WorkItem/Migration/WorkItemMigrationResultTest.php"
+code = "assertion-style"
+message = "Inconsistent assertions style."
+count = 7
 
 [[issues]]
 file = "tests/Unit/Domain/WorkItem/Migration/WorkItemMigratorTest.php"
