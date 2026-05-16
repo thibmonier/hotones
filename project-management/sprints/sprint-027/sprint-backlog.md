@@ -1,80 +1,80 @@
 # Sprint 027 — Sprint Backlog
 
-> **Statut** : kickoff_pending (scope partiel décidé sp-026 retro). Formalisation Sprint Planning P1.
-> Engagement provisoire **12 pts** — 6 pts ops/dette confirmés + 6 pts features TBD.
+> **Statut** : scope_figed (Planning P1 2026-05-16). Prêt développement.
+> Engagement ferme **12 pts** — 8 pts features UX + 1 pt ops migration + 3 pts dette ciblée.
 
-## Engagement provisoire — 12 pts
+## Engagement ferme — 12 pts
 
-### Ops migration prod (1 pt confirmé)
-
-| Priorité | ID | Titre | Points | Tâches | Statut |
-|---|---|---|---:|---:|---|
-| 🔴 Must | T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1 | 2 | 🔲 To Do |
-
-### Sub-epic D dette résiduelle (5 pts confirmés)
+### Features EPIC-003 Phase 6 (8 pts)
 
 | Priorité | ID | Titre | Points | Tâches | Statut |
 |---|---|---|---:|---:|---|
-| 🟡 Should | MAGO-LINT-BATCH-003 | Cleanup assertion-style 113 fixes (`--unsafe` PR preview review) | 2 | 3 | 🔲 To Do |
-| 🟡 Should | OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK | Script + Makefile + hook retro + alerte Slack | 1 | 4 | 🔲 To Do |
-| 🟡 Should | OPS-DEPENDENCY-FRESHNESS-CHECK | Script audit composer + yarn + cron Slack hebdo | 1 | 4 | 🔲 To Do |
-| 🟢 Could | KPI-TEST-SUPPORT-TRAIT | Helper trait Multi-tenant + cache + setUp (refactor) | 1 | 1 | 🔲 To Do |
+| 🔴 Must | US-120 | UX refonte dashboard 9 KPIs (responsivité mobile + ordre lisible) | 8 | TBD Planning P2 | 🔲 To Do |
 
-### Features TBD (6 pts) — Planning P1
+### Ops migration prod (1 pt — A-1 HIGH sp-026 retro)
 
 | Priorité | ID | Titre | Points | Tâches | Statut |
 |---|---|---|---:|---:|---|
-| TBD | ??? | TBD Planning P1 (EPIC-003 Phase 6 OU nouvel EPIC OU UX refonte dashboard) | 6 | TBD | 🔲 TBD |
+| 🔴 Must | T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1 | 2 | 🔲 To Do (`requires:ops-human`) |
 
-**Total provisoire engagé : 6 pts ferme + 6 pts TBD = 12 / 12 pts cible**
+**Fenêtre maintenance prod : semaine 2 sp-027 (J5-J10)** — atelier OPS-PREP-J0 J-2.
 
-## Répartition provisoire par couche (sous réserve scope TBD)
+### Sub-epic D dette ciblée (3 pts)
 
-| Couche | Tâches confirmées | Heures |
+| Priorité | ID | Titre | Points | Tâches | Statut |
+|---|---|---|---:|---:|---|
+| 🟡 Should | MAGO-LINT-BATCH-003 | Cleanup assertion-style 113 fixes — **3 PRs split** | 2 | 3 | 🔲 To Do |
+| 🟡 Should | OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK | Script + Makefile + hook retro + alerte Slack 24h | 1 | 4 | 🔲 To Do |
+
+**Total engagé : 12 / 12 pts ferme · 4 stories · ~22 tâches (TBD US-120 Planning P2)**
+
+## Stories reportées sp-028
+
+| ID | Titre | Points | Raison report |
+|---|---|---:|---|
+| KPI-TEST-SUPPORT-TRAIT | Helper trait Multi-tenant + cache + setUp | 1 | Priorité UX > refactor (3ᵉ report A-3 sp-025) |
+| OPS-DEPENDENCY-FRESHNESS-CHECK | Script audit composer + yarn + cron Slack hebdo | 1 | Priorité UX > process complementary |
+| Slack `#kpi-alerts-prod` (A-7 sp-024..026) | Channel création | — | **5ᵉ tentative sp-028 — ADR-0019 Out Backlog si nouvel échec** |
+
+## Répartition par couche (estimation pré-Planning P2)
+
+| Couche | Tâches estim | Heures estim |
 |---|---:|---:|
+| [FE-WEB] (UX refonte) | ~10 | ~18h |
 | [BE] | 2 | 3.5h |
-| [OPS] | 8 | 10h |
-| [TEST] | 1 | 3h |
+| [OPS] | 5 | 5h |
+| [TEST] | 3 | 5h |
 | [DOC] | 1 | 0.5h |
-| **TOTAL confirmé** | **12** | **17h** |
-| TBD (6 pts features) | ~10 | ~18h |
-| **TOTAL cible** | **~22** | **~35h** |
+| **TOTAL** | **~21** | **~32h** |
 
 ## Dépendances
 
 | Item | Dépend de | Statut |
 |---|---|---|
-| T-113-07 | Fenêtre maintenance prod planifiée + accès Tech Lead + backup BDD | ⚠️ J-2 OPS-PREP |
-| MAGO-LINT-BATCH-003 | Approval explicit `--unsafe` (label PR `mago-unsafe-review`) | ⚠️ PO + Tech Lead Planning P1 |
-| OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK | Accès DB prod read-only ou SSH-tunnel | ⚠️ Tech Lead |
-| OPS-DEPENDENCY-FRESHNESS-CHECK | Slack channel `#tech-lead-digest` créé | ⚠️ A-6 Planning P1 |
-| KPI-TEST-SUPPORT-TRAIT | Indépendant — extraction refactor | ✅ |
-| Features TBD | Scope identifié Planning P1 | ❌ atelier scope J-3 obligatoire |
+| US-120 UX refonte | Wireframes + design tokens existants + feedback stakeholders sp-026 | 🟡 atelier UX J-3 |
+| T-113-07 | Fenêtre maintenance prod + accès Tech Lead + backup BDD | ⚠️ OPS-PREP-J0 J-2 |
+| MAGO-LINT-BATCH-003 | Auto-merge activé (✅ 2026-05-16) + label PR `mago-unsafe-review` | ✅ ready |
+| OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK | Accès DB prod read-only ou `doctrine:migrations:status --env=prod` | ⚠️ Tech Lead |
 
-## Sprint Planning P1 — points à acter
+## Sprint Planning P2 — points à acter
 
-- [ ] Sprint Goal figé (1 phrase)
-- [ ] Scope features TBD identifié (6 pts)
-- [ ] Engagement 12 pts confirmé par équipe
-- [ ] T-113-07 fenêtre maintenance prod ferme avec date+heure
-- [ ] A-2 décision tag `requires:ops-human` ou exclusion engagement-ratio
-- [ ] A-3 approval `--unsafe` Mago + label PR
-- [ ] A-5 décision `batch-queue.yaml` (gitignore vs single PR vs auto-merge)
-- [ ] A-6 Slack `#kpi-alerts-prod` création (4ᵉ tentative — décision PO+TL)
-- [ ] Décompte ops-bloquant des pts engagement-ratio (L-3 sp-026 retro)
-- [ ] Dossier `sprint-027` renommé selon scope figé (ex: `sprint-027-ops-dette-phase-6` ou autre)
+- [ ] US-120 décomposition tâches (atelier wireframes pré-J0)
+- [ ] T-113-07 créneau fenêtre maintenance ferme (jour+heure)
+- [ ] MAGO-LINT-BATCH-003 split PRs Unit→Integration→Functional ordre
+- [ ] OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK accès DB prod modalité
+- [ ] Dossier `sprint-027` renommé `sprint-027-ux-refonte-dashboard-phase-6`
+- [ ] Tag `requires:ops-human` métadata format YAML défini
 
 ## Risques
 
 | Risque | Probabilité | Mitigation |
 |---|---|---|
-| T-113-07 4ᵉ report si fenêtre non confirmée | Moyenne | Atelier OPS-PREP J-2 ferme + créneau accepté |
-| 6 pts features TBD non identifiés J0 | Faible | Atelier scope J-3 obligatoire (PO + Tech Lead) |
-| Mago `--unsafe` mass diff 113 fichiers tests | Moyenne | Split en 3 PRs (Unit / Integration / Functional) |
-| OPS scripts nécessitent accès prod restreint | Faible | SSH-tunnel ou `doctrine:migrations:status --env=prod` read-only |
+| US-120 UX refonte sous-estimée 8 pts | Moyenne | Wireframes pré-Planning P1 + scoping atelier UX |
+| T-113-07 fenêtre maintenance non confirmée | Faible | Atelier OPS-PREP-J0 J-2 ferme |
+| Mago 3 PRs split conflit séquentiel | Moyenne | Stack PRs ordre + auto-merge activé |
 
 ---
 
 **Auteur** : Tech Lead
-**Date** : 2026-05-16 (kickoff stub)
-**Version** : 0.1.0 (provisoire)
+**Date** : 2026-05-16 (Planning P1 figé)
+**Version** : 1.0.0
