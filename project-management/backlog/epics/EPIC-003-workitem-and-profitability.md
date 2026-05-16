@@ -3,7 +3,7 @@
 ## Métadonnées
 
 - **ID** : EPIC-003
-- **Statut** : 🟡 In Progress (Phase 3 finition, sprint-023)
+- **Statut** : 🟢 Phase 5 complète (9 KPIs dashboard livrés sp-026) — Phase 6 à scoper sp-027
 - **Priorité** : **High**
 - **MMF** : « Toute saisie temps contributeur recalcule la marge projet temps réel ; tout dépassement seuil configuré déclenche alerte Slack `#alerts-prod` en < 5 min. »
 - **Créé le** : 2026-05-08 (atelier PO sprint-019, ADR-0013)
@@ -99,14 +99,41 @@ contributeurs (`WorkItem`).
 | US-108 | Configurabilité hiérarchique seuil marge (Q5.1 D) | 2 | sprint-023 | ✅ |
 | US-109 | (réservé Phase 3 finition / Phase 4 kickoff) | — | sprint-023 | 🟡 |
 
-### Phase 4 — KPIs dashboard + adoption (sprint-024+, planifiée)
+### Phase 4 — KPIs dashboard + migration legacy (sprint-024, livrée)
 
-| ID | Titre | Pts | Notes |
-|---|---|---:|---|
-| US-110 | KPI DSO calcul + exposition dashboard | 3 | EPIC-002 dashboard étendu |
-| US-111 | KPI temps facturation lead time devis → facture | 3 | — |
-| US-112 | KPI % projets adoption marge temps réel | 2 | — |
-| US-113 | Migration historique `WorkItem.cost` legacy → DDD | 3 | Cf audit Phase 1 |
+| ID | Titre | Pts | Sprint | Statut |
+|---|---|---:|---|---|
+| US-110 | KPI DSO calcul + exposition dashboard | 3 | sprint-024 | ✅ |
+| US-111 | KPI temps facturation lead time devis → facture | 3 | sprint-024 | ✅ |
+| US-112 | KPI % projets adoption marge temps réel | 2 | sprint-024 | ✅ |
+| US-113 | Migration historique `WorkItem.cost` legacy → DDD (T-113-01..06) | 3 | sprint-024 | ✅ |
+| T-113-07 | Dry-run prod migration WorkItem.cost legacy | 1 | sprint-027 (reporté sp-026) | ⏳ ops fenêtre maintenance |
+
+### Phase 5 — KPIs business avancés + drill-down (sprint-025/026, livrée)
+
+| ID | Titre | Pts | Sprint | Statut |
+|---|---|---:|---|---|
+| US-114 | KPI Revenue forecast (prévision CA glissante) | 3 | sprint-025 | ✅ |
+| US-115 | KPI Taux conversion devis → commande | 3 | sprint-025 | ✅ |
+| US-116 | Extension widgets DSO/lead-time (drill-down + export CSV) | 2 | sprint-025 | ✅ |
+| US-117 | KPI Marge moyenne portefeuille | 3 | sprint-026 | ✅ |
+| US-119 | Extension drill-down Conversion + Margin | 2 | sprint-026 | ✅ |
+
+**Bilan Phase 5** : 9 KPIs dashboard total (3 existants + 3 sp-024 + 3 sp-025/026), 4 widgets drill-down complets, pattern KpiCalculator 7ᵉ application consécutive.
+
+### Phase 6 — Scope à figer Planning P1 sp-027
+
+Candidats identifiés (à arbitrer avec PO) :
+
+| Option | Description | Pts estim |
+|---|---|---:|
+| A | Pagination drill-down 4 KPIs (volume > 50 clients) — A-8 sp-025 retro | 2-3 |
+| B | UX refonte dashboard 9 KPIs (responsivité mobile, ordre lisible) | 5-8 |
+| C | KPI #10 (à identifier avec PO — ex : CSAT post-livraison, NPS interne) | 3 |
+| D | Drift detection migration `WorkItem.cost` (post T-113-07 dry-run) | 2 |
+| E | Refonte alerting hiérarchique Slack (consolidation 4 channels alert) | 3 |
+
+**Décision** : atelier scope OPS-PREP-J0 sp-027 J-2 (PO + Tech Lead).
 
 ---
 
@@ -119,6 +146,8 @@ flowchart TD
     EPIC003P1 --> EPIC003P2[Phase 2 ACL + invariants]
     EPIC003P2 --> EPIC003P3
     EPIC003P3 --> EPIC003P4[Phase 4 KPIs dashboard]
+    EPIC003P4 --> EPIC003P5[Phase 5 KPIs business avances + drill-down]
+    EPIC003P5 --> EPIC003P6[Phase 6 TBD]
 ```
 
 | Item | Dépend de | Status |
@@ -141,7 +170,7 @@ flowchart TD
 
 ---
 
-## Plan macro (6 sprints estimés, 4 livrés)
+## Plan macro (8 sprints livrés, Phase 6 à scoper sp-027)
 
 | Sprint | Phase | Stories | Livrables | Statut |
 |---|---|---|---|---|
@@ -149,8 +178,11 @@ flowchart TD
 | sprint-020 | Phase 2 | US-098 + US-099 | ACL + invariants journaliers + ADR-0015 | ✅ |
 | sprint-021 | Phase 3.1 | US-100..US-102 | UC RecordWorkItem + Workflow + UI grille | ✅ |
 | sprint-022 | Phase 3.2 | US-103..US-105 | MarginCalculator + alerte Slack + strangler étape 1 | ✅ |
-| sprint-023 | Phase 3.3 | US-106..US-108 | Refactor Subscriber + persistence margin + configurabilité | 🟡 finition |
-| sprint-024 | Phase 4 | US-110..US-113 | KPIs DSO + temps facturation + migration legacy | ⏳ planifié |
+| sprint-023 | Phase 3.3 | US-106..US-108 | Refactor Subscriber + persistence margin + configurabilité | ✅ |
+| sprint-024 | Phase 4 | US-110..US-113 (T-113-01..06) | KPIs DSO + temps facturation + adoption + migration legacy | ✅ |
+| sprint-025 | Phase 5.1 | US-114..US-116 | KPIs Revenue forecast + Conversion rate + drill-down DSO/lead-time | ✅ |
+| sprint-026 | Phase 5.2 | US-117 + US-119 | KPI Marge portefeuille + drill-down Conv/Margin (9 KPIs total) | ✅ |
+| sprint-027 | Phase 6 | TBD + T-113-07 ops | Scope figer Planning P1 (candidats A-E) | ⏳ kickoff |
 
 ---
 
@@ -169,8 +201,10 @@ flowchart TD
 2. < 3 utilisations alerte dépassement / mois post prod → fonctionnalité gadget
 3. Bug data integrity > 5 % vs comptable → bloquer scaling
 
-**Statut actuel** : Phase 3 finition sprint-023 (5ᵉ sprint EPIC-003). MVP
-calcul marge + alerte livré sprint-022. Trigger 1 non déclenché.
+**Statut actuel** : Phase 5 complète sprint-026 (8 sprints EPIC-003 livrés).
+MVP calcul marge + alerte livré sprint-022. 9 KPIs dashboard livrés.
+Trigger 1 non déclenché (8 sprints, MVP livré sp-022, scope étendu Phase 4/5
+non blocage).
 
 ---
 
@@ -178,4 +212,5 @@ calcul marge + alerte livré sprint-022. Trigger 1 non déclenché.
 
 - ADR-0013 (scope) / 0015 (Phase 2) / 0016 (Phase 3)
 - Audit data : `docs/02-architecture/epic-003-audit-existing-data.md`
-- Sprints sprint-019 → sprint-023 + sprint-024 (planifié Phase 4)
+- Runbook T-113-07 : `docs/runbooks/workitem-cost-migration.md`
+- Sprints sprint-019 → sprint-026 livrés ; sprint-027 Phase 6 à figer

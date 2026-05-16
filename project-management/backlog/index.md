@@ -1,6 +1,6 @@
 # Backlog Index
 
-> Dernière mise à jour: 2026-05-11
+> Dernière mise à jour: 2026-05-16
 
 ---
 
@@ -9,12 +9,13 @@
 | Type | 🔴 To Do | 🟡 In Progress | ⏸️ Blocked | 🟢 Done | Total |
 |------|----------|----------------|------------|---------|-------|
 | EPICs | 0 | 1 | 0 | 2 | 3 |
-| User Stories | ~70 | 1 | 0 | ~29 | 100 |
-| Tasks (in sprints) | — | — | — | — | 58 |
+| User Stories | ~70 | 0 | 0 | ~44 | ~114 |
+| Tasks (in sprints) | — | — | — | — | 100+ |
 
-> Statuts US dérivés livraisons git sprint-001..023. Reste 70 stories
-> non démarrées dans backlog/user-stories/US-*.md (split 2026-05-11
-> depuis BC files, voir `by-bc-archive/`).
+> Statuts US dérivés livraisons git sprint-001..026. Delta depuis 2026-05-11 :
+> +15 US livrées (US-110..US-119 EPIC-003 Phase 4+5 + 5 dette/tests/ops),
+> +2 OPS captures backlog (OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK +
+> OPS-DEPENDENCY-FRESHNESS-CHECK).
 
 ---
 
@@ -24,34 +25,46 @@
 |----|-----|--------|----------|-----|-------------|
 | EPIC-001 | Migration Clean Architecture DDD | 🟢 Done | High | ~15 (sprint-007..014) | 100 % (4 phases livrées) |
 | EPIC-002 | Observability & Performance | 🟢 Done | High | US-091..US-095 | 100 % (sprints 016-018, 124-130 % engagement) |
-| EPIC-003 | WorkItem & Profitability | 🟡 In Progress | High | US-097..US-108 + Phase 4 planifiée | Phase 3 finition (sprint-023, 5ᵉ sprint sur 6 estimés) |
+| EPIC-003 | WorkItem & Profitability | 🟡 Phase 5 done | High | US-097..US-119 (Phase 6 TBD) | 100 % Phase 5 (8 sp livrés, 9 KPIs dashboard) |
 
 ---
 
 ## Sprint Actuel
 
-**sprint-024 — EPIC-003 Phase 4 Kickoff (KPIs business) — kickoff pending**
+**sprint-027 — Ops migration prod + dette résorption + features TBD — kickoff pending**
 
 | Champ | Valeur |
 |---|---|
-| Période | 2026-05-27 → 2026-06-10 (10 jours ouvrés) |
-| Capacité | 12 pts ferme + 1-2 pts libre (4ᵉ confirmation recalibrage durable) |
-| Goal | KPIs business (DSO + temps facturation + adoption marge). Décision PO PRE-5 Render redeploy 6ᵉ sprint consécutif holdover (trigger atteint). |
-| Stories engagées (provisoire) | US-110/111/112/113 + OPS-PRE5-DECISION |
-| Statut | kickoff_pending — Sprint Planning P1 à 2026-05-27 |
+| Période | 2026-07-08 → 2026-07-22 (10 jours ouvrés) — clôture anticipée probable |
+| Capacité | 12 pts ferme (7ᵉ confirmation recalibrage durable visée) |
+| Goal | Solde T-113-07 dry-run prod + cleanup Mago assertion-style + 2 OPS stories process + features TBD Planning P1 |
+| Stories engagées (6 pts ferme) | T-113-07 + MAGO-LINT-BATCH-003 + OPS-SPRINT-CLOSURE-MIGRATIONS-CHECK + OPS-DEPENDENCY-FRESHNESS-CHECK + KPI-TEST-SUPPORT-TRAIT |
+| Stories TBD (6 pts) | Phase 6 EPIC-003 OU autre — Planning P1 |
+| Statut | kickoff_pending — atelier OPS-PREP-J0 J-2 + Sprint Planning P1 |
 
-Voir : `project-management/sprints/sprint-024-epic-003-phase-4-kickoff/sprint-goal.md`
+Voir : `project-management/sprints/sprint-027/sprint-goal.md`
 
-### Sprint Précédent — sprint-023 ✅ CLOSED 2026-05-11
+### Sprint Précédent — sprint-026 ✅ CLOSED 2026-05-16
+
+| Champ | Valeur |
+|---|---|
+| Engagement | 12 pts ferme |
+| Livré | **11 pts (92 %)** — T-113-07 reporté ops humaine |
+| Stories | US-117 + US-119 + MAGO-LINT-BATCH-002 + COVERAGE-014 + TEST-FUNCTIONAL-FIXES-003 |
+| Highlights | EPIC-003 Phase 5 complète (9 KPIs total dashboard), pattern KpiCalculator 7ᵉ application, nouveau Domain Event ProjectMarginRecalculatedEvent, sur-livraison TEST-FUNCTIONAL-FIXES-003 (14 markers retirés vs 6 spec), 6ᵉ sprint consécutif 0 commit `--no-verify` |
+
+Voir : `project-management/sprints/sprint-026/sprint-review.md` + `sprint-retro.md`
+
+### Sprint Avant-Précédent — sprint-025 ✅ CLOSED 2026-05-15
 
 | Champ | Valeur |
 |---|---|
 | Engagement | 12 pts ferme |
 | Livré | **12 pts (100 %)** |
-| Stories | US-106 + US-107 + US-108 + COVERAGE-012 + INTEGRATION-21-SUITE |
-| Highlights | Strangler fig EPIC-003 Phase 3 complet (LowMarginAlertEvent supprimé), persistence margin snapshot, configurabilité hiérarchique seuil, 3ᵉ sprint consécutif 0 holdover OPS, coverage 70 % atteint, 0 commit `--no-verify` |
+| Stories | US-114 + US-115 + US-116 + MAGO-LINT-BATCH-001 + VACATION-REPO-AUDIT + TEST-COVERAGE-013 |
+| Highlights | EPIC-003 Phase 5 démarrée (2 KPIs Revenue forecast + Conversion rate + drill-down DSO/lead-time), Sub-epic D dette soldée, Mago baseline activé (1307 issues) |
 
-Voir : `project-management/sprints/sprint-023-epic-003-phase-3-finition/sprint-review.md` + `sprint-retro.md`
+Voir : `project-management/sprints/sprint-025/sprint-review.md`
 
 ---
 
@@ -76,7 +89,10 @@ Voir : `project-management/sprints/sprint-023-epic-003-phase-3-finition/sprint-r
 | sprint-021 | EPIC-003 Phase 3 RecordWorkItem | TBD | TBD | TBD |
 | sprint-022 | EPIC-003 Phase 3 Completion | 12 | 13 (108 %) | 13 |
 | sprint-023 | EPIC-003 Phase 3 Finition ✅ closed 2026-05-11 | 12 | 12 (100 %) | 12 |
-| sprint-024 | EPIC-003 Phase 4 Kickoff (kickoff pending) | TBD | — | — |
+| sprint-024 | EPIC-003 Phase 4 KPIs DSO/lead-time/adoption + migration ✅ closed 2026-05-14 | 12 | 12 (100 %) | 12 |
+| sprint-025 | EPIC-003 Phase 5.1 Revenue forecast + Conversion + drill-down ✅ closed 2026-05-15 | 12 | 12 (100 %) | 12 |
+| sprint-026 | EPIC-003 Phase 5.2 + dette + T-113-07 reporté ✅ closed 2026-05-16 | 12 | 11 (92 %) | 11 |
+| sprint-027 | Ops migration prod + dette + Phase 6 TBD (kickoff pending) | 12 | — | — |
 
 > Détail vélocité : `.bmad/sprint-status.yaml` (rebuild en cours, voir
 > backup `.bmad/sprint-status.yaml.backup-2026-05-11-sprint011`).
@@ -91,7 +107,7 @@ backlog/
 ├── epics/
 │   ├── EPIC-001-migration-clean-architecture-ddd.md  ✅
 │   ├── EPIC-002-observability-and-performance.md     ✅
-│   └── EPIC-003-workitem-and-profitability.md        🟡
+│   └── EPIC-003-workitem-and-profitability.md        🟡 Phase 5 done
 ├── user-stories/
 │   ├── US-001-*.md ... US-142-*.md   # 100 fichiers individuels (split 2026-05-11)
 │   ├── INDEX.md                       # Index legacy (pré-split)
