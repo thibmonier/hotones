@@ -9,7 +9,6 @@ use App\Entity\Company;
 use App\Infrastructure\Multitenant\TenantContext;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -28,13 +27,11 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * Ces tests sont l'évidence end-to-end demandée par gap-analysis #1
  * (multi-tenant SQLFilter absent → maintenant présent et testé).
  *
- * @see ADR-0004 — sprint-008 INVESTIGATE-FUNCTIONAL-FAILURES.
- *      3 / 4 tests présentent une régression depuis le merge initial PR #118.
- *      Investigation différée à sprint-009 (story SEC-MULTITENANT-FIX-001, 2 pts).
- *      Marker `skip-pre-push` posé pour ne pas bloquer les nouveaux pushes.
- *      CI continue d'exécuter la suite complète et signale les régressions.
+ * @see ADR-0004 — sprint-008 INVESTIGATE-FUNCTIONAL-FAILURES historique.
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré
+ * — régression initiale résorbée (audit verts en pre-push).
  */
-#[Group('skip-pre-push')]
 final class TenantFilterRegressionTest extends KernelTestCase
 {
     use Factories;

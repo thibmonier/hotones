@@ -12,15 +12,15 @@ use App\Factory\UserFactory;
 use App\Tests\Support\MultiTenantTestTrait;
 use DateTime;
 use DateTimeImmutable;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * Functional tests for `/admin/business-dashboard/drill-down/{kpi}` (US-116 T-116-04).
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 final class BusinessDashboardDrillDownControllerTest extends WebTestCase
 {
     use Factories;

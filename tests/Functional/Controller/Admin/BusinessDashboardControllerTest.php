@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller\Admin;
 
 use App\Factory\UserFactory;
 use App\Tests\Support\MultiTenantTestTrait;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -17,8 +16,10 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * - US-110 T-110-04 DSO widget
  * - US-111 T-111-04 billing lead time widget
  * - US-112 T-112-03 margin adoption widget
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré
+ * — tous tests passent désormais en pre-push (passe en CI complète).
  */
-#[Group('skip-pre-push')]
 final class BusinessDashboardControllerTest extends WebTestCase
 {
     use Factories;

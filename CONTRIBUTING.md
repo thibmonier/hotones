@@ -169,8 +169,14 @@ Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-p
 #### Liste des classes skippées
 
 > **Audit sprint-006** (TEST-FUNCTIONAL-FIXES-002, PRs #100 → #103) :
-> 5 markers retirés (causes racines fixées), 3 markers conservés via ADR-0003,
-> 6 markers restent à auditer hors scope sprint-006.
+> 5 markers retirés (causes racines fixées), 3 markers conservés via ADR-0003.
+>
+> **Audit sprint-026** (TEST-FUNCTIONAL-FIXES-003) :
+> 11 markers stale retirés (tests passent désormais en pre-push après
+> stabilisation framework Symfony 8 + fixes amont multi-tenant cumulés
+> sp-007 → sp-025). 3 Vacation conservés via ADR-0003. Plus 1
+> BusinessDashboardDrillDownControllerTest (US-119 sp-026) ajouté avec
+> marker puis nettoyé immédiatement.
 
 **Markers conservés (legacy tolérée — voir [ADR-0003](docs/02-architecture/adr/0003-test-legacy-tolerance-vacation-csrf-session-boundary.md))**
 
@@ -182,17 +188,25 @@ Le pre-push hook lance la suite **sans** les tests marqués `#[Group('skip-pre-p
 
 Refonte planifiée **EPIC-001 phase 2** (migration BC Vacation → DDD complet) ou refactor centralisé `SessionAwareTestTrait`.
 
-**Markers à auditer (hors scope sprint-006, candidats sprint-009+)**
+**Markers retirés sprint-026** (cause racine résorbée, tests verts en pre-push)
 
-| Test | Catégorie | Raison |
-|---|---|---|
-| `MultiTenant\ControllerAccessControlTest` | Multi-tenant | Filtre company-context fait fail certains asserts |
-| `Controller\Analytics\DashboardControllerTest` | Session | Period selection state perdu entre requests |
-| `Controller\HomeControllerTest` | Auth | Auth flow flaky en test |
-| `Service\NotificationEventChainTest` | Integration | Event dispatch non-déterministe en test container |
-| `Controller\Admin\OnboardingTemplateControllerTest` | Admin | Patterns admin EA5 non couverts par fixtures (cf ADR-0004 sprint-008) |
-| `Controller\TimesheetControllerTest` | Multi-tenant | Filter exclut les fixtures cross-company |
-| `MultiTenant\TenantFilterRegressionTest` | Multi-tenant | **Régression sprint-007** (3/4 tests) — `find()` ne semble pas appliquer le SQLFilter. Story `SEC-MULTITENANT-FIX-001` sprint-009 (2 pts). cf ADR-0004 |
+| Test | Cause racine historique |
+|---|---|
+| `Functional\Controller\HomeControllerTest` | Auth flow flaky (résolu) |
+| `Functional\Controller\Admin\BusinessDashboardControllerTest` | Multi-tenant + fixtures (résolu via MultiTenantTestTrait sp-007) |
+| `Functional\Controller\Admin\BusinessDashboardDrillDownControllerTest` | Idem (US-116 sp-025 + US-119 sp-026) |
+| `Functional\Controller\Admin\OnboardingTemplateControllerTest` | Patterns admin EA5 (résolu) |
+| `Functional\Controller\Analytics\DashboardControllerTest` | Session state |
+| `Functional\Controller\Client\ClientControllerDddTest` | DDD stack Phase 3 stable |
+| `Functional\Controller\Invoice\InvoiceControllerDddTest` | DDD stack Phase 4 stable |
+| `Functional\Controller\Order\OrderControllerDddTest` | DDD stack Phase 4 stable |
+| `Functional\Controller\Project\ProjectControllerDddTest` | DDD stack Phase 4 stable |
+| `Functional\Controller\TimesheetControllerTest` | Multi-tenant filter résolu |
+| `Functional\Controller\WeeklyTimesheetControllerTest` | Multi-tenant filter résolu |
+| `Functional\MultiTenant\ControllerAccessControlTest` | Filter company-context résolu sp-007 |
+| `Functional\MultiTenant\TenantFilterRegressionTest` | Régression sp-007 résorbée |
+| `Integration\Infrastructure\Contributor\DoctrineDddContributorRepositoryIntegrationTest` | ACL stack stable sp-015 |
+| `Integration\Service\NotificationEventChainTest` | Event dispatch déterministe avec Symfony 8 |
 
 **Markers retirés (causes racines fixées sprint-006)**
 

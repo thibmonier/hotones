@@ -11,7 +11,6 @@ use App\Factory\ClientFactory;
 use App\Factory\ProjectFactory;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -25,8 +24,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * - Un utilisateur de Company A ne peut PAS accéder aux données de Company B
  * - Les routes respectent l'isolation multi-tenant
  * - Les tentatives d'accès cross-company retournent 404 ou 403
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 class ControllerAccessControlTest extends WebTestCase
 {
     use Factories;
