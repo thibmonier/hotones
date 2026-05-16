@@ -8,7 +8,6 @@ use App\Entity\Client;
 use App\Factory\UserFactory;
 use App\Tests\Support\MultiTenantTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -24,13 +23,12 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  * Validates the full stack:
  *   Controller → UseCase → DddRepository → Translator → flat persistence
  *
- * Skipped pre-push because functional tests on tenant-scoped flows often
- * need session/CSRF state — see ADR-0003 / CONTRIBUTING for the policy.
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré
+ * — tests passent désormais en pre-push.
  *
  * @see ADR-0008 ACL pattern
  * @see ADR-0009 Controller migration pattern
  */
-#[Group('skip-pre-push')]
 final class ClientControllerDddTest extends WebTestCase
 {
     use Factories;

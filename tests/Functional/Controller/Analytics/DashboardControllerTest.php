@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller\Analytics;
 
 use App\Factory\UserFactory;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * Tests fonctionnels pour le DashboardController Analytics.
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 class DashboardControllerTest extends WebTestCase
 {
     use Factories;

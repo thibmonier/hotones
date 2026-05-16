@@ -9,7 +9,6 @@ use App\Entity\ProjectTask;
 use App\Factory\UserFactory;
 use App\Tests\Support\MultiTenantTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -27,8 +26,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *
  * @see ADR-0009 Controller migration pattern (Phase 4 critères)
  * @see ADR-0008 ACL pattern
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 final class ProjectControllerDddTest extends WebTestCase
 {
     use Factories;

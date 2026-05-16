@@ -17,7 +17,6 @@ use App\Repository\ContributorRepository;
 use App\Security\CompanyContext;
 use App\Tests\Support\MultiTenantTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -34,8 +33,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *
  * @see ADR-0008 ACL pattern
  * @see ADR-0011 Foundation stabilized (no cherry-pick)
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 final class DoctrineDddContributorRepositoryIntegrationTest extends KernelTestCase
 {
     use Factories;

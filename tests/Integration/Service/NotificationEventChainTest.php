@@ -13,7 +13,6 @@ use App\Factory\CompanyFactory;
 use App\Factory\UserFactory;
 use App\Repository\NotificationRepository;
 use App\Tests\Integration\Service\Fixture\StubNotificationEvent;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -27,8 +26,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *
  * Validates the wiring (DI + Symfony EventDispatcher subscriber registration)
  * end-to-end and confirms the notification is queryable by recipient afterwards.
+ *
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
  */
-#[Group('skip-pre-push')]
 final class NotificationEventChainTest extends KernelTestCase
 {
     use Factories;

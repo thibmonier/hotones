@@ -10,13 +10,14 @@ use App\Factory\UserFactory;
 use App\Repository\OnboardingTemplateRepository;
 use App\Repository\ProfileRepository;
 use App\Tests\Support\MultiTenantTestTrait;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[Group('skip-pre-push')]
+/**
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
+ */
 class OnboardingTemplateControllerTest extends WebTestCase
 {
     use Factories;

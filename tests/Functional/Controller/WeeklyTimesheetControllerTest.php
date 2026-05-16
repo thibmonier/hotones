@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller;
 
 use App\Factory\ContributorFactory;
 use App\Factory\UserFactory;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -17,11 +16,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  *
  * Vérifie endpoint `/timesheet/week/{week}` (US-102) + JSON save endpoint.
  *
- * `#[Group('skip-pre-push')]` (sprint-005 OPS-011 pattern) — Functional
- * Symfony tests env brittleness (multi-tenant filters + session). CI
- * exécute full suite.
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré
+ * (test passe désormais en pre-push, env brittleness historique résorbée).
  */
-#[Group('skip-pre-push')]
 final class WeeklyTimesheetControllerTest extends WebTestCase
 {
     use Factories;

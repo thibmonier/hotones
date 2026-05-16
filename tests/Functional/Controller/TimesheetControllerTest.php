@@ -11,12 +11,13 @@ use App\Factory\ProjectTaskFactory;
 use App\Factory\TimesheetFactory;
 use App\Factory\UserFactory;
 use DateTime;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[Group('skip-pre-push')]
+/**
+ * Sprint-026 TEST-FUNCTIONAL-FIXES-003 : marker `skip-pre-push` retiré.
+ */
 class TimesheetControllerTest extends WebTestCase
 {
     use Factories;
