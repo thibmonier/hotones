@@ -43,9 +43,11 @@ final readonly class RevenueForecastCalculator
         // Matérialise une fois — `$records` peut être un Generator non rembobinable.
         $pipeline = [];
         foreach ($records as $record) {
-            if ($record->contributesToForecast()) {
-                $pipeline[] = $record;
+            if (!$record->contributesToForecast()) {
+                continue;
             }
+
+            $pipeline[] = $record;
         }
 
         $forecast30 = $this->sumHorizon($pipeline, self::HORIZON_30_DAYS, $probabilityCoefficient, $now);

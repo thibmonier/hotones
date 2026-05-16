@@ -86,7 +86,7 @@ final readonly class DoctrineBillingLeadTimeReadModelRepository implements Billi
 
         $perClient = [];
         foreach ($records as $record) {
-            $leadTimeDays = ($record->emittedAt->getTimestamp() - $record->signedAt->getTimestamp()) / 86400;
+            $leadTimeDays = ($record->emittedAt->getTimestamp() - $record->signedAt->getTimestamp()) / 86_400;
             $name = $record->clientName;
 
             if (!isset($perClient[$name])) {

@@ -95,7 +95,7 @@ final readonly class DoctrineDsoReadModelRepository implements DsoReadModelRepos
             $name = (string) $row['clientName'];
             $issuedAt = self::toImmutable($row['issuedAt']);
             $paidAt = self::toImmutable($row['paidAt']);
-            $delayDays = ($paidAt->getTimestamp() - $issuedAt->getTimestamp()) / 86400;
+            $delayDays = ($paidAt->getTimestamp() - $issuedAt->getTimestamp()) / 86_400;
             $amountCents = self::eurosToCents((string) $row['amountTtc']);
 
             if (!isset($perClient[$name])) {
