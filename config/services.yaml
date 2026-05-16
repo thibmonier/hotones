@@ -128,6 +128,23 @@ services:
         alias: App\Infrastructure\Project\Persistence\Doctrine\DoctrineMarginAdoptionReadModelRepository
         public: true
 
+    # Portfolio Margin Read-Model Repository (EPIC-003 Phase 5 sprint-026 US-117 T-117-02/03)
+    # public: true tant que pas de consumer downstream (T-117-04 Widget).
+    # T-117-03 caching decorator (cache.kpi 1h TTL) — invalidé event-driven
+    # ProjectMarginRecalculatedEvent + rotation journalière filet sécurité.
+    App\Domain\Project\Repository\PortfolioMarginReadModelRepositoryInterface:
+        alias: App\Infrastructure\Project\Persistence\Doctrine\CachingPortfolioMarginReadModelRepository
+        public: true
+
+    App\Infrastructure\Project\Persistence\Doctrine\CachingPortfolioMarginReadModelRepository:
+        arguments:
+            $inner: '@App\Infrastructure\Project\Persistence\Doctrine\DoctrinePortfolioMarginReadModelRepository'
+            $kpiCache: '@cache.kpi'
+
+    App\Application\Project\EventListener\InvalidatePortfolioMarginCacheOnProjectMarginRecalculated:
+        arguments:
+            $kpiCache: '@cache.kpi'
+
     # T-112-04 Margin adoption red threshold checker (Slack persistent 7j)
     App\Application\Project\Alerting\CheckMarginAdoptionRedThresholdHandler:
         arguments:
@@ -197,6 +214,11 @@ services:
 
     # Conversion Rate Domain Service (sprint-025 US-115 T-115-01) — Domain pure, autowire explicite
     App\Domain\Project\Service\ConversionRateCalculator:
+        autowire: true
+        autoconfigure: true
+
+    # Portfolio Margin Domain Service (sprint-026 US-117 T-117-01) — Domain pure, autowire explicite
+    App\Domain\Project\Service\PortfolioMarginCalculator:
         autowire: true
         autoconfigure: true
 

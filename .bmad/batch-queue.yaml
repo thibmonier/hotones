@@ -2,155 +2,101 @@ execution:
   mode: "sequential"
   resume_on_failure: true
   checkpoint_interval: 1
-  sprint: "sprint-025"
-  reset_at: "2026-05-14T00:00:00Z"
-  reset_reason: "Rebuild sprint-025 — EPIC-003 Phase 5 KPIs (8 pts) + Sub-epic D dette (4 pts). Décomposition 23 tâches via /project:decompose-tasks (PR #275)."
+  sprint: "sprint-026"
+  reset_at: "2026-05-15T17:30:00Z"
+  reset_reason: "Sprint-025 clôturé 12/12 pts. Sprint-026 décomposition prête (19 tâches, 12 pts) — EPIC-003 Phase 5 continuation (US-117 + US-119, 5 pts) + Sub-epic D dette résiduelle (6 pts) + Migration prod (1 pt)."
 
 queue:
-  US-114:
-    title: "KPI Revenue forecast (prévision CA glissante)"
+  US-117:
+    title: "KPI Marge moyenne portefeuille"
     points: 3
     priority: 1
     status: "completed"
-    tasks_done: ["T-114-01", "T-114-02", "T-114-03", "T-114-04", "T-114-05", "T-114-06"]
+    tasks_done: ["T-117-01", "T-117-02", "T-117-03", "T-117-04", "T-117-05", "T-117-06"]
     depends_on: []
     nature: "feature"
     epic: "EPIC-003 Phase 5"
-    branch: "feat/us-114-revenue-forecast"
+    branch: "feat/us-117-portfolio-margin"
     tasks:
-      - id: "T-114-01"
-        title: "Domain Service RevenueForecastCalculator + VO + tests Unit"
+      - id: "T-117-01"
+        title: "Domain Service PortfolioMarginCalculator + VO + tests Unit"
         estimate_hours: 3
-      - id: "T-114-02"
+      - id: "T-117-02"
         title: "Repository read-model port + Doctrine adapter"
         estimate_hours: 2
-      - id: "T-114-03"
-        title: "Cache decorator + subscribers invalidation"
+      - id: "T-117-03"
+        title: "Cache decorator + subscriber ProjectMarginRecalculatedEvent"
         estimate_hours: 2
-      - id: "T-114-04"
+      - id: "T-117-04"
         title: "Widget Twig dashboard + handler CQRS"
         estimate_hours: 2
-      - id: "T-114-05"
-        title: "Alerte Slack seuil rouge forecast"
+      - id: "T-117-05"
+        title: "Alerte Slack seuil rouge marge portefeuille"
         estimate_hours: 1
-      - id: "T-114-06"
-        title: "Tests Integration E2E"
+      - id: "T-117-06"
+        title: "Tests Integration E2E flow"
         estimate_hours: 2
 
-  US-115:
-    title: "KPI Taux de conversion devis → commande"
-    points: 3
+  US-119:
+    title: "Extension drill-down Conversion + Margin"
+    points: 2
     priority: 2
     status: "pending"
-    depends_on: []
+    depends_on: ["US-117"]
     nature: "feature"
     epic: "EPIC-003 Phase 5"
-    branch: "feat/us-115-conversion-rate"
-    tasks:
-      - id: "T-115-01"
-        title: "Domain Service ConversionRateCalculator + tendance + tests Unit"
-        estimate_hours: 3
-      - id: "T-115-02"
-        title: "Repository read-model port + Doctrine adapter"
-        estimate_hours: 2
-      - id: "T-115-03"
-        title: "Cache decorator + subscriber OrderValidatedEvent invalidation"
-        estimate_hours: 2
-      - id: "T-115-04"
-        title: "Widget Twig dashboard + handler CQRS + tendance"
-        estimate_hours: 2
-      - id: "T-115-05"
-        title: "Alerte Slack seuil rouge conversion"
-        estimate_hours: 1
-      - id: "T-115-06"
-        title: "Tests Integration E2E"
-        estimate_hours: 2
+    branch: "feat/us-119-drill-down-conversion-margin"
 
-  MAGO-LINT-BATCH-001:
-    title: "Mago lint cleanup batch initial (100-150 erreurs)"
+  MAGO-LINT-BATCH-002:
+    title: "Cleanup Mago résiduel (200-300 erreurs ciblées)"
     points: 2
     priority: 3
     status: "pending"
     depends_on: []
     nature: "tech-debt"
     epic: "TECH Sub-epic D"
-    branch: "chore/mago-lint-batch-001"
-    tasks:
-      - id: "T-MAGO-01"
-        title: "Audit + catégorisation 626 erreurs Mago"
-        estimate_hours: 1
-      - id: "T-MAGO-02"
-        title: "Cleanup batch initial 100-150 erreurs"
-        estimate_hours: 3
-      - id: "T-MAGO-03"
-        title: "Baseline résiduel + doc CONTRIBUTING.md"
-        estimate_hours: 1
+    branch: "chore/mago-lint-batch-002"
 
-  US-116:
-    title: "Extension widgets DSO/lead time (drill-down + export CSV)"
+  COVERAGE-014:
+    title: "Push coverage 72 → 74 % (services legacy)"
     points: 2
     priority: 4
     status: "pending"
     depends_on: []
-    nature: "feature"
-    epic: "EPIC-003 Phase 5"
-    branch: "feat/us-116-widget-drill-down"
-    tasks:
-      - id: "T-116-01"
-        title: "Étendre read-models DSO + lead time : findAllClientsAggregated"
-        estimate_hours: 2
-      - id: "T-116-02"
-        title: "Controller drill-down + route + voter + vue Twig"
-        estimate_hours: 2
-      - id: "T-116-03"
-        title: "Export CSV (réutilise DriftReportCsvExporter)"
-        estimate_hours: 1.5
-      - id: "T-116-04"
-        title: "Tests Integration drill-down + Functional export CSV"
-        estimate_hours: 1.5
+    nature: "test"
+    epic: "TECH Sub-epic D"
+    branch: "test/coverage-014-push-74"
 
-  VACATION-REPO-AUDIT:
-    title: "Audit Deptrac VacationRepository (CompanyContext hors Repository layer)"
-    points: 1
+  TEST-FUNCTIONAL-FIXES-003:
+    title: "Audit 6 skip-pre-push markers restants"
+    points: 2
     priority: 5
     status: "pending"
     depends_on: []
     nature: "tech-debt"
     epic: "TECH Sub-epic D"
-    branch: "chore/vacation-repo-deptrac-audit"
-    tasks:
-      - id: "T-VACREPO-01"
-        title: "Audit violation Deptrac"
-        estimate_hours: 1
-      - id: "T-VACREPO-02"
-        title: "Correction architecture"
-        estimate_hours: 2
+    branch: "chore/test-functional-fixes-003"
 
-  TEST-COVERAGE-013:
-    title: "Coverage anticipation 70 → 72 %"
+  T-113-07:
+    title: "Dry-run prod migration WorkItem.cost legacy"
     points: 1
     priority: 6
     status: "pending"
     depends_on: []
-    nature: "test"
-    epic: "TECH Sub-epic D"
-    branch: "test/coverage-013-push-72"
-    tasks:
-      - id: "T-COV-01"
-        title: "Identifier zones non couvertes"
-        estimate_hours: 1
-      - id: "T-COV-02"
-        title: "Tests ciblés push 70 → 72 %"
-        estimate_hours: 3
+    nature: "ops"
+    epic: "Migration prod"
+    branch: "ops/t-113-07-dry-run-prod"
 
 checkpoints:
-  last_completed: "US-114"
-  last_task_completed: "T-114-06"
+  last_completed: "US-117"
+  last_task_completed: "T-117-06"
   current_story: null
-  next_story: "US-115"
-  timestamp: "2026-05-15T12:00:00Z"
+  next_story: "US-119"
+  next_task: null
+  timestamp: "2026-05-15T19:30:00Z"
   stories_completed: 1
   stories_failed: 0
   tasks_completed: 6
-  tasks_total: 23
-  branch_completed: "feat/us-114-revenue-forecast"
+  tasks_total: 19
+  branch_current: "feat/us-117-portfolio-margin"
+  branch_completed: "feat/us-117-portfolio-margin"

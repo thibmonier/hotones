@@ -8,6 +8,7 @@ use App\Application\Project\Query\BillingLeadTimeKpi\ComputeBillingLeadTimeKpiHa
 use App\Application\Project\Query\ConversionRateKpi\ComputeConversionRateKpiHandler;
 use App\Application\Project\Query\DsoKpi\ComputeDsoKpiHandler;
 use App\Application\Project\Query\MarginAdoptionKpi\ComputeMarginAdoptionKpiHandler;
+use App\Application\Project\Query\PortfolioMarginKpi\ComputePortfolioMarginKpiHandler;
 use App\Application\Project\Query\RevenueForecastKpi\ComputeRevenueForecastKpiHandler;
 use App\Service\Analytics\BusinessKpiService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * US-110 (sprint-024 EPIC-003 Phase 4) — KPI DSO ajouté (T-110-04).
  * US-111 (sprint-024 EPIC-003 Phase 4) — KPI billing lead time ajouté (T-111-04).
  * US-112 (sprint-024 EPIC-003 Phase 4) — KPI adoption marge ajouté (T-112-03).
+ * US-114 (sprint-025 EPIC-003 Phase 5) — KPI revenue forecast ajouté (T-114-04).
+ * US-115 (sprint-025 EPIC-003 Phase 5) — KPI taux conversion ajouté (T-115-04).
+ * US-117 (sprint-026 EPIC-003 Phase 5) — KPI marge portefeuille ajouté (T-117-04).
  *
  * Cache : BusinessKpiService 5 min (cache.analytics) + DSO/billing lead time 1 h (cache.kpi).
  * Adoption marge calculée à la demande (volume faible).
@@ -36,6 +40,7 @@ final class BusinessDashboardController extends AbstractController
         private readonly ComputeMarginAdoptionKpiHandler $computeMarginAdoptionKpi,
         private readonly ComputeRevenueForecastKpiHandler $computeRevenueForecastKpi,
         private readonly ComputeConversionRateKpiHandler $computeConversionRateKpi,
+        private readonly ComputePortfolioMarginKpiHandler $computePortfolioMarginKpi,
     ) {
     }
 
@@ -49,6 +54,7 @@ final class BusinessDashboardController extends AbstractController
             'margin_adoption' => ($this->computeMarginAdoptionKpi)(),
             'revenue_forecast' => ($this->computeRevenueForecastKpi)(),
             'conversion_rate' => ($this->computeConversionRateKpi)(),
+            'portfolio_margin' => ($this->computePortfolioMarginKpi)(),
         ]);
     }
 }

@@ -1,0 +1,66 @@
+{# US-117 T-117-04 — Portfolio margin widget (marge moyenne pondérée portefeuille actif) #}
+{# Renders avg % + counts above/below target + sans snapshot + warning threshold flag. #}
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        💰 Marge moyenne portefeuille
+                        <small class="text-muted">pondérée par facture totale (projets actifs)</small>
+                    </h5>
+                    {% if portfolio_margin.warningTriggered %}
+                        <span class="badge bg-warning text-dark"
+                              title="Marge moyenne ({{ portfolio_margin.averagePercent|number_format(1, ',', ' ') }} %) sous seuil {{ portfolio_margin.warningThresholdPercent|number_format(0, ',', ' ') }} %">
+                            ⚠ Sous seuil (&lt; {{ portfolio_margin.warningThresholdPercent|number_format(0, ',', ' ') }} %)
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100 {{ portfolio_margin.warningTriggered ? 'border-warning' : '' }}">
+                            <div class="text-muted small">Marge moyenne pondérée</div>
+                            <div class="fs-2 fw-bold">
+                                {{ portfolio_margin.averagePercent|number_format(1, ',', ' ') }} %
+                            </div>
+                            <small class="text-muted">
+                                {{ portfolio_margin.projectsWithSnapshot }} projets avec snapshot
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">≥ Cible ({{ portfolio_margin.targetMarginPercent|number_format(0, ',', ' ') }} %)</div>
+                            <div class="fs-2 fw-bold text-success">{{ portfolio_margin.projectsAboveTarget }}</div>
+                            <small class="text-muted">projets au-dessus seuil cible</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">&lt; Cible ({{ portfolio_margin.targetMarginPercent|number_format(0, ',', ' ') }} %)</div>
+                            <div class="fs-2 fw-bold text-danger">{{ portfolio_margin.projectsBelowTarget }}</div>
+                            <small class="text-muted">projets sous seuil cible</small>
+                        </div>
+                    </div>
+                </div>
+
+                {% if portfolio_margin.projectsWithoutSnapshot > 0 %}
+                    <div class="alert alert-info mt-3 mb-0 py-2 small">
+                        ℹ {{ portfolio_margin.projectsWithoutSnapshot }} projet(s) actif(s) sans snapshot marge —
+                        non comptés dans la moyenne (recalcul via <code>WorkItem</code> enregistré ou <code>Invoice</code> payée).
+                    </div>
+                {% endif %}
+
+                <p class="text-muted small mt-3 mb-0">
+                    Formule : Σ(marge_proj × factureTotal_proj) / Σ(factureTotal_proj) sur projets <code>active</code>
+                    avec snapshot US-107 (<code>coutTotalCents</code> + <code>factureTotalCents</code> + <code>margeCalculatedAt</code>).
+                    Cache 1 h (invalidé sur <code>ProjectMarginRecalculatedEvent</code>).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

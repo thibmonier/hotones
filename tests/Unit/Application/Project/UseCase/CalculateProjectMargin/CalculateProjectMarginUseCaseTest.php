@@ -10,6 +10,7 @@ use App\Domain\Client\ValueObject\ClientId;
 use App\Domain\Contributor\ValueObject\ContributorId;
 use App\Domain\Project\Entity\Project;
 use App\Domain\Project\Event\MarginThresholdExceededEvent;
+use App\Domain\Project\Event\ProjectMarginRecalculatedEvent;
 use App\Domain\Project\Repository\ProjectRepositoryInterface;
 use App\Domain\Project\ValueObject\ProjectId;
 use App\Domain\Project\ValueObject\ProjectType;
@@ -69,9 +70,10 @@ final class CalculateProjectMarginUseCaseTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $eventBus = $this->createMock(MessageBusInterface::class);
-        $eventBus->expects(self::once())
+        // Sprint-026 US-117 T-117-03 : dispatch systématique de
+        // ProjectMarginRecalculatedEvent + MarginThresholdExceededEvent quand sous seuil.
+        $eventBus->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(static::isInstanceOf(MarginThresholdExceededEvent::class))
             ->willReturnCallback(static fn (object $e): Envelope => new Envelope($e));
 
         $useCase = new CalculateProjectMarginUseCase($projectRepo, $workItemRepo, $em, $eventBus, $logger);
@@ -98,7 +100,12 @@ final class CalculateProjectMarginUseCaseTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $eventBus = $this->createMock(MessageBusInterface::class);
-        $eventBus->expects(self::never())->method('dispatch');
+        // Sprint-026 US-117 T-117-03 : ProjectMarginRecalculatedEvent dispatché
+        // systématiquement (1×), pas de MarginThresholdExceededEvent au-dessus du seuil.
+        $eventBus->expects(self::once())
+            ->method('dispatch')
+            ->with(static::isInstanceOf(ProjectMarginRecalculatedEvent::class))
+            ->willReturnCallback(static fn (object $e): Envelope => new Envelope($e));
 
         $useCase = new CalculateProjectMarginUseCase($projectRepo, $workItemRepo, $em, $eventBus, $logger);
 
