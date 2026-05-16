@@ -37,6 +37,21 @@ final readonly class CachingConversionRateReadModelRepository implements Convers
         );
     }
 
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+    {
+        $cacheKey = sprintf(
+            'conversion_rate.clients_aggregated.company_%d.window_%d.day_%s',
+            $this->companyContext->getCurrentCompany()->getId() ?? 0,
+            $windowDays,
+            $now->format('Y-m-d'),
+        );
+
+        return $this->kpiCache->get(
+            $cacheKey,
+            fn (ItemInterface $item): array => $this->inner->findAllClientsAggregated($windowDays, $now),
+        );
+    }
+
     private function buildCacheKey(DateTimeImmutable $now): string
     {
         $companyId = $this->companyContext->getCurrentCompany()->getId() ?? 0;

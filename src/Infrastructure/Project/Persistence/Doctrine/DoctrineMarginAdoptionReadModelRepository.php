@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Infrastructure\Project\Persistence\Doctrine;
 
 use App\Domain\Project\Repository\MarginAdoptionReadModelRepositoryInterface;
+use App\Domain\Project\Service\ClientMarginAdoptionAggregate;
+use App\Domain\Project\Service\MarginAdoptionCalculator;
 use App\Domain\Project\Service\ProjectMarginSnapshotRecord;
+use App\Entity\Client;
 use App\Entity\Project;
 use App\Security\CompanyContext;
 use DateTimeImmutable;
@@ -61,6 +64,78 @@ final readonly class DoctrineMarginAdoptionReadModelRepository implements Margin
             ),
             $rows,
         );
+    }
+
+    public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+    {
+        // windowDays ignoré (adoption = snapshot, pas fenêtre roulante) ;
+        // conservé pour signature cohérente.
+        unset($windowDays);
+
+        $company = $this->companyContext->getCurrentCompany();
+
+        $rows = $this->entityManager->createQueryBuilder()
+            ->select('c.name AS clientName', 'p.margeCalculatedAt')
+            ->from(Project::class, 'p')
+            ->innerJoin(Client::class, 'c', 'WITH', 'c.id = p.client')
+            ->where('p.company = :company')
+            ->andWhere('p.status = :status')
+            ->setParameter('company', $company)
+            ->setParameter('status', 'active')
+            ->getQuery()
+            ->getArrayResult();
+
+        $perClient = [];
+        foreach ($rows as $row) {
+            $name = (string) $row['clientName'];
+            $calculatedAt = $row['margeCalculatedAt'] instanceof DateTimeInterface
+                ? self::toImmutable($row['margeCalculatedAt'])
+                : null;
+
+            if (!isset($perClient[$name])) {
+                $perClient[$name] = ['total' => 0, 'fresh' => 0, 'staleCritical' => 0];
+            }
+
+            ++$perClient[$name]['total'];
+
+            if ($calculatedAt === null) {
+                ++$perClient[$name]['staleCritical'];
+                continue;
+            }
+
+            $age = ($now->getTimestamp() - $calculatedAt->getTimestamp()) / 86400.0;
+
+            if ($age >= MarginAdoptionCalculator::STALE_WARNING_THRESHOLD_DAYS) {
+                ++$perClient[$name]['staleCritical'];
+                continue;
+            }
+
+            if ($age < MarginAdoptionCalculator::FRESH_THRESHOLD_DAYS) {
+                ++$perClient[$name]['fresh'];
+            }
+        }
+
+        $aggregates = [];
+        foreach ($perClient as $name => $stats) {
+            // total >= 1 par construction (entrée créée uniquement si row matchée).
+            $freshPercent = round($stats['fresh'] * 100.0 / $stats['total'], 1);
+
+            $aggregates[] = new ClientMarginAdoptionAggregate(
+                clientName: $name,
+                freshPercent: $freshPercent,
+                totalActive: $stats['total'],
+                freshCount: $stats['fresh'],
+                staleCriticalCount: $stats['staleCritical'],
+            );
+        }
+
+        // Tri par adoption croissante (clients en retard en tête)
+        usort(
+            $aggregates,
+            static fn (ClientMarginAdoptionAggregate $a, ClientMarginAdoptionAggregate $b): int => $a->freshPercent <=> $b->freshPercent,
+        );
+
+        return $aggregates;
     }
 
     private static function toImmutable(DateTimeInterface $date): DateTimeImmutable

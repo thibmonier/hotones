@@ -125,6 +125,11 @@ final class CheckMarginAdoptionRedThresholdHandlerTest extends TestCase
             {
                 return $this->records;
             }
+
+            public function findAllClientsAggregated(int $windowDays, DateTimeImmutable $now): array
+            {
+                return [];
+            }
         };
 
         $kpiHandler = new ComputeMarginAdoptionKpiHandler($repo, new MarginAdoptionCalculator());
